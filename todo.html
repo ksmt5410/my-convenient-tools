@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Todo App</title>
+    <style>
+        /* === デザイン設定（CSS） === */
+        :root {
+            --bg-color: #ffffff;
+            --panel-bg: #f5f5f5;
+            --text-color: #000000;
+            --sub-text: #757575;
+            --border-color: #cbd5e1;
+            --active-color: #1565c0;
+            --active-bg: #e3f2fd;
+
+            /* Java版ボタンカラー */
+            --btn-complete-bg: #c8e6c9;
+            --btn-complete-text: #2e7d32;
+            --btn-edit-bg: #e0f7fa;
+            --btn-edit-text: #00838f;
+            --btn-delete-bg: #ffebee;
+            --btn-delete-text: #c62828;
+            --btn-uncomplete-bg: #ffffff;
+            --btn-uncomplete-text: #424242;
+            --btn-overdue-bg: #ffebee;
+            --btn-overdue-text: #c62828;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1e1e1e;
+            --panel-bg: #2d2d2d;
+            --text-color: #ffffff;
+            --sub-text: #b0bec5;
+            --border-color: #555555;
+            --active-color: #2196f3;
+            --active-bg: #1565c0;
+
+            /* Java版ボタンカラー（ダーク） */
+            --btn-complete-bg: #1b5e20;
+            --btn-complete-text: #a5d6a7;
+            --btn-edit-bg: #006064;
+            --btn-edit-text: #80deea;
+            --btn-delete-bg: #b71c1c;
+            --btn-delete-text: #ef9a9a;
+            --btn-uncomplete-bg: #424242;
+            --btn-uncomplete-text: #e0e0e0;
+            --btn-overdue-bg: #b71c1c;
+            --btn-overdue-text: #ff8a80;
+        }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background 0.2s, color 0.2s;
+            padding-bottom: 90px;
+        }
+
+        header {
+            background-color: var(--panel-bg);
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        @media(min-width: 600px) {
+            header {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+
+        .filters {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: var(--panel-bg);
+            color: var(--text-color);
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: all 0.1s ease;
+        }
+
+        button.active {
+            background-color: var(--active-bg);
+            color: var(--active-color);
+            border-color: var(--active-color);
+        }
+
+        .action-btn {
+            border-radius: 6px;
+            border: 1px solid rgba(0,0,0,0.15);
+        }
+        [data-theme="dark"] .action-btn {
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+
+        input, select, textarea {
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-size: 0.9rem;
+        }
+
+        input[type="color"] {
+            padding: 2px;
+            width: 40px;
+            height: 38px;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+            background: none;
+        }
+
+        .todo-list {
+            padding: 10px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .todo-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+            gap: 10px;
+        }
+
+        .todo-left {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .status-btn {
+            min-width: 70px;
+            padding: 5px 10px;
+            font-size: 0.8rem;
+        }
+
+        .todo-details {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .todo-title {
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        .completed .todo-title {
+            text-decoration: line-through;
+            color: var(--sub-text);
+        }
+
+        /* ★ 新設：タイトルの後ろに置く繰り返し用のスタイル */
+        /* フォントサイズと色を、期限(todo-sub)と同じに設定します */
+        .repeat-title-label {
+            font-size: 0.8rem;
+            color: var(--sub-text);
+            font-weight: normal; /* タイトルの太字を打ち消す */
+            margin-left: 4px;   /* タイトルとの間に少し隙間を空ける */
+        }
+
+        .todo-sub {
+            font-size: 0.8rem;
+            color: var(--sub-text);
+        }
+
+        .overdue {
+            color: #ff6b6b !important;
+            font-weight: bold;
+        }
+
+        .footer-panel {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: var(--panel-bg);
+            padding: 15px 0;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .add-btn {
+            background-color: #fff3e0;
+            color: #e65100;
+            border: 1px solid #ffb74d;
+            font-size: 1rem;
+            padding: 10px 24px;
+            border-radius: 20px;
+        }
+        [data-theme="dark"] .add-btn {
+            background-color: #e65100;
+            color: #ffffff;
+            border: 1px solid #ff8f00;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .modal-content {
+            background: var(--bg-color);
+            padding: 20px;
+            border-radius: 12px;
+            width: 85%;
+            max-width: 380px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="filters">
+            <button id="filterAll" class="active" onclick="setFilter('ALL')">すべて</button>
+            <button id="filterActive" onclick="setFilter('ACTIVE')">未完了</button>
+            <select id="categoryFilter" onchange="renderTodos()">
+                <option value="ALL">すべてのカテゴリ</option>
+            </select>
+            <input type="text" id="searchField" placeholder="検索..." oninput="renderTodos()">
+        </div>
+        <div>
+            <button onclick="toggleDarkMode()">⚙ モード切替</button>
+        </div>
+    </header>
+
+    <div class="todo-list" id="todoList"></div>
+
+    <div class="footer-panel">
+        <button class="add-btn" onclick="openAddModal()">＋ 新しいタスクを追加</button>
+    </div>
+
+    <div class="modal" id="taskModal">
+        <div class="modal-content">
+            <h3 id="modalTitle" style="margin:0 0 5px 0;">新しいタスク</h3>
+            <input type="text" id="taskName" placeholder="タスク名">
+            
+            <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                <input type="color" id="taskColor" value="#00796b" title="カテゴリの色を選択">
+                <input type="text" id="taskCategory" placeholder="カテゴリ名を入力" style="flex: 1; min-width: 120px;" oninput="matchExistingColor()">
+                <select id="taskCategorySelect" onchange="selectExistingCategory()" style="max-width: 130px;">
+                    <option value="">(既存から選ぶ)</option>
+                </select>
+            </div>
+            
+            <input type="date" id="taskDueDate">
+            <select id="taskRepeat">
+                <option value="NONE">繰り返しなし</option>
+                <option value="DAILY">毎日</option>
+                <option value="WEEKLY">毎週</option>
+                <option value="MONTHLY">毎月</option>
+                <option value="MONTH_START">毎月初/営業日</option>
+                <option value="MONTH_END">毎月末/営業日</option>
+                <option value="YEARLY">毎年</option>
+            </select>
+            <textarea id="taskMemo" placeholder="メモ・詳細" rows="3"></textarea>
+            <div style="display:flex; justify-content: flex-end; gap: 10px; margin-top: 5px;">
+                <button onclick="closeModal()">キャンセル</button>
+                <button id="saveBtn" style="background:#2165f2; color:white;">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // === アプリのロジック（JavaScript） ===
+        let todos = [];
+        try {
+            todos = JSON.parse(localStorage.getItem('todos')) || [];
+        } catch (e) {
+            todos = [];
+        }
+        
+        let currentFilter = 'ALL';
+        let isDarkMode = localStorage.getItem('darkMode') === 'true';
+        let editingTodoId = null;
+
+        if (isDarkMode) document.documentElement.setAttribute('data-theme', 'dark');
+
+        function saveToStorage() {
+            localStorage.setItem('todos', JSON.stringify(todos));
+            localStorage.setItem('darkMode', isDarkMode);
+        }
+
+        function toggleDarkMode() {
+            isDarkMode = !isDarkMode;
+            document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+            saveToStorage();
+            renderTodos();
+        }
+
+        function setFilter(filter) {
+            currentFilter = filter;
+            document.getElementById('filterAll').classList.toggle('active', filter === 'ALL');
+            document.getElementById('filterActive').classList.toggle('active', filter === 'ACTIVE');
+            renderTodos();
+        }
+
+        function getUniqueCategories() {
+            return [...new Set(todos.map(t => t.category).filter(c => c && c !== 'なし'))];
+        }
+
+        function updateCategoryDropdowns() {
+            const categories = getUniqueCategories();
+
+            const filterCombo = document.getElementById('categoryFilter');
+            if (filterCombo) {
+                const savedValue = filterCombo.value;
+                filterCombo.innerHTML = '<option value="ALL">すべてのカテゴリ</option>';
+                categories.forEach(cat => {
+                    const opt = document.createElement('option');
+                    opt.value = cat; opt.textContent = cat;
+                    filterCombo.appendChild(opt);
+                });
+                if (savedValue && [...filterCombo.options].some(o => o.value === savedValue)) {
+                    filterCombo.value = savedValue;
+                }
+            }
+
+            const modalCombo = document.getElementById('taskCategorySelect');
+            if (modalCombo) {
+                modalCombo.innerHTML = '<option value="">(既存から選ぶ)</option>';
+                categories.forEach(cat => {
+                    const opt = document.createElement('option');
+                    opt.value = cat; opt.textContent = cat;
+                    modalCombo.appendChild(opt);
+                });
+            }
+        }
+
+        function selectExistingCategory() {
+            const modalCombo = document.getElementById('taskCategorySelect');
+            const selectedValue = modalCombo.value;
+            if (selectedValue) {
+                document.getElementById('taskCategory').value = selectedValue;
+                const found = todos.find(t => t.category === selectedValue && t.categoryColor);
+                if (found) {
+                    document.getElementById('taskColor').value = found.categoryColor;
+                }
+            }
+        }
+
+        function matchExistingColor() {
+            const currentCat = document.getElementById('taskCategory').value.trim();
+            const modalCombo = document.getElementById('taskCategorySelect');
+            if ([...modalCombo.options].some(o => o.value === currentCat)) {
+                modalCombo.value = currentCat;
+            } else {
+                modalCombo.value = "";
+            }
+
+            if (!currentCat || currentCat === 'なし') return;
+            const found = todos.find(t => t.category === currentCat && t.categoryColor);
+            if (found) {
+                document.getElementById('taskColor').value = found.categoryColor;
+            }
+        }
+
+        function getBusinessDayOfMonth(year, month, type) {
+            let date;
+            if (type === 'START') {
+                date = new Date(year, month, 1);
+                while (date.getDay() === 0 || date.getDay() === 6) { date.setDate(date.getDate() + 1); }
+            } else {
+                date = new Date(year, month + 1, 0);
+                while (date.getDay() === 0 || date.getDay() === 6) { date.setDate(date.getDate() - 1); }
+            }
+            return date.toISOString().split('T')[0];
+        }
+
+        function formatDueDateWithCountdown(dueDateStr, isCompleted) {
+            if (!dueDateStr) return { dateText: 'なし', countdownText: '', isOverdue: false };
+
+            const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
+            const dateParts = dueDateStr.split('-'); 
+            const dateObj = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
+            
+            const month = parseInt(dateParts[1], 10);
+            const day = parseInt(dateParts[2], 10);
+            const monthDay = `${month}/${day}`;
+            
+            const dayOfWeek = weekdays[dateObj.getDay()];       
+            const dateText = `${monthDay} (${dayOfWeek})`;      
+
+            const now = new Date();
+            const todayZero = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+            const targetZero = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate()).getTime();
+
+            const diffDays = Math.round((targetZero - todayZero) / (1000 * 60 * 60 * 24));
+
+            let countdownText = '';
+            let isOverdue = false;
+
+            if (isCompleted) {
+                countdownText = '';
+            } else if (diffDays === 0) {
+                countdownText = ' 【今日が期限！】';
+            } else if (diffDays < 0) {
+                countdownText = ` 【${Math.abs(diffDays)}日超過！】`;
+                isOverdue = true;
+            } else {
+                countdownText = ` 【あと${diffDays}日】`;
+            }
+
+            return { dateText, countdownText, isOverdue };
+        }
+
+        function renderTodos() {
+            const listContainer = document.getElementById('todoList');
+            if (!listContainer) return;
+            listContainer.innerHTML = '';
+            updateCategoryDropdowns();
+
+            const searchText = document.getElementById('searchField').value.toLowerCase().trim();
+            const selectedCat = document.getElementById('categoryFilter').value;
+
+            const filtered = todos.filter(todo => {
+                if (currentFilter === 'ACTIVE' && todo.isCompleted) return false;
+                if (selectedCat !== 'ALL' && todo.category !== selectedCat) return false;
+                if (searchText && !todo.name.toLowerCase().includes(searchText) && !(todo.category && todo.category.toLowerCase().includes(searchText))) return false;
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                listContainer.innerHTML = '<div style="text-align:center; color:gray; padding:35px 20px; font-size:0.9rem;">（該当するタスクはありません）</div>';
+                return;
+            }
+
+            filtered.sort((a, b) => {
+                if (!a.dueDate && !b.dueDate) return a.createdAt - b.createdAt;
+                if (!a.dueDate) return 1;
+                if (!b.dueDate) return -1;
+                return a.dueDate.localeCompare(b.dueDate);
+            });
+
+            filtered.forEach(todo => {
+                const item = document.createElement('div');
+                item.className = `todo-item ${todo.isCompleted ? 'completed' : ''}`;
+
+                const dateInfo = formatDueDateWithCountdown(todo.dueDate, todo.isCompleted);
+                
+                let repeatLabel = '';
+                if (todo.repeatType === 'DAILY') repeatLabel = ' [毎日]';
+                if (todo.repeatType === 'WEEKLY') repeatLabel = ' [毎週]';
+                if (todo.repeatType === 'MONTHLY') repeatLabel = ' [毎月]';
+                if (todo.repeatType === 'MONTH_START') repeatLabel = ' [毎月初/営業日]';
+                if (todo.repeatType === 'MONTH_END') repeatLabel = ' [毎月末/営業日]';
+                if (todo.repeatType === 'YEARLY') repeatLabel = ' [毎年]';
+
+                const catColor = todo.categoryColor || '#00796b';
+
+                let statusBtnStyle = '';
+                if (todo.isCompleted) {
+                    statusBtnStyle = 'background-color: var(--btn-complete-bg); color: var(--btn-complete-text);';
+                } else if (dateInfo.isOverdue) {
+                    statusBtnStyle = 'background-color: var(--btn-overdue-bg); color: var(--btn-overdue-text); font-weight: bold;';
+                } else {
+                    statusBtnStyle = 'background-color: var(--btn-uncomplete-bg); color: var(--btn-uncomplete-text);';
+                }
+
+                item.innerHTML = `
+                    <div class="todo-left">
+                        <button class="status-btn action-btn" style="${statusBtnStyle}" onclick="toggleComplete('${todo.id}')">
+                            ${todo.isCompleted ? '完了済' : '未完了'}
+                        </button>
+                        <div class="todo-details">
+                            <span class="todo-title">
+                                ${todo.category && todo.category !== 'なし' ? `<span style="color:${catColor}; font-weight:bold;">[${todo.category}]</span> ` : ''}${todo.name}${repeatLabel ? `<span class="repeat-title-label">${repeatLabel}</span>` : ''}
+                            </span>
+                            <span class="todo-sub ${dateInfo.isOverdue ? 'overdue' : ''}">
+                                期限: ${dateInfo.dateText}<span style="font-weight:bold;">${dateInfo.countdownText}</span>
+                            </span>
+                            ${todo.memo ? `<span class="todo-sub" style="color: #00796b; white-space: pre-wrap;">${todo.memo}</span>` : ''}
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:5px;">
+                        <button class="action-btn" style="background-color: var(--btn-edit-bg); color: var(--btn-edit-text);" onclick="openEditModal('${todo.id}')">編集</button>
+                        <button class="action-btn" style="background-color: var(--btn-delete-bg); color: var(--btn-delete-text);" onclick="deleteTodo('${todo.id}')">削除</button>
+                    </div>
+                `;
+                listContainer.appendChild(item);
+            });
+        }
+
+        function toggleComplete(id) {
+            const todo = todos.find(t => t.id === id);
+            if (todo) {
+                todo.isCompleted = !todo.isCompleted;
+                
+                if (todo.isCompleted && todo.repeatType && todo.repeatType !== 'NONE' && !todo.isRepeatGenerated) {
+                    let baseDate = todo.dueDate ? new Date(todo.dueDate) : new Date();
+                    let nextDateStr = '';
+
+                    if (todo.repeatType === 'DAILY') {
+                        baseDate.setDate(baseDate.getDate() + 1);
+                        nextDateStr = baseDate.toISOString().split('T')[0];
+                    } else if (todo.repeatType === 'WEEKLY') {
+                        baseDate.setDate(baseDate.getDate() + 7);
+                        nextDateStr = baseDate.toISOString().split('T')[0];
+                    } else if (todo.repeatType === 'MONTHLY') {
+                        baseDate.setMonth(baseDate.getMonth() + 1);
+                        nextDateStr = baseDate.toISOString().split('T')[0];
+                    } else if (todo.repeatType === 'MONTH_START') {
+                        baseDate.setMonth(baseDate.getMonth() + 1);
+                        nextDateStr = getBusinessDayOfMonth(baseDate.getFullYear(), baseDate.getMonth(), 'START');
+                    } else if (todo.repeatType === 'MONTH_END') {
+                        baseDate.setMonth(baseDate.getMonth() + 1);
+                        nextDateStr = getBusinessDayOfMonth(baseDate.getFullYear(), baseDate.getMonth(), 'END');
+                    } else if (todo.repeatType === 'YEARLY') {
+                        baseDate.setFullYear(baseDate.getFullYear() + 1);
+                        nextDateStr = baseDate.toISOString().split('T')[0];
+                    }
+                    
+                    if (nextDateStr) {
+                        todos.push({
+                            id: Date.now().toString() + Math.random().toString(36).substr(2, 4),
+                            name: todo.name,
+                            category: todo.category,
+                            categoryColor: todo.categoryColor || '#00796b',
+                            dueDate: nextDateStr,
+                            repeatType: todo.repeatType,
+                            memo: todo.memo,
+                            isCompleted: false,
+                            isRepeatGenerated: false,
+                            createdAt: Date.now()
+                        });
+                        todo.isRepeatGenerated = true;
+                    }
+                }
+                saveToStorage();
+                renderTodos();
+            }
+        }
+
+        function openAddModal() {
+            editingTodoId = null;
+            document.getElementById('modalTitle').textContent = '新しいタスク';
+            document.getElementById('taskName').value = '';
+            document.getElementById('taskCategory').value = '';
+            document.getElementById('taskCategorySelect').value = '';
+            document.getElementById('taskColor').value = isDarkMode ? '#80cbc4' : '#00796b';
+            document.getElementById('taskDueDate').value = '';
+            document.getElementById('taskRepeat').value = 'NONE';
+            document.getElementById('taskMemo').value = '';
+            document.getElementById('saveBtn').onclick = saveTodo;
+            
+            updateCategoryDropdowns();
+            document.getElementById('taskModal').style.display = 'flex';
+        }
+
+        function openEditModal(id) {
+            editingTodoId = id;
+            const todo = todos.find(t => t.id === id);
+            if (!todo) return;
+            
+            document.getElementById('modalTitle').textContent = 'タスクの編集';
+            document.getElementById('taskName').value = todo.name;
+            document.getElementById('taskCategory').value = todo.category || '';
+            document.getElementById('taskColor').value = todo.categoryColor || '#00796b';
+            document.getElementById('taskDueDate').value = todo.dueDate || '';
+            document.getElementById('taskRepeat').value = todo.repeatType || 'NONE';
+            document.getElementById('taskMemo').value = todo.memo || '';
+            document.getElementById('saveBtn').onclick = saveTodo;
+            
+            updateCategoryDropdowns();
+            document.getElementById('taskCategorySelect').value = todo.category || '';
+            document.getElementById('taskModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('taskModal').style.display = 'none';
+        }
+
+        function saveTodo() {
+            const name = document.getElementById('taskName').value.trim();
+            if (!name) { alert('タスク名を入力してください'); return; }
+
+            const category = document.getElementById('taskCategory').value.trim() || 'なし';
+            const categoryColor = document.getElementById('taskColor').value;
+            const dueDate = document.getElementById('taskDueDate').value || null;
+            const repeatType = document.getElementById('taskRepeat').value;
+            const memo = document.getElementById('taskMemo').value.trim();
+
+            if (editingTodoId) {
+                const todo = todos.find(t => t.id === editingTodoId);
+                if (todo) {
+                    todo.name = name; 
+                    todo.category = category; 
+                    todo.categoryColor = categoryColor;
+                    todo.dueDate = dueDate; 
+                    todo.repeatType = repeatType; 
+                    todo.memo = memo;
+                    
+                    if (category !== 'なし') {
+                        todos.forEach(t => {
+                            if (t.category === category) t.categoryColor = categoryColor;
+                        });
+                    }
+                }
+            } else {
+                todos.push({
+                    id: Date.now().toString(),
+                    name, category, categoryColor, dueDate, repeatType, memo,
+                    isCompleted: false, isRepeatGenerated: false, createdAt: Date.now()
+                });
+                
+                if (category !== 'なし') {
+                    todos.forEach(t => {
+                        if (t.category === category) t.categoryColor = categoryColor;
+                    });
+                }
+            }
+            saveToStorage();
+            closeModal();
+            renderTodos();
+        }
+
+        function deleteTodo(id) {
+            if(confirm('このタスクを削除しますか？')) {
+                todos = todos.filter(t => t.id !== id);
+                saveToStorage();
+                renderTodos();
+            }
+        }
+
+        renderTodos();
+    </script>
+</body>
+</html>

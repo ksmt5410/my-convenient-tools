@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文字数カウンター</title>
+    <style>
+        :root { --bg-color: #ffffff; --panel-bg: #f5f5f5; --text-color: #000000; --border-color: #cbd5e1; --active-color: #1565c0; --active-bg: #e3f2fd; }
+        [data-theme="dark"] { --bg-color: #1e1e1e; --panel-bg: #2d2d2d; --text-color: #ffffff; --border-color: #555555; --active-color: #2196f3; --active-bg: #1565c0; }
+        body { margin: 0; font-family: sans-serif; background-color: var(--bg-color); color: var(--text-color); transition: background 0.2s; }
+        header { background-color: var(--panel-bg); padding: 12px; display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); }
+        .container { max-width: 600px; margin: 20px auto; padding: 0 15px; }
+        textarea { width: 100%; height: 200px; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color); color: var(--text-color); font-size: 1rem; box-sizing: border-box; }
+        .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .result-box { background: var(--panel-bg); padding: 15px; border-radius: 8px; text-align: center; }
+        .count-val { font-size: 1.5rem; font-weight: bold; color: var(--active-color); display: block; }
+        .btn-group { margin: 10px 0; display: flex; gap: 10px; }
+        button { padding: 8px 16px; border-radius: 6px; border: 1px solid var(--border-color); cursor: pointer; background: var(--panel-bg); color: var(--text-color); }
+        .sns-box { margin-top: 15px; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.9rem; line-height: 1.6; }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" style="text-decoration:none; color:var(--text-color);">← 戻る</a>
+    <strong>ツール：文字数カウンター</strong>
+    <button onclick="toggleDarkMode()">⚙</button>
+</header>
+
+<div class="container">
+    <textarea id="textInput" placeholder="ここに文章を入力..." oninput="updateCounter()"></textarea>
+    <div class="btn-group">
+        <button onclick="clearText()">クリア</button>
+        <button onclick="copyText()">結果をコピー</button>
+    </div>
+    <div class="result-grid">
+        <div class="result-box">文字数(空白込) <span id="charCount" class="count-val">0</span></div>
+        <div class="result-box">文字数(空白除) <span id="noSpaceCount" class="count-val">0</span></div>
+    </div>
+    <div class="sns-box" id="infoBox">
+        読み上げ時間: 約 0 分<br>
+        Twitter: 140文字まであと 140 文字<br>
+        Instagram: 2200文字まであと 2200 文字
+    </div>
+</div>
+
+<script>
+    let isDarkMode = localStorage.getItem('darkMode') === 'true';
+    if (isDarkMode) document.documentElement.setAttribute('data-theme', 'dark');
+    function toggleDarkMode() {
+        isDarkMode = !isDarkMode;
+        document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+        localStorage.setItem('darkMode', isDarkMode);
+    }
+    function updateCounter() {
+        const text = document.getElementById('textInput').value;
+        const len = text.length;
+        document.getElementById('charCount').textContent = len;
+        document.getElementById('noSpaceCount').textContent = text.replace(/\s/g, '').length;
+        const time = Math.ceil(len / 400);
+        document.getElementById('infoBox').innerHTML = `
+            読み上げ時間: 約 ${time} 分<br>
+            Twitter: 140文字まであと ${Math.max(0, 140 - len)} 文字${len > 140 ? ' <span style="color:red;">(超!)</span>' : ''}<br>
+            Instagram: 2200文字まであと ${Math.max(0, 2200 - len)} 文字${len > 2200 ? ' <span style="color:red;">(超!)</span>' : ''}
+        `;
+    }
+    function clearText() { if(confirm('消去しますか？')) { document.getElementById('textInput').value = ''; updateCounter(); } }
+    function copyText() { navigator.clipboard.writeText(document.getElementById('textInput').value).then(() => alert('コピーしました！')); }
+</script>
+</body>
+</html>
