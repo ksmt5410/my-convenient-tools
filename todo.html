@@ -1,103 +1,141 @@
 <!DOCTYPE html>
+
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Todo App</title>
+    
     <style>
-        /* === デザイン設定（CSS） === */
+        /* 通常モード（ライトモード）の色を設定する変数（パーツの色置き場） */
         :root {
-            --bg-color: #ffffff;
-            --panel-bg: #f5f5f5;
-            --text-color: #000000;
-            --sub-text: #757575;
-            --border-color: #cbd5e1;
-            --active-color: #1565c0;
-            --active-bg: #e3f2fd;
+            --bg-color: #ffffff;        /* 画面全体の背景色（白） */
+            --panel-bg: #f5f5f5;        /* ヘッダーやパネルの背景色（薄いグレー） */
+            --text-color: #000000;      /* 文字の色（黒） */
+            --sub-text: #757575;        /* 期限などの補足文字の色（グレー） */
+            --border-color: #cbd5e1;    /* 枠線の色（薄いグレー） */
+            --active-color: #1565c0;    /* 選択中の文字などのメインカラー（青） */
+            --active-bg: #e3f2fd;       /* 選択中のボタンの背景色（薄い青） */
 
-            /* Java版ボタンカラー */
-            --btn-complete-bg: #c8e6c9;
-            --btn-complete-text: #2e7d32;
-            --btn-edit-bg: #e0f7fa;
-            --btn-edit-text: #00838f;
-            --btn-delete-bg: #ffebee;
-            --btn-delete-text: #c62828;
-            --btn-uncomplete-bg: #ffffff;
-            --btn-uncomplete-text: #424242;
-            --btn-overdue-bg: #ffebee;
-            --btn-overdue-text: #c62828;
+            /* 各種操作ボタンの色 */
+            --btn-complete-bg: #c8e6c9;   /* 完了済ボタンの背景（薄い緑） */
+            --btn-complete-text: #2e7d32; /* 完了済ボタンの文字（濃い緑） */
+            --btn-edit-bg: #e0f7fa;       /* 編集ボタンの背景（薄い水色） */
+            --btn-edit-text: #00838f;     /* 編集ボタンの文字（濃い青緑） */
+            --btn-delete-bg: #ffebee;     /* 削除ボタンの背景（薄い赤） */
+            --btn-delete-text: #c62828;   /* 削除ボタンの文字（濃い赤） */
+            --btn-uncomplete-bg: #ffffff; /* 未完了ボタンの背景（白） */
+            --btn-uncomplete-text: #424242;/* 未完了ボタンの文字（濃いグレー） */
+            --btn-overdue-bg: #ffebee;     /* 期限超過ボタンの背景（薄い赤） */
+            --btn-overdue-text: #c62828;   /* 期限超過ボタンの文字（濃い赤） */
         }
 
+        /* ダークモードに切り替わったときの色（変数の上書き） */
         [data-theme="dark"] {
-            --bg-color: #1e1e1e;
-            --panel-bg: #2d2d2d;
-            --text-color: #ffffff;
-            --sub-text: #b0bec5;
-            --border-color: #555555;
-            --active-color: #2196f3;
-            --active-bg: #1565c0;
+            --bg-color: #1e1e1e;        /* 画面全体の背景色（濃いグレー） */
+            --panel-bg: #2d2d2d;        /* ヘッダーやパネルの背景色（少し明るいグレー） */
+            --text-color: #ffffff;      /* 文字の色（白） */
+            --sub-text: #b0bec5;        /* 期限などの補足文字の色（明るいグレー） */
+            --border-color: #555555;    /* 枠線の色（濃いグレー） */
+            --active-color: #2196f3;    /* メインカラー（明るい青） */
+            --active-bg: #1565c0;       /* 選択中のボタンの背景色（濃い青） */
 
-            /* Java版ボタンカラー（ダーク） */
-            --btn-complete-bg: #1b5e20;
-            --btn-complete-text: #a5d6a7;
-            --btn-edit-bg: #006064;
-            --btn-edit-text: #80deea;
-            --btn-delete-bg: #b71c1c;
-            --btn-delete-text: #ef9a9a;
-            --btn-uncomplete-bg: #424242;
-            --btn-uncomplete-text: #e0e0e0;
-            --btn-overdue-bg: #b71c1c;
-            --btn-overdue-text: #ff8a80;
+            /* 各種操作ボタンの色（ダークモード用） */
+            --btn-complete-bg: #1b5e20;   /* 完了済ボタンの背景（濃い緑） */
+            --btn-complete-text: #a5d6a7; /* 完了済ボタンの文字（薄い緑） */
+            --btn-edit-bg: #006064;       /* 編集ボタンの背景（濃い青緑） */
+            --btn-edit-text: #80deea;     /* 編集ボタンの文字（薄い水色） */
+            --btn-delete-bg: #b71c1c;     /* 削除ボタンの背景（濃い赤） */
+            --btn-delete-text: #ef9a9a;   /* 削除ボタンの文字（薄い赤） */
+            --btn-uncomplete-bg: #424242; /* 未完了ボタンの背景（グレー） */
+            --btn-uncomplete-text: #e0e0e0;/* 未完了ボタンの文字（白に近いグレー） */
+            --btn-overdue-bg: #b71c1c;     /* 期限超過ボタンの背景（濃い赤） */
+            --btn-overdue-text: #ff8a80;   /* 期限超過ボタンの文字（明るい赤） */
         }
 
+        /* 画面全体の文字の種類や余白の設定 */
         body {
             margin: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
-            transition: background 0.2s, color 0.2s;
-            padding-bottom: 90px;
+            transition: background 0.2s, color 0.2s; /* 背景色が変わるときにふわっと変化させる */
+            padding-bottom: 90px; /* 一番下の「追加ボタン」と被らないように下に余白を作る */
         }
 
+        /* ヘッダー全体のデザイン（基本は縦並び構成） */
         header {
             background-color: var(--panel-bg);
             padding: 12px;
             border-bottom: 1px solid var(--border-color);
             display: flex;
-            flex-direction: column;
-            gap: 10px;
+            flex-direction: column; /* 要素を縦に並べる（1段目と2段目を作る） */
+            gap: 12px; /* 1段目と2段目の間の隙間 */
         }
 
-        /* ヘッダーの中のモード切替ボタンだけを、可愛いアイコン風にする */
+        /* 【1段目】🏠とタイトルのグループ、および⚙️を横並びにする設定 */
+        .header-top {
+            display: flex;
+            justify-content: space-between; /* 左端と右端にパッと離して配置 */
+            align-items: center;            /* 縦の真ん中で高さを揃える */
+            width: 100%;
+        }
+
+        /* ヘッダーの中にあるモード切替ボタンだけをアイコン風にする設定 */
         header button {
-            background: transparent !important; /* 背景を透明に */
+            background: transparent !important; /* 背景を透明にする */
             border: none !important;             /* 枠線を消す */
             font-size: 1.5rem !important;        /* 🏠と同じサイズにする */
             box-shadow: none !important;         /* 影を消す */
-            padding: 0 !important;               /* 余白をリセット */
-            cursor: pointer;
+            padding: 0 !important;               /* ボタンの内側の余白をゼロにする */
+            cursor: pointer;                     /* マウスが乗ったときに指マークにする */
         }
 
-        /* マウスが乗ったときのアニメーション（これもおそろい！） */
-        header button:hover {
-            transform: translateY(-2px);
+        /* フィルターや検索欄が集まるグループ（2段目） */
+        .filters {
+            display: flex;
+            gap: 8px;              /* ボタン同士の隙間 */
+            align-items: center;   /* 縦の真ん中で高さを揃える */
+            flex-wrap: wrap;       /* スマホなどの狭い画面で入り切らない場合は綺麗に折り返す */
+            justify-content: center; /* スマホ時は中央寄せにする */
         }
 
+        /* 💻 パソコン（画面の横幅が600ピクセル以上）のときだけの特別ルール */
         @media(min-width: 600px) {
             header {
-                flex-direction: row;
-                justify-content: space-between;
+                flex-direction: row;            /* 縦並びから「1行の横並び」に変える */
+                justify-content: space-between; /* 左右の端に要素を広げる */
                 align-items: center;
+                gap: 20px;
+                /* 👇 ★これを入れることで、⚙️ボタンがヘッダーの外に飛び出すのを絶対に防ぎます */
+                position: relative;
+            }
+            .header-top {
+                width: auto;                    /* スマホ用の横幅100%を解除 */
+                display: flex;
+                align-items: center;
+                flex: 0 0 auto;
+            }
+            
+            /* 👇 パソコンのときだけ、⚙️ボタンをヘッダー内の右端にピン留めします */
+            header > .header-top > button {
+                position: absolute;
+                right: 20px;       /* ヘッダーの右端から20ピクセルの内側に配置 */
+                top: 50%;          /* 上から50%の位置へ */
+                transform: translateY(-50%); /* 縦のピッタリ真ん中に合わせる */
+            }
+
+            /* フィルターと検索バーのグループ（真ん中エリア） */
+            .filters {
+                flex: 1;                        /* 空いている真ん中のスペースを広げる */
+                justify-content: flex-start;    /* 左寄せにする */
+                margin-left: 15px;              /* タイトルとの間の隙間 */
+                padding-right: 40px;            /* 右端の⚙️ボタンと重ならないように余白を作る */
             }
         }
 
-        .filters {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
+        /* アプリ内の通常のボタン共通設定 */
         button {
             padding: 6px 12px;
             border-radius: 8px;
@@ -105,18 +143,18 @@
             background-color: var(--panel-bg);
             color: var(--text-color);
             cursor: pointer;
-            font-weight: bold;
             font-size: 1rem;
-            transition: all 0.1s ease;
-            font-weight: normal !important;
+            font-weight: normal !important; /* 太字を解除して普通にする */
         }
 
+        /* 現在選ばれているフィルターボタン（すべて、未完了）を強調する設定 */
         button.active {
             background-color: var(--active-bg);
             color: var(--active-color);
             border-color: var(--active-color);
         }
 
+        /* 各タスク内の操作ボタン（編集・削除など）の枠線調整 */
         .action-btn {
             border-radius: 6px;
             border: 1px solid rgba(0,0,0,0.15);
@@ -125,6 +163,7 @@
             border: 1px solid rgba(255,255,255,0.15);
         }
 
+        /* 入力欄、セレクトボックス、メモ欄の共通デザイン */
         input, select, textarea {
             padding: 8px;
             border-radius: 6px;
@@ -134,6 +173,7 @@
             font-size: 0.9rem;
         }
 
+        /* カラー選択ボタンの特殊な形を調整 */
         input[type="color"] {
             padding: 2px;
             width: 40px;
@@ -143,68 +183,77 @@
             background: none;
         }
 
+        /* タスクを並べるエリア（外枠） */
         .todo-list {
             padding: 10px;
             max-width: 600px;
-            margin: 0 auto;
+            margin: 0 auto; /* 画面の中央に配置する */
         }
 
+        /* 追加されたタスク1つ1つの横長のボックス */
         .todo-item {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            justify-content: space-between; /* 左側のテキストと、右側の編集・削除ボタンを端に離す */
+            align-items: center;            /* 縦の真ん中で揃える */
             padding: 12px;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color); /* 下側に区切り線を引く */
             gap: 10px;
         }
 
+        /* タスク内の左側（ステータスボタンとテキスト情報）のグループ */
         .todo-left {
             display: flex;
-            align-items: flex-start;
+            align-items: flex-start; /* 上側の位置で揃える */
             gap: 10px;
         }
 
+        /* 「未完了/完了済」を表すステータスボタン */
         .status-btn {
             min-width: 70px;
             padding: 5px 10px;
             font-size: 0.8rem;
         }
 
+        /* タスク名、期限、メモを縦に並べるグループ */
         .todo-details {
             display: flex;
             flex-direction: column;
             gap: 2px;
         }
 
+        /* タスクの名前のテキスト */
         .todo-title {
             font-size: 1rem;
             font-weight: bold;
         }
 
+        /* 完了チェックがついたタスクの文字を薄くして、真ん中に横線を引く */
         .completed .todo-title {
             text-decoration: line-through;
             color: var(--sub-text);
         }
 
-        /* ★ 新設：タイトルの後ろに置く繰り返し用のスタイル */
-        /* フォントサイズと色を、期限(todo-sub)と同じに設定します */
+        /* タイトルの後ろに置く繰り返し設定用のラベル */
         .repeat-title-label {
             font-size: 0.8rem;
             color: var(--sub-text);
-            font-weight: normal; /* タイトルの太字を打ち消す */
-            margin-left: 4px;   /* タイトルとの間に少し隙間を空ける */
+            font-weight: normal; /* 太字を打ち消す */
+            margin-left: 4px;   /* 少し隙間を開ける */
         }
 
+        /* 期限などの補足テキスト */
         .todo-sub {
             font-size: 0.8rem;
             color: var(--sub-text);
         }
 
+        /* 期限が過ぎてしまっている（超過）ときの赤い文字設定 */
         .overdue {
             color: #ff6b6b !important;
             font-weight: bold;
         }
 
+        /* 画面の一番下に固定される「追加ボタン」用のパネル */
         .footer-panel {
             position: fixed;
             bottom: 0;
@@ -215,13 +264,14 @@
             border-top: 1px solid var(--border-color);
         }
 
+        /* 「＋ 新しいタスクを追加」ボタンのデザイン */
         .add-btn {
             background-color: #fff3e0;
             color: #e65100;
             border: 1px solid #ffb74d;
             font-size: 1rem;
             padding: 10px 24px;
-            border-radius: 20px;
+            border-radius: 20px; /* 丸みのあるカプセル型にする */
         }
         [data-theme="dark"] .add-btn {
             background-color: #e65100;
@@ -229,16 +279,18 @@
             border: 1px solid #ff8f00;
         }
 
+        /* 入力画面（ポップアップ）の後ろの暗い背景 */
         .modal {
-            display: none;
+            display: none; /* 最初は画面から隠しておく */
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            justify-content: center;
+            background: rgba(0,0,0,0.5); /* 黒を50%透明にする */
+            justify-content: center; /* 真ん中に寄せる */
             align-items: center;
-            z-index: 100;
+            z-index: 100; /* 他のパーツより手前に表示するおまじない */
         }
 
+        /* 入力画面（ポップアップ）の四角い白いボックス */
         .modal-content {
             background: var(--bg-color);
             padding: 20px;
@@ -249,15 +301,16 @@
             flex-direction: column;
             gap: 12px;
         }
-        /* ★ すべてのボタンにふわっと浮き上がるアニメーションを適用 */
+
+        /* すべてのボタンにふわっと浮き上がるアニメーションを適用 */
         button, .action-btn, .status-btn, .add-btn {
             transition: all 0.2s ease !important;
         }
 
-        /* ★ マウスが乗ったときに少し上に浮き上がらせる */
+        /* マウスがボタンの上に乗ったとき（hover）の立体的な動き */
         button:hover, .action-btn:hover, .status-btn:hover, .add-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transform: translateY(-2px); /* 上に2ピクセルだけ浮かせる */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* 下に柔らかい影をつける */
             opacity: 0.9;
         }
     </style>
@@ -265,20 +318,21 @@
 <body>
 
     <header>
-        <div style="display: flex; align-items: center; gap: 15px;">
-            <a href="index.html" style="text-decoration: none; font-size: 1.5rem; color: var(--text-color); line-height: 1;" title="トップページに戻る">🏠</a>
-            
-            <div class="filters">
-                <button id="filterAll" class="active" onclick="setFilter('ALL')">すべて</button>
-                <button id="filterActive" onclick="setFilter('ACTIVE')">未完了</button>
-                <select id="categoryFilter" onchange="renderTodos()">
-                    <option value="ALL">すべてのカテゴリ</option>
-                </select>
-                <input type="text" id="searchField" placeholder="検索..." oninput="renderTodos()">
+        <div class="header-top">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <a href="index.html" style="text-decoration: none; font-size: 1.5rem; color: var(--text-color); line-height: 1;" title="トップページに戻る">🏠</a>
+                <strong>My Todo App</strong>
             </div>
-        </div>
-        <div>
             <button onclick="toggleDarkMode()">⚙️</button>
+        </div>
+        
+        <div class="filters">
+            <button id="filterAll" class="active" onclick="setFilter('ALL')">すべて</button>
+            <button id="filterActive" onclick="setFilter('ACTIVE')">未完了</button>
+            <select id="categoryFilter" onchange="renderTodos()">
+                <option value="ALL">すべてのカテゴリ</option>
+            </select>
+            <input type="text" id="searchField" placeholder="検索..." oninput="renderTodos()">
         </div>
     </header>
 
@@ -312,6 +366,7 @@
                 <option value="YEARLY">毎年</option>
             </select>
             <textarea id="taskMemo" placeholder="メモ・詳細" rows="3"></textarea>
+            
             <div style="display:flex; justify-content: flex-end; gap: 10px; margin-top: 5px;">
                 <button onclick="closeModal()">キャンセル</button>
                 <button id="saveBtn" style="background:#2165f2; color:white;">保存</button>
@@ -320,7 +375,7 @@
     </div>
 
     <script>
-        // === アプリのロジック（JavaScript） ===
+        // ブラウザの記憶（ローカルストレージ）から過去に保存したタスクを読み込む（無い場合は空っぽのリスト []）
         let todos = [];
         try {
             todos = JSON.parse(localStorage.getItem('todos')) || [];
@@ -328,38 +383,46 @@
             todos = [];
         }
         
-        let currentFilter = 'ALL';
-        let isDarkMode = localStorage.getItem('darkMode') === 'true';
-        let editingTodoId = null;
+        let currentFilter = 'ALL'; // 現在選ばれているフィルターの状態（最初はすべて表示）
+        let isDarkMode = localStorage.getItem('darkMode') === 'true'; // ダークモードの設定を読み込む
+        let editingTodoId = null; // 現在どのタスクを編集しているかを覚えておくための変数（追加時はnull）
 
+        // もし前回ダークモードにしていたら、画面を開いた瞬間にその見た目にする
         if (isDarkMode) document.documentElement.setAttribute('data-theme', 'dark');
 
+        // タスクデータとダークモードの設定をブラウザの記憶（ローカルストレージ）に保存する共通命令
         function saveToStorage() {
             localStorage.setItem('todos', JSON.stringify(todos));
             localStorage.setItem('darkMode', isDarkMode);
         }
 
+        // ⚙️ボタン用のダークモード切り替え命令
         function toggleDarkMode() {
-            isDarkMode = !isDarkMode;
-            document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
-            saveToStorage();
-            renderTodos();
+            isDarkMode = !isDarkMode; // 現在の状態を反転させる
+            document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light'); // 見た目を変更
+            saveToStorage(); // ブラウザに保存
+            renderTodos();   // 画面を再描画してボタンの色などを最新にする
         }
 
+        // フィルター（すべて / 未完了）のボタンが切り替えられたときの命令
         function setFilter(filter) {
-            currentFilter = filter;
+            currentFilter = filter; // 現在のフィルター状態を書き換える
+            // ボタンの見た目（青いハイライト）を切り替える処理
             document.getElementById('filterAll').classList.toggle('active', filter === 'ALL');
             document.getElementById('filterActive').classList.toggle('active', filter === 'ACTIVE');
-            renderTodos();
+            renderTodos(); // 新しい条件で画面を描き直す
         }
 
+        // 登録されているタスクから、重複のないカテゴリ名のリストを自動で作る処理
         function getUniqueCategories() {
             return [...new Set(todos.map(t => t.category).filter(c => c && c !== 'なし'))];
         }
 
+        // ヘッダーのプルダウンと、ポップアップ内の「既存から選ぶ」の選択肢を最新にする命令
         function updateCategoryDropdowns() {
             const categories = getUniqueCategories();
 
+            // ヘッダー側のカテゴリフィルター用プルダウンを更新
             const filterCombo = document.getElementById('categoryFilter');
             if (filterCombo) {
                 const savedValue = filterCombo.value;
@@ -374,6 +437,7 @@
                 }
             }
 
+            // ポップアップ画面内の「既存から選ぶ」用プルダウンを更新
             const modalCombo = document.getElementById('taskCategorySelect');
             if (modalCombo) {
                 modalCombo.innerHTML = '<option value="">(既存から選ぶ)</option>';
@@ -385,6 +449,7 @@
             }
         }
 
+        // ポップアップ内で「既存から選ぶ」が選択されたときに、入力欄に名前と色を自動セットする処理
         function selectExistingCategory() {
             const modalCombo = document.getElementById('taskCategorySelect');
             const selectedValue = modalCombo.value;
@@ -397,6 +462,7 @@
             }
         }
 
+        // カテゴリ名を手入力したときに、すでに存在するカテゴリであれば自動で色を一致させる処理
         function matchExistingColor() {
             const currentCat = document.getElementById('taskCategory').value.trim();
             const modalCombo = document.getElementById('taskCategorySelect');
@@ -413,6 +479,7 @@
             }
         }
 
+        // 指定した年月の「最初の営業日(START)」または「最後の営業日(END)」の日付を計算する処理（土日を除外）
         function getBusinessDayOfMonth(year, month, type) {
             let date;
             if (type === 'START') {
@@ -425,6 +492,7 @@
             return date.toISOString().split('T')[0];
         }
 
+        // 期限日の文字列（YYYY-MM-DD）を読みやすい形式（M/D (曜日)）にして、あと何日かを計算する処理
         function formatDueDateWithCountdown(dueDateStr, isCompleted) {
             if (!dueDateStr) return { dateText: 'なし', countdownText: '', isOverdue: false };
 
@@ -449,7 +517,7 @@
             let isOverdue = false;
 
             if (isCompleted) {
-                countdownText = '';
+                countdownText = ''; // 完了済ならカウントダウンは表示しない
             } else if (diffDays === 0) {
                 countdownText = ' 【今日が期限！】';
             } else if (diffDays < 0) {
@@ -462,15 +530,17 @@
             return { dateText, countdownText, isOverdue };
         }
 
+        // 【最重要】データ（配列）を元に、実際のHTML（todo-item）を作って画面に表示する命令
         function renderTodos() {
             const listContainer = document.getElementById('todoList');
             if (!listContainer) return;
-            listContainer.innerHTML = '';
-            updateCategoryDropdowns();
+            listContainer.innerHTML = ''; // 一度、いま画面に出ているリストを全部きれいに消去する
+            updateCategoryDropdowns(); // カテゴリの選択肢（プルダウン）を最新にする
 
-            const searchText = document.getElementById('searchField').value.toLowerCase().trim();
-            const selectedCat = document.getElementById('categoryFilter').value;
+            const searchText = document.getElementById('searchField').value.toLowerCase().trim(); // 検索文字
+            const selectedCat = document.getElementById('categoryFilter').value; // 選択されたカテゴリ
 
+            // 登録されているすべてのタスクから、条件（フィルター・検索）に合うものだけを絞り込む
             const filtered = todos.filter(todo => {
                 if (currentFilter === 'ACTIVE' && todo.isCompleted) return false;
                 if (selectedCat !== 'ALL' && todo.category !== selectedCat) return false;
@@ -478,11 +548,13 @@
                 return true;
             });
 
+            // 条件に合うタスクが1つもなければ案内を表示して終了する
             if (filtered.length === 0) {
                 listContainer.innerHTML = '<div style="text-align:center; color:gray; padding:35px 20px; font-size:0.9rem;">（該当するタスクはありません）</div>';
                 return;
             }
 
+            // タスクを期限日が近い順（昇順）に並び替える処理（期限なしは一番下）
             filtered.sort((a, b) => {
                 if (!a.dueDate && !b.dueDate) return a.createdAt - b.createdAt;
                 if (!a.dueDate) return 1;
@@ -490,12 +562,14 @@
                 return a.dueDate.localeCompare(b.dueDate);
             });
 
+            // 絞り込んで並び替えたタスクを、1つずつHTMLとして組み立てて画面に追加していく
             filtered.forEach(todo => {
                 const item = document.createElement('div');
                 item.className = `todo-item ${todo.isCompleted ? 'completed' : ''}`;
 
                 const dateInfo = formatDueDateWithCountdown(todo.dueDate, todo.isCompleted);
                 
+                // 繰り返し設定のラベル文字列を作る
                 let repeatLabel = '';
                 if (todo.repeatType === 'DAILY') repeatLabel = ' [毎日]';
                 if (todo.repeatType === 'WEEKLY') repeatLabel = ' [毎週]';
@@ -504,8 +578,9 @@
                 if (todo.repeatType === 'MONTH_END') repeatLabel = ' [毎月末/営業日]';
                 if (todo.repeatType === 'YEARLY') repeatLabel = ' [毎年]';
 
-                const catColor = todo.categoryColor || '#00796b';
+                const catColor = todo.categoryColor || '#00796b'; // カテゴリの色（無ければ標準の青緑）
 
+                // タスクの状態（完了・未完了・期限超過）に合わせて、左側のステータスボタンのスタイルを決定する
                 let statusBtnStyle = '';
                 if (todo.isCompleted) {
                     statusBtnStyle = 'background-color: var(--btn-complete-bg); color: var(--btn-complete-text);';
@@ -515,6 +590,7 @@
                     statusBtnStyle = 'background-color: var(--btn-uncomplete-bg); color: var(--btn-uncomplete-text);';
                 }
 
+                // タスクのHTMLの中身を生成
                 item.innerHTML = `
                     <div class="todo-left">
                         <button class="status-btn action-btn" style="${statusBtnStyle}" onclick="toggleComplete('${todo.id}')">
@@ -535,19 +611,22 @@
                         <button class="action-btn" style="background-color: var(--btn-delete-bg); color: var(--btn-delete-text);" onclick="deleteTodo('${todo.id}')">削除</button>
                     </div>
                 `;
-                listContainer.appendChild(item);
+                listContainer.appendChild(item); // 画面のリストコンテナの中にタスクを1つ追加
             });
         }
 
+        // タスクの「未完了/完了済」チェックを反転させ、繰り返し設定があれば次のタスクを自動生成する処理
         function toggleComplete(id) {
             const todo = todos.find(t => t.id === id);
             if (todo) {
-                todo.isCompleted = !todo.isCompleted;
+                todo.isCompleted = !todo.isCompleted; // 完了状態を真逆にする
                 
+                // タスクが「完了」になり、かつ繰り返し設定がされていて、まだ次の繰り返しタスクが作られていない場合の処理
                 if (todo.isCompleted && todo.repeatType && todo.repeatType !== 'NONE' && !todo.isRepeatGenerated) {
                     let baseDate = todo.dueDate ? new Date(todo.dueDate) : new Date();
                     let nextDateStr = '';
 
+                    // 各繰り返しタイプに合わせて、次回の日付を計算する
                     if (todo.repeatType === 'DAILY') {
                         baseDate.setDate(baseDate.getDate() + 1);
                         nextDateStr = baseDate.toISOString().split('T')[0];
@@ -568,9 +647,10 @@
                         nextDateStr = baseDate.toISOString().split('T')[0];
                     }
                     
+                    // 次回の日付が正常に計算できたら、新しい未完了タスクとしてリストに新しく追加する
                     if (nextDateStr) {
                         todos.push({
-                            id: Date.now().toString() + Math.random().toString(36).substr(2, 4),
+                            id: Date.now().toString() + Math.random().toString(36).substr(2, 4), // 重複しないIDを生成
                             name: todo.name,
                             category: todo.category,
                             categoryColor: todo.categoryColor || '#00796b',
@@ -581,33 +661,35 @@
                             isRepeatGenerated: false,
                             createdAt: Date.now()
                         });
-                        todo.isRepeatGenerated = true;
+                        todo.isRepeatGenerated = true; // 元のタスクに「次回タスク生成済み」の目印をつける
                     }
                 }
-                saveToStorage();
-                renderTodos();
+                saveToStorage(); // 変更をブラウザに保存
+                renderTodos();   // 画面を最新に更新
             }
         }
 
+        // 「＋ 新しいタスクを追加」ボタンを押したときに、入力用ポップアップ画面を空っぽの状態で開く命令
         function openAddModal() {
-            editingTodoId = null;
+            editingTodoId = null; // 編集ではなく「新規追加モード」にする
             document.getElementById('modalTitle').textContent = '新しいタスク';
             document.getElementById('taskName').value = '';
             document.getElementById('taskCategory').value = '';
             document.getElementById('taskCategorySelect').value = '';
-            document.getElementById('taskColor').value = isDarkMode ? '#80cbc4' : '#00796b';
+            document.getElementById('taskColor').value = isDarkMode ? '#80cbc4' : '#00796b'; // モードに応じた初期カラー
             document.getElementById('taskDueDate').value = '';
             document.getElementById('taskRepeat').value = 'NONE';
             document.getElementById('taskMemo').value = '';
-            document.getElementById('saveBtn').onclick = saveTodo;
+            document.getElementById('saveBtn').onclick = saveTodo; // 保存ボタンを押した時はsaveTodoを実行
             
-            updateCategoryDropdowns();
-            document.getElementById('taskModal').style.display = 'flex';
+            updateCategoryDropdowns(); // 既存カテゴリの選択肢を最新にする
+            document.getElementById('taskModal').style.display = 'flex'; // ポップアップ画面を「flex」にして表示
         }
 
+        // 「編集」ボタンを押したときに、既存のタスクのデータをポップアップ画面にセットして開く命令
         function openEditModal(id) {
-            editingTodoId = id;
-            const todo = todos.find(t => t.id === id);
+            editingTodoId = id; // 現在編集中のタスクIDを記憶する
+            const todo = todos.find(t => t.id === id); // 編集対象のデータを特定
             if (!todo) return;
             
             document.getElementById('modalTitle').textContent = 'タスクの編集';
@@ -620,17 +702,19 @@
             document.getElementById('saveBtn').onclick = saveTodo;
             
             updateCategoryDropdowns();
-            document.getElementById('taskCategorySelect').value = todo.category || '';
-            document.getElementById('taskModal').style.display = 'flex';
+            document.getElementById('taskCategorySelect').value = todo.category || ''; // 既存選択肢の初期選択
+            document.getElementById('taskModal').style.display = 'flex'; // ポップアップ画面を表示
         }
 
+        // ポップアップ画面（モーダル）を閉じる命令
         function closeModal() {
-            document.getElementById('taskModal').style.display = 'none';
+            document.getElementById('taskModal').style.display = 'none'; // 非表示にする
         }
 
+        // ポップアップ画面の「保存」ボタンが押されたときに、新規追加または内容を上書き保存する命令
         function saveTodo() {
             const name = document.getElementById('taskName').value.trim();
-            if (!name) { alert('タスク名を入力してください'); return; }
+            if (!name) { alert('タスク名を入力してください'); return; } // 空っぽなら警告して中断
 
             const category = document.getElementById('taskCategory').value.trim() || 'なし';
             const categoryColor = document.getElementById('taskColor').value;
@@ -639,6 +723,7 @@
             const memo = document.getElementById('taskMemo').value.trim();
 
             if (editingTodoId) {
+                // 【編集モードの時】既存のタスクのデータを上書きする
                 const todo = todos.find(t => t.id === editingTodoId);
                 if (todo) {
                     todo.name = name; 
@@ -648,6 +733,7 @@
                     todo.repeatType = repeatType; 
                     todo.memo = memo;
                     
+                    // もしカテゴリの色が変わったら、同じカテゴリ名を持つ他のタスクの色も全部おそろいにする
                     if (category !== 'なし') {
                         todos.forEach(t => {
                             if (t.category === category) t.categoryColor = categoryColor;
@@ -655,31 +741,35 @@
                     }
                 }
             } else {
+                // 【新規追加モードの時】新しいタスクオブジェクトを作ってデータ配列の末尾に足す
                 todos.push({
                     id: Date.now().toString(),
                     name, category, categoryColor, dueDate, repeatType, memo,
                     isCompleted: false, isRepeatGenerated: false, createdAt: Date.now()
                 });
                 
+                // 新規タスクで設定した色を、同じカテゴリ名を持つ既存のタスクすべてに適用する
                 if (category !== 'なし') {
                     todos.forEach(t => {
                         if (t.category === category) t.categoryColor = categoryColor;
                     });
                 }
             }
-            saveToStorage();
-            closeModal();
-            renderTodos();
+            saveToStorage(); // ブラウザに保存
+            closeModal();    // ポップアップを閉じる
+            renderTodos();   // 画面を新しく更新する
         }
 
+        // 「削除」ボタンが押されたときに、データを配列から削除する命令
         function deleteTodo(id) {
             if(confirm('このタスクを削除しますか？')) {
-                todos = todos.filter(t => t.id !== id);
-                saveToStorage();
-                renderTodos();
+                todos = todos.filter(t => t.id !== id); // 指定されたID以外のタスクだけを残す（＝削除する）
+                saveToStorage(); // ブラウザの記憶を更新
+                renderTodos();   // 画面を新しく更新する
             }
         }
 
+        // アプリ起動時に一番最初にタスク一覧を画面に描き出す
         renderTodos();
     </script>
 </body>

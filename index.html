@@ -2,42 +2,47 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>便利ツール集</title>
     <style>
-        /* 全体のデザイン設定 */
+        /* 全体の背景や文字の種類を設定 */
         body { 
-            font-family: sans-serif; 
-            text-align: center; 
-            padding: 50px; 
-            background: #f5f5f5; 
-            margin: 0;
+            font-family: sans-serif;  /* 文字のフォントをゴシック体（見やすい標準的な文字）にする */
+            text-align: center;       /* 画面の中にある文字やボタンを「真ん中寄せ」にする */
+            padding: 50px;            /* 画面の上の端から、少しゆとり（隙間）を作る */
+            background: #f5f5f5;      /* 背景を目に優しい薄いグレーにする */
+            margin: 0;                /* ブラウザが最初から持っている不要な外側の余白をゼロにする */
         }
+        
+        /* <h1>（大見出し）のデザイン設定 */
         h1 {
-            margin-top: 0;
-            margin-bottom: 30px;
-            font-size: 2rem;
-            color: #333333;
+            margin-top: 0;            /* タイトルの上の隙間をなくしてスッキリさせる */
+            margin-bottom: 30px;      /* タイトルの下に少し隙間を作って、ボタンと離す */
+            font-size: 2rem;          /* 文字の大きさを標準より大きくする */
+            color: #333333;           /* 文字の色を真っ黒ではなく、少しおしゃれな濃いグレーにする */
         }
-        /* ボタン（カード）のデザイン */
+        
+        /* リンク（aタグ）を「四角いボタン（カード）」に変身させるデザイン設定 */
         .card { 
-            background: white; 
-            padding: 30px; 
-            margin: 10px; 
-            border-radius: 12px; 
-            display: inline-block; 
-            width: 200px; 
-            text-decoration: none; 
-            color: #333; 
-            font-weight: bold; 
-            border: 1px solid #ddd; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            transition: all 0.2s ease;
+            background: white;        /* ボタンの背景を白にする */
+            padding: 30px;            /* ボタンの中に文字を入れたとき、上下左右にたっぷりの余白を作る */
+            margin: 10px;             /* ボタンとボタンがくっつかないように、外側に隙間を作る */
+            border-radius: 12px;      /* 四角いボタンの「角」を丸くして優しくする */
+            display: inline-block;    /* ただの文字リンクから、横に並ぶ「四角い箱」の性質に変える */
+            width: 200px;             /* ボタンの横幅を200ピクセルに固定して大きさを揃える */
+            text-decoration: none;    /* リンクに自動でついてしまうダサい「下線」を消す */
+            color: #333;              /* ボタンの中の文字の色を濃いグレーにする */
+            font-weight: bold;        /* ボタンの中の文字を「太字」にする */
+            border: 1px solid #ddd;   /* ボタンの周りに薄いグレーの「枠線」を1ピクセルで引く */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* ボタンの下にうっすらと立体的な影をつける */
+            transition: all 0.2s ease; /* マウスを乗せたときに、ふわっと0.2秒かけて変化させるおまじない */
         }
-        /* マウスを乗せたときの動き */
+        
+        /* 🖱️ マウスがボタンの上に乗ったとき（hover）だけの特別なデザイン設定 */
         .card:hover { 
-            background: #e3f2fd; 
-            border-color: #1565c0;
-            transform: translateY(-2px);
+            background: #e3f2fd;      /* 背景を薄い綺麗な青色に変える */
+            border-color: #1565c0;    /* 枠線の色を濃い青色に変える */
+            transform: translateY(-2px); /* ボタンを上に2ピクセルだけピコッと浮き上がらせる */
         }
     </style>
 </head>

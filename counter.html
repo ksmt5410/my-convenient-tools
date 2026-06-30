@@ -1,68 +1,139 @@
 <!DOCTYPE html>
+
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>文字数カウンター</title>
+    
     <style>
-        :root { --bg-color: #ffffff; --panel-bg: #f5f5f5; --text-color: #000000; --border-color: #cbd5e1; --active-color: #1565c0; --active-bg: #e3f2fd; }
-        [data-theme="dark"] { --bg-color: #1e1e1e; --panel-bg: #2d2d2d; --text-color: #ffffff; --border-color: #555555; --active-color: #2196f3; --active-bg: #1565c0; }
-        body { margin: 0; font-family: sans-serif; background-color: var(--bg-color); color: var(--text-color); transition: background 0.2s; }
+        /* 通常モード（ライトモード）の色を設定する変数（パーツの色置き場） */
+        :root { 
+            --bg-color: #ffffff;      /* 画面全体の背景色（白） */
+            --panel-bg: #f5f5f5;      /* カウンター表示エリアの背景色（薄いグレー） */
+            --text-color: #000000;    /* 文字の色（黒） */
+            --border-color: #cbd5e1;  /* 枠線の色（グレー） */
+            --active-color: #1565c0;  /* 数字を強調するメインカラー（青） */
+        }
+        
+        /* ダークモードに切り替わったときの色（変数の上書き） */
+        [data-theme="dark"] { 
+            --bg-color: #1e1e1e;      /* 画面全体の背景色（濃いグレー） */
+            --panel-bg: #2d2d2d;      /* カウンター表示エリアの背景色（少し明るいグレー） */
+            --text-color: #ffffff;    /* 文字の色（白） */
+            --border-color: #555555;  /* 枠線の色（濃いグレー） */
+            --active-color: #2196f3;  /* 数字を強調するメインカラー（明るい青） */
+        }
+        
+        /* 画面全体の文字の種類や余白の設定 */
+        body { 
+            margin: 0; 
+            font-family: sans-serif; 
+            background-color: var(--bg-color); 
+            color: var(--text-color); 
+            transition: background 0.2s; /* 背景色が変わるときにふわっと変化させる */
+        }
+        
+        /* ヘッダー全体のデザイン */
         header { 
             background-color: var(--panel-bg); 
             padding: 12px; 
-            display: flex; 
-            justify-content: space-between; 
+            display: flex;                  /* 横並びにする */
+            justify-content: space-between; /* 左右の端に配置する */
+            align-items: center;            /* 縦の真ん中で揃える */
             border-bottom: 1px solid var(--border-color); 
         }
-        /* ヘッダーの中のモード切替ボタンだけを、可愛いアイコン風にする */
+        
+        /* ヘッダーの中にあるモード切替ボタンだけをアイコン風にする設定 */
         header button {
-            background: transparent !important; /* 背景を透明に */
+            background: transparent !important; /* 背景を透明にする */
             border: none !important;             /* 枠線を消す */
             font-size: 1.5rem !important;        /* 🏠と同じサイズにする */
             box-shadow: none !important;         /* 影を消す */
-            padding: 0 !important;               /* 余白をリセット */
-            cursor: pointer;
+            padding: 0 !important;               /* ボタンの内側の余白をゼロにする */
+            cursor: pointer;                     /* マウスが乗ったときに指マークにする */
         }
-
-        /* マウスが乗ったときのアニメーション（これもおそろい！） */
-        header button:hover {
-            transform: translateY(-2px);
+        
+        /* アプリの中身を中央に寄せるための外枠（コンテナ） */
+        .container { 
+            max-width: 600px; /* 横幅の最大サイズ */
+            margin: 20px auto; /* 画面の中央に配置する */
+            padding: 0 15px;  /* 左右に少しだけ隙間を作る */
         }
-        .container { max-width: 600px; margin: 20px auto; padding: 0 15px; }
-        textarea { width: 100%; height: 200px; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color); color: var(--text-color); font-size: 1rem; box-sizing: border-box; }
-        .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-        .result-box { background: var(--panel-bg); padding: 15px; border-radius: 8px; text-align: center; }
-        .count-val { font-size: 1.5rem; font-weight: bold; color: var(--active-color); display: block; }
-        .btn-group { margin: 10px 0; display: flex; gap: 10px; }
-
-                /* ★ カウンターのボタンも同様にアニメーションと影を追加 */
-        button { 
+        
+        /* 文章を入力するテキストエリアのデザイン */
+        textarea { 
+            width: 100%; 
+            height: 200px; 
+            padding: 12px; 
+            border: 1px solid var(--border-color); 
+            border-radius: 8px; /* 角を丸くする */
+            background: var(--bg-color); 
+            color: var(--text-color); 
+            font-size: 1rem; 
+            box-sizing: border-box; /* パディングを含めて横幅を100%にする */
+        }
+        
+        /* 操作ボタン（クリア・コピー）を並べるグループ */
+        .btn-group { 
+            margin: 10px 0; 
+            display: flex; /* ボタンを横並びにする */
+            gap: 10px;     /* ボタンとボタンの間の隙間 */
+        }
+        
+        /* クリアボタンとコピーボタン共通のデザイン */
+        .btn-group button { 
             padding: 8px 16px; 
             border-radius: 6px; 
             border: 1px solid var(--border-color); 
             cursor: pointer; 
             background: var(--panel-bg); 
             color: var(--text-color); 
-            transition: all 0.2s ease; /* ふわっと動かす設定 */
-            font-size: 1rem;
+            transition: all 0.2s ease; /* アニメーションをふわっとさせる */
+            font-size: 1rem; 
+            font-weight: normal !important; /* 太字を解除 */
         }
-
-        /* ★ マウスが乗ったときの動き */
+        
+        /* すべてのボタン共通：マウスが乗ったときに少し上に浮き上がらせる */
         button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            border-color: var(--active-color); /* ホバー時に枠線を少し青っぽく */
+            transform: translateY(-2px);       /* 上に2ピクセル移動させる */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* 下に柔らかい影をつける */
         }
+        
+        /* カウンターの数字を表示するエリア（2列のグリッド） */
+        .result-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; /* 均等に2分割する */
+            gap: 10px; 
+            margin-top: 15px; 
+        }
+        
+        /* カウンターの数字が入る四角いボックス */
+        .result-box { 
+            background: var(--panel-bg); 
+            padding: 15px; 
+            border-radius: 8px; 
+            text-align: center; /* 文字を真ん中に寄せる */
+        }
+        
+        /* カウントされた「数字」自体のデザイン */
+        .count-val { 
+            font-size: 1.5rem; 
+            font-weight: bold; 
+            color: var(--active-color); 
+            display: block; /* 改行して独立した行にする */
+        }
+        
+        /* SNSの制限文字数などを表示する一番下のボックス */
         .sns-box { 
             margin-top: 15px; 
             padding: 12px; 
             border: 1px solid var(--border-color); 
             border-radius: 8px; 
             font-size: 0.9rem; 
-            line-height: 1.6; 
+            line-height: 1.6; /* 行の間隔を少し広げて読みやすくする */
         }
-
     </style>
 </head>
 <body>
@@ -77,14 +148,17 @@
 
 <div class="container">
     <textarea id="textInput" placeholder="ここに文章を入力..." oninput="updateCounter()"></textarea>
+    
     <div class="btn-group">
         <button onclick="clearText()">クリア</button>
         <button onclick="copyText()">結果をコピー</button>
     </div>
+    
     <div class="result-grid">
-        <div class="result-box">文字数(空白込) <span id="charCount" class="count-val">0</span></div>
-        <div class="result-box">文字数(空白除) <span id="noSpaceCount" class="count-val">0</span></div>
+        <div class="result-box">文字数(込) <span id="charCount" class="count-val">0</span></div>
+        <div class="result-box">文字数(除) <span id="noSpaceCount" class="count-val">0</span></div>
     </div>
+    
     <div class="sns-box" id="infoBox">
         読み上げ時間: 約 0 分<br>
         Twitter: 140文字まであと 140 文字<br>
@@ -93,27 +167,58 @@
 </div>
 
 <script>
+    // ①ブラウザに保存されているダークモードの設定（trueかfalse）を読み込む
     let isDarkMode = localStorage.getItem('darkMode') === 'true';
+    
+    // ②もし前回ダークモードにしていたら、画面を開いた瞬間にその見た目にする
     if (isDarkMode) document.documentElement.setAttribute('data-theme', 'dark');
+    
+    // ⚙️ボタンが押されたときに、ライトとダークを交互に入れ替える命令
     function toggleDarkMode() {
-        isDarkMode = !isDarkMode;
-        document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
-        localStorage.setItem('darkMode', isDarkMode);
+        isDarkMode = !isDarkMode; // 現在の状態を反転させる
+        document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light'); // 見た目を変更
+        localStorage.setItem('darkMode', isDarkMode); // 次回のためにブラウザに記憶させる
     }
+
+    // 文字が入力されるたびに、リアルタイムで数字を計算して書き換える命令
     function updateCounter() {
+        // 入力欄に書かれている文章（文字列）を取得する
         const text = document.getElementById('textInput').value;
+        // 文章全体の文字数を数える
         const len = text.length;
+        
+        // 【文字数(込)】の数字を書き換える
         document.getElementById('charCount').textContent = len;
+        // 【文字数(除)】改行やスペースをすべて消した状態の文字数を計算して書き換える
         document.getElementById('noSpaceCount').textContent = text.replace(/\s/g, '').length;
+        
+        // 1分間に400文字読めると仮定して、何分かかるかを計算（切り上げ）
         const time = Math.ceil(len / 400);
+        
+        // 一番下のSNS情報パネルの中身を、計算結果を元に作り直して書き換える
         document.getElementById('infoBox').innerHTML = `
             読み上げ時間: 約 ${time} 分<br>
             Twitter: 140文字まであと ${Math.max(0, 140 - len)} 文字${len > 140 ? ' <span style="color:red;">(超!)</span>' : ''}<br>
             Instagram: 2200文字まであと ${Math.max(0, 2200 - len)} 文字${len > 2200 ? ' <span style="color:red;">(超!)</span>' : ''}
         `;
     }
-    function clearText() { if(confirm('消去しますか？')) { document.getElementById('textInput').value = ''; updateCounter(); } }
-    function copyText() { navigator.clipboard.writeText(document.getElementById('textInput').value).then(() => alert('コピーしました！')); }
+
+    // 「クリア」ボタンが押されたときに、中身を全部消す命令
+    function clearText() { 
+        // 確認ダイアログを出して、OKが押されたときだけ実行する
+        if(confirm('消去しますか？')) { 
+            document.getElementById('textInput').value = ''; // 入力欄を空っぽにする
+            updateCounter(); // カウンターの数字も0にリセットするために計算命令を呼ぶ
+        } 
+    }
+
+    // 「結果をコピー」ボタンが押されたときに、入力された文章をクリップボードにコピーする命令
+    function copyText() { 
+        // 入力欄の文章をコピーする命令を実行
+        navigator.clipboard.writeText(document.getElementById('textInput').value).then(() => {
+            alert('コピーしました！'); // 成功したら画面にポップアップを出す
+        }); 
+    }
 </script>
 </body>
 </html>
