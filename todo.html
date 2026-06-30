@@ -238,13 +238,17 @@
 <body>
 
     <header>
-        <div class="filters">
-            <button id="filterAll" class="active" onclick="setFilter('ALL')">すべて</button>
-            <button id="filterActive" onclick="setFilter('ACTIVE')">未完了</button>
-            <select id="categoryFilter" onchange="renderTodos()">
-                <option value="ALL">すべてのカテゴリ</option>
-            </select>
-            <input type="text" id="searchField" placeholder="検索..." oninput="renderTodos()">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <a href="index.html" style="text-decoration: none; font-size: 1.5rem; color: var(--text-color); line-height: 1;" title="トップページに戻る">🏠</a>
+            
+            <div class="filters">
+                <button id="filterAll" class="active" onclick="setFilter('ALL')">すべて</button>
+                <button id="filterActive" onclick="setFilter('ACTIVE')">未完了</button>
+                <select id="categoryFilter" onchange="renderTodos()">
+                    <option value="ALL">すべてのカテゴリ</option>
+                </select>
+                <input type="text" id="searchField" placeholder="検索..." oninput="renderTodos()">
+            </div>
         </div>
         <div>
             <button onclick="toggleDarkMode()">⚙ モード切替</button>
