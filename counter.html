@@ -8,15 +8,61 @@
         :root { --bg-color: #ffffff; --panel-bg: #f5f5f5; --text-color: #000000; --border-color: #cbd5e1; --active-color: #1565c0; --active-bg: #e3f2fd; }
         [data-theme="dark"] { --bg-color: #1e1e1e; --panel-bg: #2d2d2d; --text-color: #ffffff; --border-color: #555555; --active-color: #2196f3; --active-bg: #1565c0; }
         body { margin: 0; font-family: sans-serif; background-color: var(--bg-color); color: var(--text-color); transition: background 0.2s; }
-        header { background-color: var(--panel-bg); padding: 12px; display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); }
+        header { 
+            background-color: var(--panel-bg); 
+            padding: 12px; 
+            display: flex; 
+            justify-content: space-between; 
+            border-bottom: 1px solid var(--border-color); 
+        }
+        /* ヘッダーの中のモード切替ボタンだけを、可愛いアイコン風にする */
+        header button {
+            background: transparent !important; /* 背景を透明に */
+            border: none !important;             /* 枠線を消す */
+            font-size: 1.5rem !important;        /* 🏠と同じサイズにする */
+            box-shadow: none !important;         /* 影を消す */
+            padding: 0 !important;               /* 余白をリセット */
+            cursor: pointer;
+        }
+
+        /* マウスが乗ったときのアニメーション（これもおそろい！） */
+        header button:hover {
+            transform: translateY(-2px);
+        }
         .container { max-width: 600px; margin: 20px auto; padding: 0 15px; }
         textarea { width: 100%; height: 200px; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color); color: var(--text-color); font-size: 1rem; box-sizing: border-box; }
         .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
         .result-box { background: var(--panel-bg); padding: 15px; border-radius: 8px; text-align: center; }
         .count-val { font-size: 1.5rem; font-weight: bold; color: var(--active-color); display: block; }
         .btn-group { margin: 10px 0; display: flex; gap: 10px; }
-        button { padding: 8px 16px; border-radius: 6px; border: 1px solid var(--border-color); cursor: pointer; background: var(--panel-bg); color: var(--text-color); }
-        .sns-box { margin-top: 15px; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.9rem; line-height: 1.6; }
+
+                /* ★ カウンターのボタンも同様にアニメーションと影を追加 */
+        button { 
+            padding: 8px 16px; 
+            border-radius: 6px; 
+            border: 1px solid var(--border-color); 
+            cursor: pointer; 
+            background: var(--panel-bg); 
+            color: var(--text-color); 
+            transition: all 0.2s ease; /* ふわっと動かす設定 */
+            font-size: 1rem;
+        }
+
+        /* ★ マウスが乗ったときの動き */
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-color: var(--active-color); /* ホバー時に枠線を少し青っぽく */
+        }
+        .sns-box { 
+            margin-top: 15px; 
+            padding: 12px; 
+            border: 1px solid var(--border-color); 
+            border-radius: 8px; 
+            font-size: 0.9rem; 
+            line-height: 1.6; 
+        }
+
     </style>
 </head>
 <body>
@@ -26,7 +72,7 @@
         <a href="index.html" style="text-decoration: none; font-size: 1.5rem; color: var(--text-color); line-height: 1;" title="トップページに戻る">🏠</a>
         <strong>ツール：文字数カウンター</strong>
     </div>
-    <button onclick="toggleDarkMode()">⚙</button>
+    <button onclick="toggleDarkMode()">⚙️</button>
 </header>
 
 <div class="container">

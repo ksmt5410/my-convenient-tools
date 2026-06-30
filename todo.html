@@ -68,6 +68,21 @@
             gap: 10px;
         }
 
+        /* ヘッダーの中のモード切替ボタンだけを、可愛いアイコン風にする */
+        header button {
+            background: transparent !important; /* 背景を透明に */
+            border: none !important;             /* 枠線を消す */
+            font-size: 1.5rem !important;        /* 🏠と同じサイズにする */
+            box-shadow: none !important;         /* 影を消す */
+            padding: 0 !important;               /* 余白をリセット */
+            cursor: pointer;
+        }
+
+        /* マウスが乗ったときのアニメーション（これもおそろい！） */
+        header button:hover {
+            transform: translateY(-2px);
+        }
+
         @media(min-width: 600px) {
             header {
                 flex-direction: row;
@@ -91,8 +106,9 @@
             color: var(--text-color);
             cursor: pointer;
             font-weight: bold;
-            font-size: 0.9rem;
+            font-size: 1rem;
             transition: all 0.1s ease;
+            font-weight: normal !important;
         }
 
         button.active {
@@ -233,6 +249,17 @@
             flex-direction: column;
             gap: 12px;
         }
+        /* ★ すべてのボタンにふわっと浮き上がるアニメーションを適用 */
+        button, .action-btn, .status-btn, .add-btn {
+            transition: all 0.2s ease !important;
+        }
+
+        /* ★ マウスが乗ったときに少し上に浮き上がらせる */
+        button:hover, .action-btn:hover, .status-btn:hover, .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            opacity: 0.9;
+        }
     </style>
 </head>
 <body>
@@ -251,7 +278,7 @@
             </div>
         </div>
         <div>
-            <button onclick="toggleDarkMode()">⚙ モード切替</button>
+            <button onclick="toggleDarkMode()">⚙️</button>
         </div>
     </header>
 
