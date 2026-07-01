@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>お買い物リスト</title>
+    <style>
+        /* === デザイン設定（CSS） === */
+        :root {
+            --bg-color: #f9f9fb;
+            --panel-bg: #ffffff;
+            --text-color: #333333;
+            --sub-text: #757575;
+            --border-color: #e2e8f0;
+            --primary-color: #4caf50;
+            --primary-bg: #e8f5e9;
+            --danger-bg: #ffebee;
+            --danger-text: #c62828;
+            --history-bg: #f1f5f9;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #121212;
+            --panel-bg: #1e1e1e;
+            --text-color: #e2e8f0;
+            --sub-text: #94a3b8;
+            --border-color: #334155;
+            --primary-color: #81c784;
+            --primary-bg: #1b5e20;
+            --danger-bg: #b71c1c;
+            --danger-text: #ef9a9a;
+            --history-bg: #334155;
+        }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-bottom: 30px;
+        }
+
+        header {
+            background-color: var(--panel-bg);
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            flex: 1;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 0 15px;
+            box-sizing: border-box;
+        }
+
+        /* 入力エリア */
+        .input-panel {
+            background-color: var(--panel-bg);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        input, select {
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        #itemName { flex: 2; }
+        #itemPrice { flex: 1; min-width: 70px; }
+        
+        .category-combobox {
+            display: flex;
+            flex: 1;
+        }
+        #itemCategory {
+            flex: 1;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            border-right: none;
+        }
+        #itemCategorySelect {
+            width: 100px;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            cursor: pointer;
+        }
+
+        button {
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .add-btn {
+            background-color: var(--primary-color);
+            color: #ffffff;
+            padding: 0 20px;
+            font-size: 1.1rem;
+        }
+        [data-theme="dark"] .add-btn { color: #121212; }
+
+        /* 合計金額パネル */
+        .summary-panel {
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            padding: 12px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border: 1px solid var(--primary-color);
+        }
+
+        /* リストエリア */
+        .list-section-title {
+            font-size: 0.9rem;
+            color: var(--sub-text);
+            margin: 15px 0 5px 5px;
+            font-weight: bold;
+        }
+
+        .category-group-header {
+            font-size: 0.85rem;
+            color: var(--primary-color);
+            font-weight: bold;
+            margin: 12px 0 4px 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .shopping-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .shopping-item {
+            background-color: var(--panel-bg);
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            opacity: 1;
+            transform: translateY(0);
+            max-height: 100px;
+            overflow: hidden;
+            transition: opacity 0.4s ease, transform 0.4s ease, max-height 0.4s ease, padding 0.4s ease, background-color 0.2s;
+        }
+
+        .shopping-item.transitioning {
+            opacity: 0;
+            transform: translateY(-8px);
+            max-height: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            border-top-color: transparent;
+            border-bottom-color: transparent;
+            margin: 0;
+        }
+
+        .shopping-item.checked {
+            opacity: 0.4;
+            background-color: transparent;
+        }
+        .shopping-item.checked .item-name {
+            text-decoration: line-through;
+        }
+
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: bold;
+            transition: all 0.15s;
+            flex-shrink: 0;
+            background-color: var(--bg-color);
+        }
+        .shopping-item.checked .checkbox {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: var(--panel-bg);
+        }
+
+        .item-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex: 1;
+            cursor: pointer;
+        }
+        .item-main-details {
+            display: flex;
+            flex-direction: column;
+        }
+        .item-name {
+            font-weight: bold;
+            font-size: 1.05rem;
+        }
+        .item-price {
+            color: var(--sub-text);
+            font-size: 0.95rem;
+        }
+
+        /* 履歴エリア */
+        .history-panel {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px dashed var(--border-color);
+        }
+
+        .history-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .history-chip {
+            background-color: var(--history-bg);
+            color: var(--text-color);
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .history-chip:active { transform: scale(0.95); }
+
+        .clear-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .clear-btn {
+            background-color: var(--danger-bg);
+            color: var(--danger-text);
+            padding: 6px 12px;
+            font-size: 0.85rem;
+        }
+
+        button:active { transform: translateY(1px); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" style="text-decoration: none; font-size: 1.5rem; color: var(--text-color);" title="トップへ戻る">🏠</a>
+        <div class="header-title">🛒 お買い物リスト</div>
+    </header>
+
+    <div class="container">
+        <!-- 📝 アイテム入力フォーム -->
+        <div class="input-panel">
+            <div class="input-row">
+                <input type="text" id="itemName" placeholder="買うものを入力... (例: 牛肉)" oninput="matchHistoryData()" onkeypress="handleKeyPress(event)">
+                <input type="number" id="itemPrice" placeholder="￥単価" inputmode="numeric" onkeypress="handleKeyPress(event)">
+            </div>
+            <div class="input-row">
+                <div class="category-combobox">
+                    <input type="text" id="itemCategory" placeholder="カテゴリ (例: 肉類)" onkeypress="handleKeyPress(event)">
+                    <select id="itemCategorySelect" onchange="selectExistingCategory()">
+                        <option value="">(履歴)</option>
+                    </select>
+                </div>
+                <button class="add-btn" onclick="addItem()">追加</button>
+            </div>
+        </div>
+
+        <!-- 💰 合計金額表示 -->
+        <div class="summary-panel">
+            <span>カゴ内の合計 (概算):</span>
+            <span id="totalPrice" style="font-size: 1.3rem;">￥0</span>
+        </div>
+
+        <!-- 🛒 今日の買い物リスト -->
+        <div class="list-section-title">買うものリスト</div>
+        <div class="shopping-list" id="shoppingList"></div>
+
+        <!-- 🧹 リストクリア操作 -->
+        <div class="clear-actions" id="clearActions" style="display: none;">
+            <button class="clear-btn" onclick="clearChecked()">カゴ内を消去</button>
+            <button class="clear-btn" onclick="clearAll()">すべて消去</button>
+        </div>
+
+        <!-- 🗘 よく買うものの履歴 -->
+        <div class="history-panel" id="historyPanel" style="display: none;">
+            <div class="list-section-title">🗘 よく買うもの（タップでカテゴリごと追加）</div>
+            <div class="history-grid" id="historyGrid"></div>
+        </div>
+    </div>
+
+    <script>
+        let listItems = [];
+        let itemMaster = [];
+
+        try {
+            listItems = JSON.parse(localStorage.getItem('shopping_items')) || [];
+            itemMaster = JSON.parse(localStorage.getItem('shopping_master')) || [];
+        } catch(e) {
+            listItems = [];
+            itemMaster = [];
+        }
+
+        function initTheme() {
+            const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const themeSetting = localStorage.getItem('themeSetting') || 'auto';
+            if (themeSetting === 'dark' || (themeSetting === 'auto' && isSystemDark)) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        }
+        initTheme();
+
+        function saveToStorage() {
+            localStorage.setItem('shopping_items', JSON.stringify(listItems));
+            localStorage.setItem('shopping_master', JSON.stringify(itemMaster));
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') addItem();
+        }
+
+        function getUniqueCategories() {
+            const fromMaster = itemMaster.map(m => m.category).filter(Boolean);
+            const fromList = listItems.map(i => i.category).filter(Boolean);
+            return [...new Set([...fromMaster, ...fromList])].filter(c => c !== 'なし');
+        }
+
+        function updateCategoryDropdown() {
+            const select = document.getElementById('itemCategorySelect');
+            if (!select) return;
+            select.innerHTML = '<option value="">(履歴)</option>';
+            getUniqueCategories().forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat;
+                opt.textContent = cat;
+                select.appendChild(opt);
+            });
+        }
+
+        function selectExistingCategory() {
+            const select = document.getElementById('itemCategorySelect');
+            if (select.value) {
+                document.getElementById('itemCategory').value = select.value;
+            }
+        }
+
+        function matchHistoryData() {
+            const currentName = document.getElementById('itemName').value.trim();
+            if (!currentName) return;
+
+            const found = itemMaster.find(m => m.name === currentName);
+            if (found) {
+                if (found.price > 0 && !document.getElementById('itemPrice').value) {
+                    document.getElementById('itemPrice').value = found.price;
+                }
+                if (found.category && found.category !== 'なし' && !document.getElementById('itemCategory').value) {
+                    document.getElementById('itemCategory').value = found.category;
+                }
+            }
+        }
+
+        function addItem() {
+            const nameInput = document.getElementById('itemName');
+            const priceInput = document.getElementById('itemPrice');
+            const catInput = document.getElementById('itemCategory');
+            
+            const name = nameInput.value.trim();
+            const price = parseInt(priceInput.value) || 0;
+            const category = catInput.value.trim() || 'なし';
+
+            if (!name) return;
+
+            const newItem = {
+                id: Date.now().toString() + Math.random().toString(36).substr(2, 4),
+                name: name,
+                price: price,
+                category: category,
+                isChecked: false
+            };
+
+            listItems.push(newItem);
+
+            const existingMasterIndex = itemMaster.findIndex(m => m.name === name);
+            if (existingMasterIndex === -1) {
+                itemMaster.push({ name: name, price: price, category: category });
+            } else {
+                itemMaster[existingMasterIndex].category = category;
+                if (price > 0) itemMaster[existingMasterIndex].price = price;
+            }
+
+            nameInput.value = '';
+            priceInput.value = '';
+            catInput.value = '';
+            nameInput.focus();
+
+            saveToStorage();
+            render();
+        }
+
+        function addFromHistory(name, price, category) {
+            const newItem = {
+                id: Date.now().toString() + Math.random().toString(36).substr(2, 4),
+                name: name,
+                price: price,
+                category: category || 'なし',
+                isChecked: false
+            };
+            listItems.push(newItem);
+            saveToStorage();
+            render();
+        }
+
+        function toggleCheck(id) {
+            const item = listItems.find(i => i.id === id);
+            if (!item) return;
+
+            item.isChecked = !item.isChecked;
+
+            const element = document.getElementById(`shop-${id}`);
+            if (element) {
+                element.classList.toggle('checked', item.isChecked);
+                const checkEl = element.querySelector('.checkbox');
+                if (checkEl) checkEl.textContent = item.isChecked ? '✓' : '';
+                element.classList.add('transitioning');
+            }
+
+            setTimeout(() => {
+                saveToStorage();
+                render();
+            }, 400);
+        }
+
+        function deleteItem(id) {
+            listItems = listItems.filter(i => i.id !== id);
+            saveToStorage();
+            render();
+        }
+
+        function deleteMaster(name) {
+            event.stopPropagation();
+            if(confirm(`履歴から「${name}」を削除しますか？`)) {
+                itemMaster = itemMaster.filter(m => m.name !== name);
+                saveToStorage();
+                render();
+            }
+        }
+
+        function clearChecked() {
+            if(confirm('カゴに入れたアイテムをリストから消去しますか？')) {
+                listItems = listItems.filter(i => !i.isChecked);
+                saveToStorage();
+                render();
+            }
+        }
+
+        function clearAll() {
+            if(confirm('今日の買い物リストをすべて空にしますか？（よく買うものの履歴は消えません）')) {
+                listItems = [];
+                saveToStorage();
+                render();
+            }
+        }
+
+        function render() {
+            const listContainer = document.getElementById('shoppingList');
+            const historyGrid = document.getElementById('historyGrid');
+            const totalPriceEl = document.getElementById('totalPrice');
+            
+            listContainer.innerHTML = '';
+            historyGrid.innerHTML = '';
+            updateCategoryDropdown();
+
+            if (listItems.length === 0) {
+                listContainer.innerHTML = '<div style="text-align:center; color:gray; padding:20px; font-size:0.9rem;">リストは空っぽです</div>';
+                document.getElementById('clearActions').style.display = 'none';
+            } else {
+                document.getElementById('clearActions').style.display = 'flex';
+            }
+
+            const uncompletedItems = listItems.filter(i => !i.isChecked);
+            const completedItems = listItems.filter(i => i.isChecked);
+
+            const categorySort = (a, b) => {
+                if (a.category === 'なし') return 1;
+                if (b.category === 'なし') return -1;
+                return a.category.localeCompare(b.category);
+            };
+
+            uncompletedItems.sort(categorySort);
+            completedItems.sort(categorySort);
+
+            let totalPrice = 0;
+
+            // リスト内のアイテム描画からカテゴリのタグ要素を完全に撤去
+            function createItemElement(item) {
+                if (item.isChecked) totalPrice += item.price;
+
+                const div = document.createElement('div');
+                div.id = `shop-${item.id}`;
+                div.className = `shopping-item ${item.isChecked ? 'checked' : ''}`;
+                
+                div.innerHTML = `
+                    <div class="checkbox" onclick="toggleCheck('${item.id}')">
+                        ${item.isChecked ? '✓' : ''}
+                    </div>
+                    <div class="item-info" onclick="toggleCheck('${item.id}')">
+                        <div class="item-main-details">
+                            <span class="item-name">${item.name}</span>
+                        </div>
+                        <span class="item-price">${item.price > 0 ? '￥' + item.price.toLocaleString() : ''}</span>
+                    </div>
+                    <button class="delete-btn" onclick="deleteItem('${item.id}')">×</button>
+                `;
+                return div;
+            }
+
+            let lastCategory = null;
+            uncompletedItems.forEach(item => {
+                if (item.category !== lastCategory && item.category !== 'なし') {
+                    const header = document.createElement('div');
+                    header.className = 'category-group-header';
+                    header.innerHTML = `📂 ${item.category}`;
+                    listContainer.appendChild(header);
+                    lastCategory = item.category;
+                } else if (item.category === 'なし' && lastCategory !== 'なし' && uncompletedItems.some(i => i.category === 'なし')) {
+                    const header = document.createElement('div');
+                    header.className = 'category-group-header';
+                    header.innerHTML = `📂 その他`;
+                    listContainer.appendChild(header);
+                    lastCategory = 'なし';
+                }
+                listContainer.appendChild(createItemElement(item));
+            });
+
+            if (completedItems.length > 0) {
+                const compHeader = document.createElement('div');
+                compHeader.className = 'category-group-header';
+                compHeader.style.color = 'var(--sub-text)';
+                compHeader.innerHTML = `✅ カゴに入れたもの`;
+                listContainer.appendChild(compHeader);
+                
+                completedItems.forEach(item => {
+                    listContainer.appendChild(createItemElement(item));
+                });
+            }
+
+            totalPriceEl.textContent = `￥${totalPrice.toLocaleString()}`;
+
+            // よく買うもの履歴の描画（履歴管理用に小さなバッジだけ残しています）
+            if (itemMaster.length > 0) {
+                document.getElementById('historyPanel').style.display = 'block';
+                itemMaster.forEach(m => {
+                    const chip = document.createElement('button');
+                    chip.className = 'history-chip';
+                    chip.onclick = () => addFromHistory(m.name, m.price, m.category);
+                    chip.innerHTML = `
+                        <span>${m.name}</span>
+                        ${m.category && m.category !== 'なし' ? `<span style="font-size:0.7rem; opacity:0.7; background:rgba(0,0,0,0.05); padding:1px 4px; border-radius:3px;">${m.category}</span>` : ''}
+                        <span style="color:var(--sub-text); font-size:0.75rem; font-weight:normal;">${m.price > 0 ? '￥'+m.price : ''}</span>
+                        <span style="margin-left:5px; color:var(--sub-text); font-size:0.8rem;" onclick="deleteMaster('${m.name}')">×</span>
+                    `;
+                    historyGrid.appendChild(chip);
+                });
+            } else {
+                document.getElementById('historyPanel').style.display = 'none';
+            }
+        }
+
+        render();
+    </script>
+</body>
+</html>

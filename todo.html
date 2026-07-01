@@ -749,12 +749,12 @@
                 const dateInfo = formatDueDateWithCountdown(todo.dueDate, todo.isCompleted);
                 
                 let repeatLabel = '';
-                if (todo.repeatType === 'DAILY') repeatLabel = '🔄 毎日';
-                if (todo.repeatType === 'WEEKLY') repeatLabel = '🔄 毎週';
-                if (todo.repeatType === 'MONTHLY') repeatLabel = '🔄 毎月';
-                if (todo.repeatType === 'MONTH_START') repeatLabel = '🔄 毎月初/営業日';
-                if (todo.repeatType === 'MONTH_END') repeatLabel = '🔄 毎月末/営業日';
-                if (todo.repeatType === 'YEARLY') repeatLabel = '🔄 毎年';
+                if (todo.repeatType === 'DAILY') repeatLabel = '🗘 毎日';
+                if (todo.repeatType === 'WEEKLY') repeatLabel = '🗘 毎週';
+                if (todo.repeatType === 'MONTHLY') repeatLabel = '🗘 毎月';
+                if (todo.repeatType === 'MONTH_START') repeatLabel = '🗘 毎月初/営業日';
+                if (todo.repeatType === 'MONTH_END') repeatLabel = '🗘 毎月末/営業日';
+                if (todo.repeatType === 'YEARLY') repeatLabel = '🗘 毎年';
 
                 const catColor = todo.categoryColor || '#00796b';
 
