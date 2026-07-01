@@ -15,6 +15,10 @@
             --text-color: #000000;    /* 文字の色（黒） */
             --border-color: #cbd5e1;  /* 枠線の色（グレー） */
             --active-color: #1565c0;  /* 数字を強調するメインカラー（青） */
+            
+            /* 🆕 ポップアップ用の色設定 */
+            --modal-bg: #ffffff;
+            --option-bg: #f5f5f5;
         }
         
         /* ダークモードに切り替わったときの色（変数の上書き） */
@@ -24,6 +28,10 @@
             --text-color: #ffffff;    /* 文字の色（白） */
             --border-color: #555555;  /* 枠線の色（濃いグレー） */
             --active-color: #2196f3;  /* 数字を強調するメインカラー（明るい青） */
+            
+            /* 🆕 ポップアップ用の色設定（ダーク） */
+            --modal-bg: #1e1e1e;
+            --option-bg: #3d3d3d;
         }
         
         /* 画面全体の文字の種類や余白の設定 */
@@ -117,7 +125,7 @@
             text-align: center; /* 文字を真ん中に寄せる */
         }
         
-        /* カウントされた「数字」自体のデザイン */
+        /* カカウントされた「数字」自体のデザイン */
         .count-val { 
             font-size: 1.5rem; 
             font-weight: bold; 
@@ -134,6 +142,50 @@
             font-size: 0.9rem; 
             line-height: 1.6; /* 行の間隔を少し広げて読みやすくする */
         }
+
+        /* 🆕 ポップアップ画面（モーダル設定） */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        .modal-content {
+            background: var(--modal-bg);
+            padding: 20px;
+            border-radius: 12px;
+            width: 85%;
+            max-width: 380px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            text-align: left;
+            border: 1px solid var(--border-color);
+            box-sizing: border-box;
+        }
+        .theme-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-radius: 8px;
+            background: var(--option-bg);
+            cursor: pointer;
+        }
+        .modal-close-btn {
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: #2165f2;
+            color: white;
+            cursor: pointer;
+            font-size: 1rem;
+            align-self: flex-end;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -141,9 +193,9 @@
 <header>
     <div style="display: flex; align-items: center; gap: 15px;">
         <a href="index.html" style="text-decoration: none; font-size: 1.5rem; color: var(--text-color); line-height: 1;" title="トップページに戻る">🏠</a>
-        <strong>ツール：文字数カウンター</strong>
+        <strong>文字数カウンター</strong>
     </div>
-    <button onclick="toggleDarkMode()">⚙️</button>
+    <button onclick="openThemeModal()">⚙️</button>
 </header>
 
 <div class="container">
@@ -155,8 +207,8 @@
     </div>
     
     <div class="result-grid">
-        <div class="result-box">文字数(込) <span id="charCount" class="count-val">0</span></div>
-        <div class="result-box">文字数(除) <span id="noSpaceCount" class="count-val">0</span></div>
+        <div class="result-box">文字数(空白込) <span id="charCount" class="count-val">0</span></div>
+        <div class="result-box">文字数(空白除) <span id="noSpaceCount" class="count-val">0</span></div>
     </div>
     
     <div class="sns-box" id="infoBox">
@@ -166,19 +218,66 @@
     </div>
 </div>
 
+<div class="modal" id="themeModal">
+    <div class="modal-content">
+        <h3 style="margin:0 0 10px 0;">画面モードの設定</h3>
+        <label class="theme-option" onclick="changeThemeSetting('auto')">
+            <span>システム設定に従う</span>
+            <input type="radio" name="themeGroup" id="themeAuto" checked>
+        </label>
+        <label class="theme-option" onclick="changeThemeSetting('light')">
+            <span>ライトモード</span>
+            <input type="radio" name="themeGroup" id="themeLight">
+        </label>
+        <label class="theme-option" onclick="changeThemeSetting('dark')">
+            <span>ダークモード</span>
+            <input type="radio" name="themeGroup" id="themeDark">
+        </label>
+        <button class="modal-close-btn" onclick="closeThemeModal()">閉じる</button>
+    </div>
+</div>
+
 <script>
-    // ①ブラウザに保存されているダークモードの設定（trueかfalse）を読み込む
-    let isDarkMode = localStorage.getItem('darkMode') === 'true';
-    
-    // ②もし前回ダークモードにしていたら、画面を開いた瞬間にその見た目にする
-    if (isDarkMode) document.documentElement.setAttribute('data-theme', 'dark');
-    
-    // ⚙️ボタンが押されたときに、ライトとダークを交互に入れ替える命令
-    function toggleDarkMode() {
-        isDarkMode = !isDarkMode; // 現在の状態を反転させる
-        document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light'); // 見た目を変更
-        localStorage.setItem('darkMode', isDarkMode); // 次回のためにブラウザに記憶させる
+    // 🆕 3モードテーマ設定の読み込みと自動連動ロジック
+    let themeSetting = localStorage.getItem('themeSetting') || 'auto';
+
+    function applyCurrentTheme() {
+        if (themeSetting === 'auto') {
+            const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            document.documentElement.setAttribute('data-theme', isSystemDark ? 'dark' : 'light');
+        } else {
+            document.documentElement.setAttribute('data-theme', themeSetting);
+        }
     }
+
+    // パソコンやスマホ自体の設定が途中で切り替わったときにも自動連動させる
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+        if (themeSetting === 'auto') applyCurrentTheme();
+    });
+
+    // ポップアップを開く命令
+    function openThemeModal() {
+        document.getElementById('themeAuto').checked = (themeSetting === 'auto');
+        document.getElementById('themeLight').checked = (themeSetting === 'light');
+        document.getElementById('themeDark').checked = (themeSetting === 'dark');
+        document.getElementById('themeModal').style.display = 'flex';
+    }
+
+    // 設定を切り替えた時の命令
+    function changeThemeSetting(newSetting) {
+        themeSetting = newSetting;
+        localStorage.setItem('themeSetting', themeSetting);
+        applyCurrentTheme();
+    }
+
+    // ポップアップを閉じる命令
+    function closeThemeModal() {
+        document.getElementById('themeModal').style.display = 'none';
+    }
+
+    // 起動時に現在のテーマを反映
+    applyCurrentTheme();
+
 
     // 文字が入力されるたびに、リアルタイムで数字を計算して書き換える命令
     function updateCounter() {

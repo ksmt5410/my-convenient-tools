@@ -5,53 +5,183 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>便利ツール集</title>
     <style>
+        /* 通常モード（ライトモード）の色を設定する変数 */
+        :root {
+            --bg-color: #f5f5f5;        /* 画面全体の背景色（薄いグレー） */
+            --card-bg: #ffffff;         /* カードボタンの背景色（白） */
+            --text-color: #333333;      /* 文字の色（濃いグレー） */
+            --border-color: #dddddd;    /* 枠線の色（薄いグレー） */
+            --panel-bg: #e0e0e0;        /* ⚙️ポップアップ内の選択肢の背景 */
+        }
+
+        /* ダークモードの色を設定する変数 */
+        [data-theme="dark"] {
+            --bg-color: #121212;        /* 画面全体の背景色（真っ黒に近いグレー） */
+            --card-bg: #1e1e1e;         /* カードボタンの背景色（濃いグレー） */
+            --text-color: #ffffff;      /* 文字の色（白） */
+            --border-color: #444444;    /* 枠線の色（濃いグレー） */
+            --panel-bg: #2d2d2d;        /* ⚙️ポップアップ内の選択肢の背景 */
+        }
+
         /* 全体の背景や文字の種類を設定 */
         body { 
-            font-family: sans-serif;  /* 文字のフォントをゴシック体（見やすい標準的な文字）にする */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             text-align: center;       /* 画面の中にある文字やボタンを「真ん中寄せ」にする */
-            padding: 50px;            /* 画面の上の端から、少しゆとり（隙間）を作る */
-            background: #f5f5f5;      /* 背景を目に優しい薄いグレーにする */
-            margin: 0;                /* ブラウザが最初から持っている不要な外側の余白をゼロにする */
+            padding: 50px 20px;       /* 画面の上と左右にゆとりを作る */
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;                /* 不要な外側の余白をゼロにする */
+            transition: background 0.2s, color 0.2s;
+            position: relative;
         }
         
         /* <h1>（大見出し）のデザイン設定 */
         h1 {
-            margin-top: 0;            /* タイトルの上の隙間をなくしてスッキリさせる */
+            margin-top: 20px;
             margin-bottom: 30px;      /* タイトルの下に少し隙間を作って、ボタンと離す */
             font-size: 2rem;          /* 文字の大きさを標準より大きくする */
-            color: #333333;           /* 文字の色を真っ黒ではなく、少しおしゃれな濃いグレーにする */
         }
         
         /* リンク（aタグ）を「四角いボタン（カード）」に変身させるデザイン設定 */
         .card { 
-            background: white;        /* ボタンの背景を白にする */
+            background-color: var(--card-bg); /* ボタンの背景 */
             padding: 30px;            /* ボタンの中に文字を入れたとき、上下左右にたっぷりの余白を作る */
             margin: 10px;             /* ボタンとボタンがくっつかないように、外側に隙間を作る */
             border-radius: 12px;      /* 四角いボタンの「角」を丸くして優しくする */
-            display: inline-block;    /* ただの文字リンクから、横に並ぶ「四角い箱」の性質に変える */
+            display: inline-block;    /* 横に並ぶ「四角い箱」の性質に変える */
             width: 200px;             /* ボタンの横幅を200ピクセルに固定して大きさを揃える */
-            text-decoration: none;    /* リンクに自動でついてしまうダサい「下線」を消す */
-            color: #333;              /* ボタンの中の文字の色を濃いグレーにする */
+            text-decoration: none;    /* リンクに自動でついてしまう「下線」を消す */
+            color: var(--text-color); /* ボタンの中の文字の色 */
             font-weight: bold;        /* ボタンの中の文字を「太字」にする */
-            border: 1px solid #ddd;   /* ボタンの周りに薄いグレーの「枠線」を1ピクセルで引く */
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* ボタンの下にうっすらと立体的な影をつける */
-            transition: all 0.2s ease; /* マウスを乗せたときに、ふわっと0.2秒かけて変化させるおまじない */
+            border: 1px solid var(--border-color); /* ボタンの周りの「枠線」 */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* ボタンの下にうっすらと影をつける */
+            transition: all 0.2s ease; /* マウスを乗せたときにふわっと動かす設定 */
         }
         
-        /* 🖱️ マウスがボタンの上に乗ったとき（hover）だけの特別なデザイン設定 */
+        /* マウスをボタンの上に重ねたとき（hover）の見た目の変化設定 */
         .card:hover { 
-            background: #e3f2fd;      /* 背景を薄い綺麗な青色に変える */
-            border-color: #1565c0;    /* 枠線の色を濃い青色に変える */
-            transform: translateY(-2px); /* ボタンを上に2ピクセルだけピコッと浮き上がらせる */
+            transform: translateY(-50px); /* ボタンを上に5ピクセル浮き上がらせる */
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1); /* 浮き上がった分、下の影を濃く広くする */
+        }
+
+        /* ⚙️設定ボタンのデザイン */
+        .gear-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: transparent;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* ポップアップ画面（モーダル） */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        .modal-content {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            width: 85%;
+            max-width: 380px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            text-align: left;
+        }
+        .theme-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-radius: 8px;
+            background: var(--panel-bg);
+            cursor: pointer;
+        }
+        button {
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: var(--panel-bg);
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 1rem;
         }
     </style>
 </head>
 <body>
 
+    <button class="gear-btn" onclick="openThemeModal()">⚙️</button>
+
     <h1>便利ツール集</h1>
     
-    <a href="todo.html" class="card">Todoアプリ</a>
-    <a href="counter.html" class="card">文字数カウンター</a>
+    <a href="todo.html" class="card">📄 Todoリスト</a>
+    
+    <a href="counter.html" class="card">✏️ 文字数カウンター</a>
 
+    <div class="modal" id="themeModal">
+        <div class="modal-content">
+            <h3 style="margin:0 0 10px 0;">画面モードの設定</h3>
+            <label class="theme-option" onclick="changeThemeSetting('auto')">
+                <span>システム設定に従う</span>
+                <input type="radio" name="themeGroup" id="themeAuto" checked>
+            </label>
+            <label class="theme-option" onclick="changeThemeSetting('light')">
+                <span>ライトモード</span>
+                <input type="radio" name="themeGroup" id="themeLight">
+            </label>
+            <label class="theme-option" onclick="changeThemeSetting('dark')">
+                <span>ダークモード</span>
+                <input type="radio" name="themeGroup" id="themeDark">
+            </label>
+            <div style="display:flex; justify-content: flex-end; margin-top: 10px;">
+                <button onclick="closeThemeModal()" style="background:#2165f2; color:white;">閉じる</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let themeSetting = localStorage.getItem('themeSetting') || 'auto';
+
+        function applyCurrentTheme() {
+            if (themeSetting === 'auto') {
+                const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                document.documentElement.setAttribute('data-theme', isSystemDark ? 'dark' : 'light');
+            } else {
+                document.documentElement.setAttribute('data-theme', themeSetting);
+            }
+        }
+
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+            if (themeSetting === 'auto') applyCurrentTheme();
+        });
+
+        function openThemeModal() {
+            document.getElementById('themeAuto').checked = (themeSetting === 'auto');
+            document.getElementById('themeLight').checked = (themeSetting === 'light');
+            document.getElementById('themeDark').checked = (themeSetting === 'dark');
+            document.getElementById('themeModal').style.display = 'flex';
+        }
+
+        function changeThemeSetting(newSetting) {
+            themeSetting = newSetting;
+            localStorage.setItem('themeSetting', themeSetting);
+            applyCurrentTheme();
+        }
+
+        function closeThemeModal() {
+            document.getElementById('themeModal').style.display = 'none';
+        }
+
+        // 起動時にテーマを反映
+        applyCurrentTheme();
+    </script>
 </body>
 </html>
