@@ -15,13 +15,13 @@
             --active-color: #1565c0;
             --active-bg: #e3f2fd;
 
-            /* Java版ボタンカラー */
+            /* ボタンカラー */
             --btn-edit-bg: #e0f7fa;
             --btn-edit-text: #00838f;
             --btn-delete-bg: #ffebee;
             --btn-delete-text: #c62828;
             
-            /* 🆕 可愛いまるボタンの色（ライト） */
+            /* 可愛いまるボタンの色（ライト） */
             --btn-status-uncomplete-bg: #eceff1;
             --btn-status-uncomplete-dot: #b0bec5;
             --btn-status-complete-bg: #e8f5e9;
@@ -42,13 +42,13 @@
             --active-color: #2196f3;
             --active-bg: #1565c0;
 
-            /* Java版ボタンカラー（ダーク） */
+            /* ボタンカラー（ダーク） */
             --btn-edit-bg: #006064;
             --btn-edit-text: #80deea;
             --btn-delete-bg: #b71c1c;
             --btn-delete-text: #ef9a9a;
             
-            /* 🆕 可愛いまるボタンの色（ダーク） */
+            /* 可愛いまるボタンの色（ダーク） */
             --btn-status-uncomplete-bg: #37474f;
             --btn-status-uncomplete-dot: #78909c;
             --btn-status-complete-bg: #1b5e20;
@@ -78,7 +78,7 @@
             gap: 10px;
         }
 
-        header button {
+        header button.theme-trigger-btn {
             background: transparent !important;
             border: none !important;
             font-size: 1.5rem !important;
@@ -87,7 +87,7 @@
             cursor: pointer;
         }
 
-        header button:hover {
+        header button.theme-trigger-btn:hover {
             transform: translateY(-2px);
         }
 
@@ -101,26 +101,30 @@
 
         .filters {
             display: flex;
-            gap: 6px;
+            gap: 8px;
             align-items: center;
             flex-wrap: wrap;
         }
 
-        button {
-            padding: 6px 12px;
-            border-radius: 8px;
+        /* 🆕 「すべて」「未完了」のフィルターボタンを立体的なデザインに強化 */
+        .filter-btn {
+            padding: 6px 16px;
+            border-radius: 20px; /* 丸みのある可愛いタブ形状に */
             border: 1px solid var(--border-color);
-            background-color: var(--panel-bg);
+            background-color: var(--bg-color);
             color: var(--text-color);
             cursor: pointer;
-            font-size: 1rem;
-            transition: all 0.1s ease;
+            font-size: 0.9rem;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
         }
 
-        button.active {
+        .filter-btn.active {
             background-color: var(--active-bg);
             color: var(--active-color);
             border-color: var(--active-color);
+            box-shadow: inset 0 2px 4px rgba(21, 101, 192, 0.15); /* 選択中は少し凹んだ押し心地 */
         }
 
         .action-btn {
@@ -131,11 +135,11 @@
             border: 1px solid rgba(255,255,255,0.15);
         }
 
-        /* 🆕 ぷちっと可愛いステータス丸ボタン */
+        /* ぷちっと可愛いステータス丸ボタン */
         .status-circle-btn {
             width: 34px;
             height: 34px;
-            border-radius: 50% !important; /* 完全な丸に */
+            border-radius: 50% !important;
             border: none !important;
             display: flex;
             align-items: center;
@@ -146,7 +150,6 @@
             padding: 0 !important;
             flex-shrink: 0;
         }
-        /* 押したときのポチッと感 */
         .status-circle-btn:active {
             transform: translateY(1px);
             box-shadow: inset 0 2px 3px rgba(0,0,0,0.2);
@@ -176,7 +179,6 @@
             margin: 0 auto;
         }
 
-        /* 🆕 タスクの1行全体を縦並び・スマホ対応に最適化 */
         .todo-item {
             display: flex;
             align-items: flex-start;
@@ -192,11 +194,10 @@
             flex: 1;
         }
 
-        /* 🆕 ご希望通りの4行構成（縦並び）にするコンテナ */
         .todo-details {
             display: flex;
             flex-direction: column;
-            gap: 4px; /* 行ごとのちょっとした隙間 */
+            gap: 4px;
             flex: 1;
         }
 
@@ -212,7 +213,6 @@
             opacity: 0.7;
         }
 
-        /* 🆕 独立した2行目の繰り返しラベル */
         .repeat-row {
             font-size: 0.8rem;
             color: #ff9800;
@@ -232,7 +232,6 @@
             font-weight: bold;
         }
 
-        /* 🆕 3行目のメモ欄を読みやすく */
         .memo-row {
             font-size: 0.85rem;
             color: #00796b;
@@ -248,7 +247,6 @@
             background: rgba(255, 255, 255, 0.02);
         }
 
-        /* 右側の編集・削除ボタンを縦、またはまとまった配置に */
         .todo-right {
             display: flex;
             flex-direction: column;
@@ -304,12 +302,8 @@
             box-sizing: border-box;
         }
 
-        button, .action-btn, .add-btn {
-            transition: all 0.2s ease !important;
-        }
-
-        button:hover, .action-btn:hover, .add-btn:hover {
-            transform: translateY(-2px);
+        .filter-btn:hover, .action-btn:hover, .add-btn:hover {
+            transform: translateY(-1px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
             opacity: 0.9;
         }
@@ -355,8 +349,8 @@
             <a href="index.html" style="text-decoration: none; font-size: 1.5rem; color: var(--text-color); line-height: 1;" title="トップページに戻る">🏠</a>
             
             <div class="filters">
-                <button id="filterAll" class="active" onclick="setFilter('ALL')">すべて</button>
-                <button id="filterActive" onclick="setFilter('ACTIVE')">未完了</button>
+                <button id="filterAll" class="filter-btn active" onclick="setFilter('ALL')">すべて</button>
+                <button id="filterActive" class="filter-btn" onclick="setFilter('ACTIVE')">未完了</button>
                 <select id="categoryFilter" onchange="renderTodos()">
                     <option value="ALL">すべてのカテゴリ</option>
                 </select>
@@ -364,7 +358,7 @@
             </div>
         </div>
         <div>
-            <button onclick="openThemeModal()">⚙️</button>
+            <button class="theme-trigger-btn" onclick="openThemeModal()">⚙️</button>
         </div>
     </header>
 
@@ -374,7 +368,6 @@
         <button class="add-btn" onclick="openAddModal()">＋ 新しいタスクを追加</button>
     </div>
 
-    <!-- ⚙️ダーク・ライト設定ポップアップ画面 -->
     <div class="modal" id="themeModal">
         <div class="modal-content">
             <h3 style="margin:0 0 10px 0; text-align: left;">画面モードの設定</h3>
@@ -615,11 +608,18 @@
                 return;
             }
 
+            // 🆕 並び替え条件（ソート）の強化
             filtered.sort((a, b) => {
+                // 1. 完了状態を比較（未完了が上、完了済みが下）
+                if (a.isCompleted !== b.isCompleted) {
+                    return a.isCompleted ? 1 : -1;
+                }
+                
+                // 2. どちらも未完了、またはどちらも完了済みの場合は「期限順」に並び替える
                 if (!a.dueDate && !b.dueDate) return a.createdAt - b.createdAt;
-                if (!a.dueDate) return 1;
+                if (!a.dueDate) return 1; // 期限なしは下へ
                 if (!b.dueDate) return -1;
-                return a.dueDate.localeCompare(b.dueDate);
+                return a.dueDate.localeCompare(b.dueDate); // 日付が古い（期限が近い）順
             });
 
             filtered.forEach(todo => {
@@ -638,59 +638,51 @@
 
                 const catColor = todo.categoryColor || '#00796b';
 
-                // 🆕 ぷちっと丸ボタンの色の切り替え条件
                 let statusBtnStyle = '';
-                let statusSymbol = '●'; // 未完了のときは薄い丸
+                let statusSymbol = '●';
                 
                 if (todo.isCompleted) {
                     statusBtnStyle = 'background-color: var(--btn-status-complete-bg); color: var(--btn-status-complete-dot);';
-                    statusSymbol = '✔'; // 完了したらチェックマーク（またはお好みで丸でも！）
+                    statusSymbol = '✔';
                 } else if (dateInfo.isOverdue) {
                     statusBtnStyle = 'background-color: var(--btn-status-uncomplete-bg); color: var(--btn-status-overdue-dot);';
-                    statusSymbol = '●'; // 超過時は赤い丸
+                    statusSymbol = '●';
                 } else {
                     statusBtnStyle = 'background-color: var(--btn-status-uncomplete-bg); color: var(--btn-status-uncomplete-dot);';
                     statusSymbol = '●';
                 }
 
-                // 🆕 ご希望の4行構成に完全に分解してレンダリング
                 item.innerHTML = `
                     <div class="todo-left">
-                        <!-- まるボタン -->
                         <button class="status-circle-btn" style="${statusBtnStyle}" onclick="toggleComplete('${todo.id}')">
                             ${statusSymbol}
                         </button>
                         
-                        <!-- 4行のテキスト詳細エリア -->
                         <div class="todo-details">
-                            <!-- 1行目: カテゴリ + タスク名 -->
                             <div class="todo-title">
                                 ${todo.category && todo.category !== 'なし' ? `<span style="color:${catColor};">[${todo.category}]</span> ` : ''}${todo.name}
                             </div>
                             
-                            <!-- 2行目: 繰り返し表示 (設定されていれば表示) -->
                             ${repeatLabel ? `<div class="repeat-row">${repeatLabel}</div>` : ''}
                             
-                            <!-- 3行目: 期限表示 -->
                             <div class="todo-sub ${dateInfo.isOverdue ? 'overdue' : ''}">
                                 期限: ${dateInfo.dateText}<span style="font-weight:bold;">${dateInfo.countdownText}</span>
                             </div>
                             
-                            <!-- 4行目: メモ表示 (設定されていれば表示) -->
                             ${todo.memo ? `<div class="memo-row">${todo.memo}</div>` : ''}
                         </div>
                     </div>
                     
-                    <!-- 右側の編集・削除ボタン -->
                     <div class="todo-right">
-                        <button class="action-btn" style="background-color: var(--btn-edit-bg); color: var(--btn-edit-text);" onclick="openEditModal('${todo.id}')">編集</button>
-                        <button class="action-btn" style="background-color: var(--btn-delete-bg); color: var(--btn-delete-text);" onclick="deleteTodo('${todo.id}')">削除</button>
+                        <button class="action-btn" style="background-color: var(--btn-edit-bg); color: var(--btn-edit-text); font-size: 1.1rem; padding: 6px 10px;" onclick="openEditModal('${todo.id}')" title="編集">✏️</button>
+                        <button class="action-btn" style="background-color: var(--btn-delete-bg); color: var(--btn-delete-text); font-size: 1.1rem; padding: 6px 10px;" onclick="deleteTodo('${todo.id}')" title="削除">❌</button>
                     </div>
                 `;
                 listContainer.appendChild(item);
             });
         }
 
+        // （以降の処理は変更なしのため省略しません。そのまま完全に動作します）
         function toggleComplete(id) {
             const todo = todos.find(t => t.id === id);
             if (todo) {

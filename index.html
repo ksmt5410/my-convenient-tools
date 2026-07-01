@@ -55,13 +55,13 @@
             font-weight: bold;        /* ボタンの中の文字を「太字」にする */
             border: 1px solid var(--border-color); /* ボタンの周りの「枠線」 */
             box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* ボタンの下にうっすらと影をつける */
-            transition: all 0.2s ease; /* マウスを乗せたときにふわっと動かす設定 */
+            transition: all 0.3s ease; /* マウスを乗せたときにふわっと動かす設定 */
         }
         
         /* マウスをボタンの上に重ねたとき（hover）の見た目の変化設定 */
         .card:hover { 
-            transform: translateY(-50px); /* ボタンを上に5ピクセル浮き上がらせる */
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1); /* 浮き上がった分、下の影を濃く広くする */
+            transform: translateY(1px); /* ボタンを上に5ピクセル浮き上がらせる */
+            box-shadow: inset 0 2px 3px rgba(0,0,0,0.2);/* 浮き上がった分、下の影を濃く広くする */
         }
 
         /* ⚙️設定ボタンのデザイン */
