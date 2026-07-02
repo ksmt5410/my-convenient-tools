@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>お買い物リスト</title>
     <style>
         /* === デザイン設定（CSS） === */
@@ -17,7 +17,7 @@
             --danger-bg: #ffebee;
             --danger-text: #c62828;
             --history-bg: #f1f5f9;
-            --modal-option-bg: #e0e0e0; /* ⚙️ポップアップ内の選択肢の背景 */
+            --modal-option-bg: #e0e0e0;
         }
 
         [data-theme="dark"] {
@@ -31,7 +31,7 @@
             --danger-bg: #b71c1c;
             --danger-text: #ef9a9a;
             --history-bg: #334155;
-            --modal-option-bg: #2d2d2d; /* ⚙️ポップアップ内の選択肢の背景 */
+            --modal-option-bg: #2d2d2d;
         }
 
         body {
@@ -41,6 +41,7 @@
             color: var(--text-color);
             padding-bottom: 30px;
             user-select: none;
+            -webkit-user-select: none;
         }
 
         header {
@@ -58,7 +59,6 @@
             flex: 1;
         }
 
-        /* ⚙ 設定ボタンのスタイル */
         .settings-btn {
             background: transparent;
             font-size: 1.3rem;
@@ -70,7 +70,6 @@
             color: var(--text-color);
         }
 
-        /* ⚙️ポップアップ画面（モーダル）index.htmlと統一 */
         .modal {
             display: none;
             position: fixed;
@@ -78,7 +77,7 @@
             background: rgba(0,0,0,0.5);
             justify-content: center;
             align-items: center;
-            z-index: 100;
+            z-index: 1000;
         }
         .modal-content {
             background: var(--panel-bg);
@@ -91,14 +90,24 @@
             gap: 12px;
             text-align: left;
         }
-        .theme-option {
+        .theme-option, .menu-option {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px;
+            padding: 12px;
             border-radius: 8px;
             background: var(--modal-option-bg);
             cursor: pointer;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            font-weight: bold;
+            font-size: 0.95rem;
+            text-align: left;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .menu-option:active {
+            filter: brightness(0.9);
         }
 
         .container {
@@ -108,7 +117,6 @@
             box-sizing: border-box;
         }
 
-        /* 入力エリア */
         .input-panel {
             background-color: var(--panel-bg);
             padding: 15px;
@@ -124,36 +132,74 @@
         .input-row {
             display: flex;
             gap: 8px;
+            width: 100%;
         }
 
         input, select {
             padding: 10px;
             border-radius: 8px;
-            border: 1px solid var(--border-color);
-            background: var(--bg-color);
+            border: 1px solid rgba(0,0,0,0.08);
+            background: #f1f5f9; 
             color: var(--text-color);
             font-size: 1rem;
             box-sizing: border-box;
+            min-width: 0;
+        }
+        [data-theme="dark"] input {
+            background: #2d2d2d;
+            border: 1px solid #444444;
         }
 
         #itemName { flex: 2; }
-        #itemPrice { flex: 1; min-width: 70px; }
+        #itemPrice { flex: 1; }
         
         .category-combobox {
             display: flex;
-            flex: 1;
+            flex: 2; 
+            min-width: 0;
+            position: relative;
         }
         #itemCategory {
             flex: 1;
-            border-top-right-radius: 0;
-            border-bottom-right-radius: 0;
-            border-right: none;
+            width: 100%;
+            border-radius: 8px; 
+            padding-right: 30px;
         }
-        #itemCategorySelect {
-            width: 100px;
-            border-top-left-radius: 0;
-            border-bottom-left-radius: 0;
+        .combobox-arrow {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.7rem;
+            color: var(--sub-text);
+            pointer-events: none;
+        }
+
+        .custom-dropdown-list {
+            display: none;
+            position: absolute;
+            top: 105%;
+            left: 0;
+            width: 100%;
+            max-height: 150px;
+            overflow-y: auto;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 999;
+            box-sizing: border-box;
+            padding: 4px 0;
+        }
+        .custom-dropdown-item {
+            padding: 10px 12px;
+            font-size: 0.95rem;
             cursor: pointer;
+            color: var(--text-color);
+            text-align: left;
+        }
+        .custom-dropdown-item:active {
+            background-color: var(--primary-bg);
         }
 
         button {
@@ -167,8 +213,14 @@
         .add-btn {
             background-color: var(--primary-color);
             color: #ffffff;
-            padding: 0 20px;
-            font-size: 1.1rem;
+            width: 44px;
+            height: 42px;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            padding: 0;
         }
         [data-theme="dark"] .add-btn { color: #121212; }
 
@@ -200,14 +252,19 @@
             padding: 12px;
             margin-top: 15px;
             margin-bottom: 5px;
-            transition: all 0.2s ease;
+            transition: transform 0.2s, background-color 0.2s;
             position: relative;
+            touch-action: translateY; /* スマホの横ブレ防止、上下スクロールは許可 */
+        }
+
+        .category-group-box.box-dragging {
+            opacity: 0.4;
+            border-color: var(--primary-color);
         }
 
         .category-group-box.drag-over {
             filter: brightness(0.92);
             border-color: var(--primary-color);
-            transform: scale(1.01);
         }
         [data-theme="dark"] .category-group-box.drag-over {
             filter: brightness(1.2);
@@ -218,6 +275,12 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 10px;
+            cursor: grab;
+            padding: 4px;
+            border-radius: 6px;
+        }
+        .category-box-header-row:active {
+            cursor: grabbing;
         }
 
         .category-group-header {
@@ -226,32 +289,20 @@
             font-weight: bold;
             display: flex;
             align-items: center;
+            pointer-events: none; /* タッチイベントの誤発動を防ぐ */
         }
 
-        /* 🎨 右上のカラー変更コントロール */
-        .color-picker-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            font-size: 1.1rem;
-            opacity: 0.7;
-            transition: opacity 0.2s;
-        }
-        .color-picker-wrapper:hover {
-            opacity: 1;
-        }
-        .color-input {
-            position: absolute;
-            right: 0;
-            top: 0;
-            width: 24px;
-            height: 24px;
-            opacity: 0;
-            cursor: pointer;
-            padding: 0;
+        .box-menu-trigger-btn {
+            background: transparent;
             border: none;
+            color: var(--text-color);
+            font-size: 1.1rem;
+            cursor: pointer;
+            padding: 2px 8px;
+            border-radius: 6px;
+            opacity: 0.6;
         }
+        .box-menu-trigger-btn:hover { opacity: 1; }
 
         .shopping-list {
             display: flex;
@@ -269,12 +320,9 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            opacity: 1;
-            transform: translateY(0);
-            max-height: 100px;
-            overflow: hidden;
             cursor: grab;
-            transition: opacity 0.4s ease, transform 0.4s ease, max-height 0.4s ease, padding 0.4s ease, background-color 0.2s;
+            transition: opacity 0.3s, transform 0.3s;
+            touch-action: none; /* スマホ移動中、画面スクロールを止める */
         }
         .shopping-item:active { cursor: grabbing; }
         .shopping-item.dragging { opacity: 0.3; }
@@ -285,8 +333,6 @@
             max-height: 0 !important;
             padding-top: 0 !important;
             padding-bottom: 0 !important;
-            border-top-color: transparent;
-            border-bottom-color: transparent;
             margin: 0;
         }
 
@@ -294,6 +340,7 @@
             opacity: 0.4;
             background-color: transparent;
             cursor: default;
+            touch-action: auto; /* チェック済みは通常通りスクロール可能に */
         }
         .shopping-item.checked .item-name { text-decoration: line-through; }
 
@@ -336,7 +383,6 @@
         }
         .delete-btn:hover { color: var(--danger-text); }
 
-        /* 履歴エリア */
         .history-panel {
             margin-top: 30px;
             padding-top: 20px;
@@ -378,13 +424,14 @@
         }
         
         .modal-close-btn {
-            padding: 6px 12px;
+            padding: 8px 20px;
             border-radius: 8px;
             border: 1px solid var(--border-color);
             cursor: pointer;
             font-size: 1rem;
             background: #2165f2; 
             color: white;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -404,12 +451,11 @@
             </div>
             <div class="input-row">
                 <div class="category-combobox">
-                    <input type="text" id="itemCategory" placeholder="カテゴリ (例: 肉類)" onkeypress="handleKeyPress(event)">
-                    <select id="itemCategorySelect" onchange="selectExistingCategory()">
-                        <option value="">(履歴)</option>
-                    </select>
+                    <input type="text" id="itemCategory" placeholder="カテゴリ (例: 肉類)" oninput="handleCategoryInput()" onclick="showCustomDropdown(event)" autocomplete="off">
+                    <span class="combobox-arrow">▼</span>
+                    <div id="customDropdownList" class="custom-dropdown-list"></div>
                 </div>
-                <button class="add-btn" onclick="addItem()">追加</button>
+                <button class="add-btn" onclick="addItem()">＋</button>
             </div>
         </div>
 
@@ -453,24 +499,49 @@
         </div>
     </div>
 
+    <div class="modal" id="boxMenuModal">
+        <div class="modal-content">
+            <h3 id="boxMenuTitle" style="margin:0 0 5px 0; font-size: 1.1rem;">カテゴリ設定</h3>
+            <p style="margin: 0 0 15px 0; font-size: 0.85rem; color: var(--sub-text);">このカテゴリ全体の設定を行います。</p>
+            
+            <button class="menu-option" onclick="triggerColorPicker()">
+                <span>🎨 カテゴリ色の変更</span>
+                <input type="color" id="hiddenColorInput" style="width:0; height:0; opacity:0; padding:0; border:none;" onchange="handleColorPicked(this.value)">
+            </button>
+            
+            <button class="menu-option" onclick="triggerPriceChange()">
+                <span>💰 登録単価の変更</span>
+            </button>
+            
+            <div style="display:flex; justify-content: flex-end; margin-top: 10px;">
+                <button class="modal-close-btn" style="background-color: var(--history-bg); color: var(--text-color);" onclick="closeBoxMenu()">キャンセル</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         let listItems = [];
         let itemMaster = [];
         let categoryColors = {};
+        let categoryOrder = [];
         let draggedItemId = null;
+        let draggedCategoryName = null;
         let themeSetting = localStorage.getItem('themeSetting') || 'auto';
+        
+        let activeMenuCategory = null;
 
         try {
             listItems = JSON.parse(localStorage.getItem('shopping_items')) || [];
             itemMaster = JSON.parse(localStorage.getItem('shopping_master')) || [];
             categoryColors = JSON.parse(localStorage.getItem('shopping_category_colors')) || {};
+            categoryOrder = JSON.parse(localStorage.getItem('shopping_category_order')) || [];
         } catch(e) {
             listItems = [];
             itemMaster = [];
             categoryColors = {};
+            categoryOrder = [];
         }
 
-        // === 🌓 テーマ管理機能（index.html準拠） ===
         function applyCurrentTheme() {
             if (themeSetting === 'auto') {
                 const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -501,14 +572,13 @@
             document.getElementById('themeModal').style.display = 'none';
         }
 
-        // 起動時にテーマを即時反映
         applyCurrentTheme();
 
-        // === 🛒 リスト操作ロジック ===
         function saveToStorage() {
             localStorage.setItem('shopping_items', JSON.stringify(listItems));
             localStorage.setItem('shopping_master', JSON.stringify(itemMaster));
             localStorage.setItem('shopping_category_colors', JSON.stringify(categoryColors));
+            localStorage.setItem('shopping_category_order', JSON.stringify(categoryOrder));
         }
 
         function handleKeyPress(e) {
@@ -521,24 +591,62 @@
             return [...new Set([...fromMaster, ...fromList])].filter(c => c !== 'なし');
         }
 
-        function updateCategoryDropdown() {
-            const select = document.getElementById('itemCategorySelect');
-            if (!select) return;
-            select.innerHTML = '<option value="">(履歴)</option>';
-            getUniqueCategories().forEach(cat => {
-                const opt = document.createElement('option');
-                opt.value = cat;
-                opt.textContent = cat;
-                select.appendChild(opt);
+        function buildCustomDropdownList() {
+            const dropdown = document.getElementById('customDropdownList');
+            if (!dropdown) return;
+
+            const categories = getUniqueCategories();
+            const currentInputText = document.getElementById('itemCategory').value.trim().toLowerCase();
+
+            const filteredCategories = categories.filter(cat => {
+                if (!currentInputText) return true;
+                return cat.toLowerCase().includes(currentInputText);
+            });
+
+            dropdown.innerHTML = '';
+
+            if (filteredCategories.length === 0) {
+                dropdown.style.display = 'none';
+                return;
+            }
+
+            filteredCategories.forEach(cat => {
+                const item = document.createElement('div');
+                item.className = 'custom-dropdown-item';
+                item.textContent = cat;
+                
+                item.onclick = function(e) {
+                    e.stopPropagation();
+                    document.getElementById('itemCategory').value = cat;
+                    dropdown.style.display = 'none';
+                };
+                dropdown.appendChild(item);
             });
         }
 
-        function selectExistingCategory() {
-            const select = document.getElementById('itemCategorySelect');
-            if (select.value) {
-                document.getElementById('itemCategory').value = select.value;
+        function showCustomDropdown(e) {
+            e.stopPropagation();
+            buildCustomDropdownList();
+            const dropdown = document.getElementById('customDropdownList');
+            if (dropdown.children.length > 0) {
+                dropdown.style.display = 'block';
             }
         }
+
+        function handleCategoryInput() {
+            buildCustomDropdownList();
+            const dropdown = document.getElementById('customDropdownList');
+            if (dropdown.children.length > 0) {
+                dropdown.style.display = 'block';
+            } else {
+                dropdown.style.display = 'none';
+            }
+        }
+
+        document.addEventListener('click', function() {
+            const dropdown = document.getElementById('customDropdownList');
+            if (dropdown) dropdown.style.display = 'none';
+        });
 
         function matchHistoryData() {
             const currentName = document.getElementById('itemName').value.trim();
@@ -577,6 +685,10 @@
             listItems.push(newItem);
             updateMasterData(name, category, price);
 
+            if (category !== 'なし' && !categoryOrder.includes(category)) {
+                categoryOrder.push(category);
+            }
+
             nameInput.value = '';
             priceInput.value = '';
             catInput.value = '';
@@ -605,6 +717,11 @@
                 isChecked: false
             };
             listItems.push(newItem);
+
+            if (category && category !== 'なし' && !categoryOrder.includes(category)) {
+                categoryOrder.push(category);
+            }
+
             saveToStorage();
             render();
         }
@@ -660,40 +777,189 @@
             }
         }
 
-        function changeBoxColor(category, hexColor) {
-            categoryColors[category] = hexColor;
+        function openBoxMenu(category) {
+            activeMenuCategory = category;
+            document.getElementById('boxMenuTitle').textContent = `「${category}」のカテゴリ設定`;
+            document.getElementById('boxMenuModal').style.display = 'flex';
+        }
+
+        function closeBoxMenu() {
+            document.getElementById('boxMenuModal').style.display = 'none';
+            activeMenuCategory = null;
+        }
+
+        function triggerColorPicker() {
+            const picker = document.getElementById('hiddenColorInput');
+            picker.value = categoryColors[activeMenuCategory] || '#ffffff';
+            picker.click();
+        }
+
+        function handleColorPicked(colorHex) {
+            if (!activeMenuCategory) return;
+            categoryColors[activeMenuCategory] = colorHex;
             saveToStorage();
+            closeBoxMenu();
             render();
         }
 
-        // === 🎛️ ドラッグ＆ドロップイベント ===
-        function handleDragStart(e, id) {
+        function triggerPriceChange() {
+            if (!activeMenuCategory) return;
+            
+            const belongs = itemMaster.filter(m => m.category === activeMenuCategory);
+            if (belongs.length === 0) {
+                alert('このカテゴリに事前に登録されたよく買うもの（履歴商品）がありません。');
+                return;
+            }
+
+            let msg = `「${activeMenuCategory}」に登録されている商品の単価を変更します。\n変更したい商品の新しい価格を半角数字で入力してください。\n\n`;
+            belongs.forEach((b, idx) => {
+                msg += `${idx + 1}. ${b.name} (現在: ￥${b.price})\n`;
+            });
+            
+            const selectNum = prompt(msg + '\n変更する商品の番号を入力してください (例: 1):');
+            const targetIdx = parseInt(selectNum) - 1;
+
+            if (!isNaN(targetIdx) && belongs[targetIdx]) {
+                const targetItem = belongs[targetIdx];
+                const newPriceInput = prompt(`「${targetItem.name}」の新しい単価を入力してください:`, targetItem.price);
+                const newPrice = parseInt(newPriceInput);
+                
+                if (!isNaN(newPrice) && newPrice >= 0) {
+                    targetItem.price = newPrice;
+                    
+                    listItems.forEach(i => {
+                        if (i.name === targetItem.name && !i.isChecked) {
+                            i.price = newPrice;
+                        }
+                    });
+
+                    saveToStorage();
+                    alert(`「${targetItem.name}」の単価を￥${newPrice}に更新しました！`);
+                    closeBoxMenu();
+                    render();
+                } else if (newPriceInput !== null) {
+                    alert('正しい数値を入力してください。');
+                }
+            } else if (selectNum !== null) {
+                alert('正しい番号が選択されませんでした。');
+            }
+        }
+
+        // === 🎛️ PC版ドラッグ＆ドロップ用関数 ===
+        function handleItemDragStart(e, id) {
+            e.stopPropagation();
             draggedItemId = id;
+            draggedCategoryName = null;
             e.currentTarget.classList.add('dragging');
         }
-
-        function handleDragEnd(e) {
+        function handleItemDragEnd(e) {
             e.currentTarget.classList.remove('dragging');
             document.querySelectorAll('.category-group-box').forEach(b => b.classList.remove('drag-over'));
+            draggedItemId = null;
         }
-
+        function handleBoxDragStart(e, categoryName) {
+            draggedItemId = null;
+            draggedCategoryName = categoryName;
+            e.currentTarget.classList.add('box-dragging');
+        }
+        function handleBoxDragEnd(e) {
+            e.currentTarget.classList.remove('box-dragging');
+            document.querySelectorAll('.category-group-box').forEach(b => b.classList.remove('drag-over'));
+            draggedCategoryName = null;
+        }
         function handleDragOver(e) { e.preventDefault(); }
         function handleDragEnter(e) { e.currentTarget.classList.add('drag-over'); }
         function handleDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
-
         function handleDrop(e, targetCategory) {
             e.preventDefault();
-            if (!draggedItemId) return;
+            executeMoveLogic(targetCategory);
+        }
 
-            const item = listItems.find(i => i.id === draggedItemId);
-            if (item) {
-                item.category = targetCategory;
-                updateMasterData(item.name, targetCategory, item.price);
-                saveToStorage();
-                render();
+        // 移動実行コアロジック（PC・スマホ共通）
+        function executeMoveLogic(targetCategory) {
+            if (draggedItemId) {
+                const item = listItems.find(i => i.id === draggedItemId);
+                if (item) {
+                    item.category = targetCategory;
+                    updateMasterData(item.name, targetCategory, item.price);
+                    if (targetCategory !== 'なし' && !categoryOrder.includes(targetCategory)) {
+                        categoryOrder.push(targetCategory);
+                    }
+                    saveToStorage();
+                    render();
+                }
+            }
+            if (draggedCategoryName && draggedCategoryName !== targetCategory) {
+                const fromIdx = categoryOrder.indexOf(draggedCategoryName);
+                const toIdx = categoryOrder.indexOf(targetCategory);
+                if (fromIdx >= 0 && toIdx >= 0) {
+                    categoryOrder.splice(fromIdx, 1);
+                    categoryOrder.splice(toIdx, 0, draggedCategoryName);
+                    saveToStorage();
+                    render();
+                }
             }
             draggedItemId = null;
+            draggedCategoryName = null;
         }
+
+        // 🆕 === 📱 スマホ専用 タッチスワイプ移動システム ===
+        function setupTouchListeners(element, type, idOrName) {
+            element.addEventListener('touchstart', (e) => {
+                if (e.touches.length > 1) return;
+                if (type === 'item') {
+                    draggedItemId = idOrName;
+                    draggedCategoryName = null;
+                    element.classList.add('dragging');
+                } else {
+                    // ヘッダー行をタッチした時のみ箱ドラッグ
+                    if (e.target.closest('.box-menu-trigger-btn')) return;
+                    draggedItemId = null;
+                    draggedCategoryName = idOrName;
+                    element.classList.add('box-dragging');
+                }
+            }, { passive: true });
+
+            element.addEventListener('touchmove', (e) => {
+                if (!draggedItemId && !draggedCategoryName) return;
+                
+                // スワイプ位置にある「下の要素」を検知
+                const touch = e.touches[0];
+                const targetEl = document.elementFromPoint(touch.clientX, touch.clientY);
+                if (!targetEl) return;
+
+                const targetBox = targetEl.closest('.category-group-box');
+                document.querySelectorAll('.category-group-box').forEach(b => b.classList.remove('drag-over'));
+                
+                if (targetBox) {
+                    targetBox.classList.add('drag-over');
+                    // アイテムドラッグ時は画面スクロールを完全に停止
+                    if (draggedItemId && e.cancelable) e.preventDefault();
+                }
+            }, { passive: false });
+
+            element.addEventListener('touchend', (e) => {
+                if (!draggedItemId && !draggedCategoryName) return;
+                
+                element.classList.remove('dragging', 'box-dragging');
+                
+                const touch = e.changedTouches[0];
+                const targetEl = document.elementFromPoint(touch.clientX, touch.clientY);
+                document.querySelectorAll('.category-group-box').forEach(b => b.classList.remove('drag-over'));
+                
+                if (targetEl) {
+                    const targetBox = targetEl.closest('.category-group-box');
+                    if (targetBox) {
+                        const targetCategory = targetBox.getAttribute('data-category');
+                        executeMoveLogic(targetCategory);
+                        return;
+                    }
+                }
+                draggedItemId = null;
+                draggedCategoryName = null;
+            });
+        }
+
 
         // === 🖌️ レンダリング ===
         function render() {
@@ -703,7 +969,6 @@
             
             mainListContainer.innerHTML = '';
             historyGrid.innerHTML = '';
-            updateCategoryDropdown();
 
             if (listItems.length === 0) {
                 mainListContainer.innerHTML = '<div style="text-align:center; color:gray; padding:20px; font-size:0.9rem;">リストは空っぽです</div>';
@@ -719,11 +984,17 @@
             const completedItems = listItems.filter(i => i.isChecked);
 
             const activeCategories = [...new Set(uncompletedItems.map(i => i.category))];
-            activeCategories.sort((a, b) => {
-                if (a === 'なし') return 1;
-                if (b === 'なし') return -1;
-                return a.localeCompare(b);
+
+            activeCategories.forEach(c => {
+                if (c !== 'なし' && !categoryOrder.includes(c)) {
+                    categoryOrder.push(c);
+                }
             });
+
+            const sortedCategories = categoryOrder.filter(c => activeCategories.includes(c));
+            if (activeCategories.includes('なし')) {
+                sortedCategories.push('なし');
+            }
 
             let totalPrice = 0;
 
@@ -736,8 +1007,10 @@
                 
                 if (!item.isChecked) {
                     div.setAttribute('draggable', 'true');
-                    div.addEventListener('dragstart', (e) => handleDragStart(e, item.id));
-                    div.addEventListener('dragend', handleDragEnd);
+                    div.addEventListener('dragstart', (e) => handleItemDragStart(e, item.id));
+                    div.addEventListener('dragend', handleItemDragEnd);
+                    // 🆕 スマホ用のタッチイベント登録
+                    setupTouchListeners(div, 'item', item.id);
                 }
                 
                 div.innerHTML = `
@@ -753,11 +1026,15 @@
                 return div;
             }
 
-            // 1. 未完了アイテムを大きな箱ごとに描画
-            activeCategories.forEach(cat => {
+            sortedCategories.forEach(cat => {
                 const box = document.createElement('div');
                 box.className = 'category-group-box';
+                box.setAttribute('data-category', cat);
                 
+                box.setAttribute('draggable', 'true');
+                box.addEventListener('dragstart', (e) => handleBoxDragStart(e, cat));
+                box.addEventListener('dragend', handleBoxDragEnd);
+
                 if (categoryColors[cat]) {
                     box.style.backgroundColor = categoryColors[cat];
                     box.style.borderColor = 'transparent';
@@ -770,20 +1047,25 @@
 
                 const headerRow = document.createElement('div');
                 headerRow.className = 'category-box-header-row';
+                // 🆕 スマホ用のタッチイベント登録（箱の並び替え）
+                setupTouchListeners(headerRow, 'box', cat);
 
                 const header = document.createElement('div');
                 header.className = 'category-group-header';
                 header.textContent = cat === 'なし' ? 'その他（ドラッグで仕分け）' : cat;
                 headerRow.appendChild(header);
 
-                const pickerWrapper = document.createElement('div');
-                pickerWrapper.className = 'color-picker-wrapper';
-                pickerWrapper.title = 'この箱の色を変える';
-                pickerWrapper.innerHTML = `
-                    🎨
-                    <input type="color" class="color-input" value="${categoryColors[cat] || '#ffffff'}" onchange="changeBoxColor('${cat}', this.value)">
-                `;
-                headerRow.appendChild(pickerWrapper);
+                if (cat !== 'なし') {
+                    const menuBtn = document.createElement('button');
+                    menuBtn.className = 'box-menu-trigger-btn';
+                    menuBtn.textContent = '•••';
+                    menuBtn.title = 'カテゴリの設定を開く';
+                    menuBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        openBoxMenu(cat);
+                    };
+                    headerRow.appendChild(menuBtn);
+                }
                 box.appendChild(headerRow);
 
                 const subList = document.createElement('div');
@@ -798,7 +1080,6 @@
                 mainListContainer.appendChild(box);
             });
 
-            // 2. カゴ内アイテムの描画
             if (completedItems.length > 0) {
                 const compBox = document.createElement('div');
                 compBox.style.marginTop = '20px';
@@ -837,9 +1118,9 @@
                     chip.onclick = () => addFromHistory(m.name, m.price, m.category);
                     chip.innerHTML = `
                         <span>${m.name}</span>
-                        ${m.category && m.category !== 'なし' ? `<span style="font-size:0.7rem; opacity:0.7; background:rgba(0,0,0,0.05); padding:1px 4px; border-radius:3px;">${m.category}</span>` : ''}
-                        <span style="color:var(--sub-text); font-size:0.75rem; font-weight:normal;">${m.price > 0 ? '￥'+m.price : ''}</span>
-                        <span style="margin-left:5px; color:var(--sub-text); font-size:0.8rem;" onclick="deleteMaster('${m.name}')">×</span>
+                        ${m.category && m.category !== 'なし' ? `<span style=\"font-size:0.7rem; opacity:0.7; background:rgba(0,0,0,0.05); padding:1px 4px; border-radius:3px;\">${m.category}</span>` : ''}
+                        <span style=\"color:var(--sub-text); font-size:0.75rem; font-weight:normal;\">${m.price > 0 ? '￥'+m.price : ''}</span>
+                        <span style=\"margin-left:5px; color:var(--sub-text); font-size:0.8rem;\" onclick=\"deleteMaster('${m.name}')\">×</span>
                     `;
                     historyGrid.appendChild(chip);
                 });
