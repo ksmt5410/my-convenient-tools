@@ -69,54 +69,61 @@
             padding-bottom: 90px;
         }
 
+        /* 📱 ヘッダー全体のレイアウト調整 */
         header {
             background-color: var(--panel-bg);
-            padding: 12px;
+            padding: 10px;
             border-bottom: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
             gap: 10px;
         }
 
+        /* 🏠から⚙️までを一列に並べるためのコンテナ */
+        .header-top-row {
+            display: flex;
+            align-items: center; 
+            justify-content: space-between;
+            width: 100%;
+            gap: 8px;
+        }
+
         header button.theme-trigger-btn {
             background: transparent !important;
             border: none !important;
-            font-size: 1.5rem !important;
+            font-size: 1.4rem !important;
             box-shadow: none !important;
-            padding: 0 !important;
+            padding: 4px !important;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         header button.theme-trigger-btn:hover {
             transform: translateY(-2px);
         }
 
-        @media(min-width: 600px) {
-            header {
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-            }
-        }
-
         .filters {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             align-items: center;
-            flex-wrap: wrap;
+            flex: 1;
+            min-width: 0; 
         }
 
         .filter-btn {
-            padding: 6px 16px;
+            padding: 6px 10px;
             border-radius: 20px;
             border: 1px solid var(--border-color);
             background-color: var(--bg-color);
             color: var(--text-color);
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: bold;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             transition: all 0.2s ease;
+            white-space: nowrap;
         }
 
         .filter-btn.active {
@@ -124,6 +131,25 @@
             color: var(--active-color);
             border-color: var(--active-color);
             box-shadow: inset 0 2px 4px rgba(21, 101, 192, 0.15);
+        }
+
+        #categoryFilter {
+            flex: 1;
+            min-width: 0;
+            padding: 5px;
+            font-size: 0.85rem;
+        }
+
+        /* 🔍 2行目の検索フォーム用のコンテナ */
+        .header-bottom-row {
+            width: 100%;
+        }
+
+        #searchField {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 8px 12px;
+            font-size: 0.9rem;
         }
 
         .action-btn {
@@ -172,6 +198,7 @@
             cursor: pointer;
             border: 1px solid var(--border-color);
             background: none;
+            flex-shrink: 0;
         }
 
         .todo-list {
@@ -180,7 +207,6 @@
             margin: 0 auto;
         }
 
-        /* タスクの基本スタイルにふわっと消えるアニメーション用の設定を追加 */
         .todo-item {
             display: flex;
             align-items: flex-start;
@@ -194,7 +220,6 @@
             transition: opacity 0.4s ease, transform 0.4s ease, max-height 0.4s ease, padding 0.4s ease;
         }
 
-        /* チェックが外された/付けられたときの、完了切り替え中一時アニメーション状態 */
         .todo-item.transitioning {
             opacity: 0;
             transform: translateY(-10px);
@@ -204,7 +229,6 @@
             border-bottom-color: transparent;
         }
 
-        /* 🆕 新しいタスクが生まれたときに3回文字をチカチカさせる点滅アニメーション */
         .todo-item.new-spawn {
             animation: flash-animation 0.3s ease-in-out 3;
         }
@@ -380,55 +404,168 @@
             text-align: left;
         }
 
-        /* カテゴリ入力と選択を合体させる連結デザイン枠 */
-        .category-combobox {
+        /* 🛠️ カテゴリコンボボックスのエリアを再設計 */
+        .category-combobox-wrapper {
             display: flex;
+            align-items: center;
+            gap: 8px;
             width: 100%;
-            box-sizing: border-box;
-        }
-        .category-combobox input[type="text"] {
-            flex: 1;
-            border-top-right-radius: 0;
-            border-bottom-right-radius: 0;
-            border-right: none;
-            min-width: 0;
-        }
-        .category-combobox select {
-            width: 110px;
-            border-top-left-radius: 0;
-            border-bottom-left-radius: 0;
-            background-color: var(--panel-bg);
-            cursor: pointer;
+            position: relative; /* 子要素のカスタムリストを正しい位置に配置するために必須 */
         }
 
-        @media (max-width: 600px) {
+        .combobox-container {
+            position: relative;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .combobox-input-field {
+            width: 100%;
+            box-sizing: border-box;
+            padding-right: 30px; /* 右端の自作▼ボタンと文字が重ならないように隙間をあける */
+        }
+
+        /* 入力欄の右端に配置する可愛い「▼」矢印アイコン */
+        .combobox-arrow {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.75rem;
+            color: var(--sub-text);
+            pointer-events: none; /* 矢印の上をタップしても入力欄にタップが通るようにする */
+        }
+
+        /* 🆕 スマホでもズレない！入力欄の真下にくっつくカスタムドロップダウン */
+        .custom-dropdown-list {
+            display: none; /* 通常時は非表示 */
+            position: absolute;
+            top: 102%; /* 入力欄のすぐ下に配置 */
+            left: 0;
+            width: 100%;
+            max-height: 150px; /* 履歴が多くなっても画面を突き抜けないようにスクロール化 */
+            overflow-y: auto;
+            background: var(--modal-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 999; /* モーダルの中で最前面に表示 */
+            box-sizing: border-box;
+            padding: 4px 0;
+        }
+
+        .custom-dropdown-item {
+            padding: 10px 12px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            color: var(--text-color);
+            text-align: left;
+        }
+
+        .custom-dropdown-item:active {
+            background-color: var(--active-bg);
+            color: var(--active-color);
+        }
+
+        .menu-trigger-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 6px;
+            opacity: 0.6;
+            transition: all 0.2s;
+        }
+        .menu-trigger-btn:hover {
+            opacity: 1;
+            background-color: var(--panel-bg);
+        }
+
+        .menu-option {
+            padding: 12px;
+            border-radius: 8px;
+            background: var(--option-bg);
+            cursor: pointer;
+            font-weight: bold;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            font-size: 1rem;
+            transition: background 0.2s;
+        }
+        .menu-option:hover {
+            filter: brightness(0.9);
+        }
+        .menu-option.danger {
+            background-color: var(--btn-delete-bg);
+            color: var(--btn-delete-text);
+            border-color: rgba(255,0,0,0.2);
+        }
+
+        /* 💻 PC用の調整 */
+        @media (min-width: 600px) {
             header {
-                flex-direction: column;
-                gap: 12px;
-                padding: 12px;
+                padding: 12px 20px;
             }
-            header > div {
-                width: 100%;
-                justify-content: space-between;
+            .header-top-row {
+                gap: 15px;
             }
-            .filters {
-                width: 100%;
-                flex-wrap: wrap;
-                gap: 8px;
-                justify-content: center;
+            .filter-btn {
+                padding: 6px 16px;
+                font-size: 0.9rem;
             }
-            #searchField, #categoryFilter {
-                flex: 1;
-                min-width: 100px;
+            #categoryFilter {
+                font-size: 0.9rem;
+                padding: 8px;
             }
+            .custom-dropdown-item:hover {
+                background-color: var(--panel-bg);
+            }
+        }
+        
+        /* 📅 日付入力欄を可愛い絵文字アイコン付きにするスタイル */
+        .date-input-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .date-input-wrapper input[type="date"] {
+            width: 100%;
+            box-sizing: border-box;
+            padding-right: 40px; /* 右側の📅絵文字と文字が被らないように隙間をあける */
+            position: relative;
+        }
+
+        /* ブラウザ標準の薄いカレンダーマークや矢印を完全に消してスッキリさせる */
+        .date-input-wrapper input[type="date"]::-webkit-calendar-picker-indicator {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0; /* 透明にして全体に広げることで、どこをタップしてもカレンダーが開くようにします */
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        /* 代わりに乗せる可愛い 📅 絵文字の設定 */
+        .date-icon-emoji {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.1rem;
+            pointer-events: none; /* タップイベントを邪魔しない */
+            z-index: 1;
         }
     </style>
 </head>
 <body>
 
     <header>
-        <div style="display: flex; align-items: center; gap: 15px;">
-            <a href="index.html" style="text-decoration: none; font-size: 1.5rem; color: var(--text-color); line-height: 1;" title="トップページに戻る">🏠</a>
+        <div class="header-top-row">
+            <a href="index.html" style="text-decoration: none; font-size: 1.4rem; color: var(--text-color); line-height: 1; padding: 4px;" title="トップページに戻る">🏠</a>
             
             <div class="filters">
                 <button id="filterAll" class="filter-btn active" onclick="setFilter('ALL')">すべて</button>
@@ -436,11 +573,13 @@
                 <select id="categoryFilter" onchange="renderTodos()">
                     <option value="ALL">すべてのカテゴリ</option>
                 </select>
-                <input type="text" id="searchField" placeholder="検索..." oninput="renderTodos()">
             </div>
-        </div>
-        <div>
+            
             <button class="theme-trigger-btn" onclick="openThemeModal()">⚙️</button>
+        </div>
+        
+        <div class="header-bottom-row">
+            <input type="text" id="searchField" placeholder="検索..." oninput="renderTodos()">
         </div>
     </header>
 
@@ -471,23 +610,37 @@
         </div>
     </div>
 
+    <div class="modal" id="actionMenuModal">
+        <div class="modal-content">
+            <h3 id="menuModalTitle" style="margin:0 0 10px 0; font-size:1.1rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align: left;">タスクの操作</h3>
+            <button class="menu-option" onclick="triggerEdit()">✏️ 編集する</button>
+            <button class="menu-option danger" onclick="triggerDelete()">❌ 削除する</button>
+            <div style="display:flex; justify-content: flex-end; margin-top: 10px;">
+                <button class="modal-btn" onclick="closeActionMenu()">キャンセル</button>
+            </div>
+        </div>
+    </div>
+
     <div class="modal" id="taskModal">
         <div class="modal-content">
             <h3 id="modalTitle" style="margin:0 0 5px 0;">新しいタスク</h3>
             <input type="text" id="taskName" placeholder="タスク名">
             
-            <div style="display: flex; gap: 8px; align-items: center; width: 100%;">
+            <div class="category-combobox-wrapper">
                 <input type="color" id="taskColor" value="#00796b" title="カテゴリの色を選択">
                 
-                <div class="category-combobox">
-                    <input type="text" id="taskCategory" placeholder="新規カテゴリ名を入力" oninput="matchExistingColor()">
-                    <select id="taskCategorySelect" onchange="selectExistingCategory()">
-                        <option value="">(履歴)</option>
-                    </select>
+                <div class="combobox-container">
+                    <input type="text" id="taskCategory" class="combobox-input-field" placeholder="カテゴリ(入力or履歴)" oninput="handleCategoryInput()" onclick="showCustomDropdown(event)" autocomplete="off">
+                    <span class="combobox-arrow">▼</span>
+                    
+                    <div id="customDropdownList" class="custom-dropdown-list"></div>
                 </div>
             </div>
             
-            <input type="date" id="taskDueDate">
+            <div class="date-input-wrapper">
+                <input type="date" id="taskDueDate">
+                <span class="date-icon-emoji">📅</span>
+            </div>
             <select id="taskRepeat" onchange="autoAdjustDueDate()">
                 <option value="NONE">繰り返しなし</option>
                 <option value="DAILY">毎日</option>
@@ -506,7 +659,6 @@
     </div>
 
     <script>
-        // === アプリのロジック（JavaScript） ===
         let todos = [];
         try {
             todos = JSON.parse(localStorage.getItem('todos')) || [];
@@ -516,10 +668,9 @@
         
         let currentFilter = 'ALL';
         let editingTodoId = null;
+        let activeMenuTodoId = null; 
 
         let themeSetting = localStorage.getItem('themeSetting') || 'auto';
-
-        // 🆕 直近で自動生成されたばかりの新しいタスクのIDを一時保管する変数
         let recentlySpawnedId = null;
 
         function applyCurrentTheme() {
@@ -593,40 +744,79 @@
                     filterCombo.value = savedValue;
                 }
             }
+            
+            buildCustomDropdownList(); // カスタムドロップダウンのデータも最新にする
+        }
 
-            const modalCombo = document.getElementById('taskCategorySelect');
-            if (modalCombo) {
-                modalCombo.innerHTML = '<option value="">(履歴)</option>';
-                categories.forEach(cat => {
-                    const opt = document.createElement('option');
-                    opt.value = cat; opt.textContent = cat;
-                    modalCombo.appendChild(opt);
-                });
+        // 🆕 自作ドロップダウンの中身を組み立てる関数
+        function buildCustomDropdownList() {
+            const dropdown = document.getElementById('customDropdownList');
+            if (!dropdown) return;
+
+            const categories = getUniqueCategories();
+            const currentInputText = document.getElementById('taskCategory').value.trim().toLowerCase();
+
+            // ユーザーが文字を打っている場合は、部分一致するものだけに絞り込む
+            const filteredCategories = categories.filter(cat => {
+                if (!currentInputText) return true;
+                return cat.toLowerCase().includes(currentInputText);
+            });
+
+            dropdown.innerHTML = '';
+
+            if (filteredCategories.length === 0) {
+                dropdown.style.display = 'none';
+                return;
+            }
+
+            filteredCategories.forEach(cat => {
+                const item = document.createElement('div');
+                item.className = 'custom-dropdown-item';
+                item.textContent = cat;
+                
+                // 履歴をタップした時の処理
+                item.onclick = function(e) {
+                    e.stopPropagation(); // 親のイベント発火を防ぐ
+                    document.getElementById('taskCategory').value = cat;
+                    matchExistingColor(); // 色を連動させる
+                    dropdown.style.display = 'none'; // リストを閉じる
+                };
+                dropdown.appendChild(item);
+            });
+        }
+
+        // 🆕 タップした時にドロップダウンをパッと開く処理
+        function showCustomDropdown(e) {
+            e.stopPropagation();
+            buildCustomDropdownList();
+            const dropdown = document.getElementById('customDropdownList');
+            if (dropdown.children.length > 0) {
+                dropdown.style.display = 'block';
             }
         }
 
-        function selectExistingCategory() {
-            const modalCombo = document.getElementById('taskCategorySelect');
-            const selectedValue = modalCombo.value;
-            if (selectedValue) {
-                document.getElementById('taskCategory').value = selectedValue;
-                const found = todos.find(t => t.category === selectedValue && t.categoryColor);
-                if (found) {
-                    document.getElementById('taskColor').value = found.categoryColor;
-                }
+        // 🆕 文字を入力しているときの処理
+        function handleCategoryInput() {
+            buildCustomDropdownList();
+            const dropdown = document.getElementById('customDropdownList');
+            if (dropdown.children.length > 0) {
+                dropdown.style.display = 'block';
+            } else {
+                dropdown.style.display = 'none';
             }
+            matchExistingColor();
         }
+
+        // モーダルの外側や別の場所をタップしたときにドロップダウンを自動で閉じる
+        document.addEventListener('click', function() {
+            const dropdown = document.getElementById('customDropdownList');
+            if (dropdown) dropdown.style.display = 'none';
+        });
 
         function matchExistingColor() {
             const currentCat = document.getElementById('taskCategory').value.trim();
-            const modalCombo = document.getElementById('taskCategorySelect');
-            if ([...modalCombo.options].some(o => o.value === currentCat)) {
-                modalCombo.value = currentCat;
-            } else {
-                modalCombo.value = "";
-            }
-
             if (!currentCat || currentCat === 'なし') return;
+            
             const found = todos.find(t => t.category === currentCat && t.categoryColor);
             if (found) {
                 document.getElementById('taskColor').value = found.categoryColor;
@@ -739,7 +929,6 @@
                 const item = document.createElement('div');
                 item.id = `todo-${todo.id}`;
                 
-                // 🆕 直近で誕生した繰り返しタスクのIDと一致していればチカチカ用クラス（new-spawn）も付与する
                 if (todo.id === recentlySpawnedId) {
                     item.className = `todo-item new-spawn ${todo.isCompleted ? 'completed' : ''}`;
                 } else {
@@ -794,8 +983,7 @@
                     </div>
                     
                     <div class="todo-right">
-                        <button class="action-btn" style="background-color: var(--btn-edit-bg); color: var(--btn-edit-text); font-size: 1.1rem; padding: 6px 10px;" onclick="openEditModal('${todo.id}')" title="編集">✏️</button>
-                        <button class="action-btn" style="background-color: var(--btn-delete-bg); color: var(--btn-delete-text); font-size: 1.1rem; padding: 6px 10px;" onclick="deleteTodo('${todo.id}')" title="削除">❌</button>
+                        <button class="menu-trigger-btn" onclick="openActionMenu('${todo.id}', '${todo.name.replace(/'/g, "\\'")}')" title="操作メニュー">•••</button>
                     </div>
                 `;
                 listContainer.appendChild(item);
@@ -825,7 +1013,6 @@
                 element.classList.add('transitioning');
             }
 
-            // 🆕 毎回のチェック時に、前回チカチカさせた記憶を一度きれいにリセットする
             recentlySpawnedId = null;
 
             if (todo.isCompleted && todo.repeatType && todo.repeatType !== 'NONE' && !todo.isRepeatGenerated) {
@@ -853,7 +1040,6 @@
                 }
                 
                 if (nextDateStr) {
-                    // 🆕 次の新しいタスクの固定IDを生成
                     const newId = Date.now().toString() + Math.random().toString(36).substr(2, 4);
                     
                     todos.push({
@@ -869,8 +1055,6 @@
                         createdAt: Date.now()
                     });
                     todo.isRepeatGenerated = true;
-
-                    // 🆕 この新タスクIDを「直近に生まれたタスク」としてマークする
                     recentlySpawnedId = newId;
                 }
             }
@@ -879,7 +1063,6 @@
                 saveToStorage();
                 renderTodos();
 
-                // 🆕 3回チカチカ(計0.9秒)が終わったら自動的にフラグを外す（スクロールや検索で再びチカチカしないようにするため）
                 if (recentlySpawnedId) {
                     setTimeout(() => {
                         const newEl = document.getElementById(`todo-${recentlySpawnedId}`);
@@ -894,8 +1077,7 @@
             editingTodoId = null;
             document.getElementById('modalTitle').textContent = '新しいタスク';
             document.getElementById('taskName').value = '';
-            document.getElementById('taskCategory').value = '';
-            document.getElementById('taskCategorySelect').value = '';
+            document.getElementById('taskCategory').value = ''; 
             document.getElementById('taskColor').value = (themeSetting === 'dark' || (themeSetting === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches)) ? '#80cbc4' : '#00796b';
             document.getElementById('taskDueDate').value = '';
             document.getElementById('taskRepeat').value = 'NONE';
@@ -903,6 +1085,7 @@
             document.getElementById('saveBtn').onclick = saveTodo;
             
             updateCategoryDropdowns();
+            document.getElementById('customDropdownList').style.display = 'none'; // リストは閉じておく
             document.getElementById('taskModal').style.display = 'flex';
         }
 
@@ -913,7 +1096,7 @@
             
             document.getElementById('modalTitle').textContent = 'タスクの編集';
             document.getElementById('taskName').value = todo.name;
-            document.getElementById('taskCategory').value = todo.category || '';
+            document.getElementById('taskCategory').value = (todo.category === 'なし') ? '' : (todo.category || ''); 
             document.getElementById('taskColor').value = todo.categoryColor || '#00796b';
             document.getElementById('taskDueDate').value = todo.dueDate || '';
             document.getElementById('taskRepeat').value = todo.repeatType || 'NONE';
@@ -921,7 +1104,7 @@
             document.getElementById('saveBtn').onclick = saveTodo;
             
             updateCategoryDropdowns();
-            document.getElementById('taskCategorySelect').value = todo.category || '';
+            document.getElementById('customDropdownList').style.display = 'none'; // リストは閉じておく
             document.getElementById('taskModal').style.display = 'flex';
         }
 
@@ -986,6 +1169,31 @@
                 saveToStorage();
                 renderTodos();
             }
+        }
+
+        function openActionMenu(id, name) {
+            activeMenuTodoId = id;
+            document.getElementById('menuModalTitle').textContent = `「${name}」の操作`;
+            document.getElementById('actionMenuModal').style.display = 'flex';
+        }
+
+        function closeActionMenu() {
+            document.getElementById('actionMenuModal').style.display = 'none';
+            activeMenuTodoId = null;
+        }
+
+        function triggerEdit() {
+            if (!activeMenuTodoId) return;
+            const targetId = activeMenuTodoId;
+            closeActionMenu();
+            openEditModal(targetId);
+        }
+
+        function triggerDelete() {
+            if (!activeMenuTodoId) return;
+            const targetId = activeMenuTodoId;
+            closeActionMenu();
+            deleteTodo(targetId);
         }
 
         renderTodos();
