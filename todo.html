@@ -2,62 +2,65 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>My Todo App</title>
-    <style>
-        /* === デザイン設定（CSS） === */
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">    <style>
+        /* === ✨ モダン・洗練されたデザイン設定（CSS） === */
         :root {
-            --bg-color: #ffffff;
-            --panel-bg: #f5f5f5;
-            --text-color: #000000;
-            --sub-text: #757575;
-            --border-color: #cbd5e1;
-            --active-color: #1565c0;
-            --active-bg: #e3f2fd;
+            --bg-color: #f8f9fa;
+            --panel-bg: #ffffff;
+            --text-color: #202124;
+            --sub-text: #5f6368;
+            --border-color: #e8eaed;
+            --active-color: #1a73e8;
+            --active-bg: #e8f0fe;
 
             /* ボタンカラー */
-            --btn-edit-bg: #e0f7fa;
-            --btn-edit-text: #00838f;
-            --btn-delete-bg: #ffebee;
-            --btn-delete-text: #c62828;
+            --btn-edit-bg: #e8f0fe;
+            --btn-edit-text: #1a73e8;
+            --btn-delete-bg: #fce8e6;
+            --btn-delete-text: #d93025;
             
-            /* 可愛いまるボタンの色（ライト） */
-            --btn-status-uncomplete-bg: #eceff1;
-            --btn-status-uncomplete-dot: #b0bec5;
-            --btn-status-complete-bg: #e8f5e9;
-            --btn-status-complete-dot: #4caf50;
-            --btn-status-overdue-dot: #f44336;
+            /* まるボタンの色（ライト） */
+            --btn-status-uncomplete-bg: #f1f3f4;
+            --btn-status-uncomplete-dot: #5f6368;
+            --btn-status-complete-bg: #e6f4ea;
+            --btn-status-complete-dot: #137333;
+            --btn-status-overdue-dot: #d93025;
             
             /* ポップアップ用の色 */
             --modal-bg: #ffffff;
-            --option-bg: #f5f5f5;
+            --option-bg: #f8f9fa;
+            --shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
         }
 
         [data-theme="dark"] {
-            --bg-color: #1e1e1e;
-            --panel-bg: #2d2d2d;
-            --text-color: #ffffff;
-            --sub-text: #b0bec5;
-            --border-color: #555555;
-            --active-color: #2196f3;
-            --active-bg: #1565c0;
+            --bg-color: #121212;
+            --panel-bg: #1e1e1e;
+            --text-color: #e8eaed;
+            --sub-text: #9aa0a6;
+            --border-color: #2f3134;
+            --active-color: #8ab4f8;
+            --active-bg: #1a233a;
 
             /* ボタンカラー（ダーク） */
-            --btn-edit-bg: #006064;
-            --btn-edit-text: #80deea;
+            --btn-edit-bg: #1a233a;
+            --btn-edit-text: #8ab4f8;
             --btn-delete-bg: #b71c1c;
             --btn-delete-text: #ef9a9a;
             
-            /* 可愛いまるボタンの色（ダーク） */
-            --btn-status-uncomplete-bg: #37474f;
-            --btn-status-uncomplete-dot: #78909c;
-            --btn-status-complete-bg: #1b5e20;
+            /* まるボタンの色（ダーク） */
+            --btn-status-uncomplete-bg: #2f3134;
+            --btn-status-uncomplete-dot: #9aa0a6;
+            --btn-status-complete-bg: #0f5132;
             --btn-status-complete-dot: #81c784;
-            --btn-status-overdue-dot: #e57373;
+            --btn-status-overdue-dot: #f28b82;
             
             /* ポップアップ用の色（ダーク） */
             --modal-bg: #1e1e1e;
-            --option-bg: #3d3d3d;
+            --option-bg: #2f3134;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
         }
 
         body {
@@ -66,17 +69,26 @@
             background-color: var(--bg-color);
             color: var(--text-color);
             transition: background 0.2s, color 0.2s;
-            padding-bottom: 90px;
+            padding-bottom: 100px;
+        }
+
+        /* Material Iconsの基本調整 */
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+            line-height: 1;
         }
 
         /* 📱 ヘッダー全体のレイアウト調整 */
         header {
             background-color: var(--panel-bg);
-            padding: 10px;
+            padding: 12px 16px;
             border-bottom: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
         }
 
         /* 🏠から⚙️までを一列に並べるためのコンテナ */
@@ -85,59 +97,66 @@
             align-items: center; 
             justify-content: space-between;
             width: 100%;
-            gap: 8px;
+            gap: 10px;
         }
 
+        /* 矢印・歯車ボタンをスマートに統一 */
+        .home-link-btn, 
         header button.theme-trigger-btn {
+            text-decoration: none;
+            color: var(--text-color);
             background: transparent !important;
             border: none !important;
-            font-size: 1.4rem !important;
             box-shadow: none !important;
-            padding: 4px !important;
+            padding: 6px !important;
             cursor: pointer;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
+            transition: opacity 0.2s;
+            /* 🔽 完全にカウンターの見た目と合わせるための指定 */
+            font-family: 'Material Icons Round';
+            font-size: 24px;
         }
-
-        header button.theme-trigger-btn:hover {
-            transform: translateY(-2px);
+        .home-link-btn:active, 
+        header button.theme-trigger-btn:active {
+            opacity: 0.5;
         }
-
         .filters {
             display: flex;
-            gap: 6px;
+            gap: 8px;
             align-items: center;
             flex: 1;
             min-width: 0; 
         }
 
         .filter-btn {
-            padding: 6px 10px;
+            padding: 8px 14px;
             border-radius: 20px;
             border: 1px solid var(--border-color);
             background-color: var(--bg-color);
-            color: var(--text-color);
+            color: var(--sub-text);
             cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: bold;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            font-size: 0.88rem;
+            font-weight: 600;
             transition: all 0.2s ease;
             white-space: nowrap;
         }
 
         .filter-btn.active {
-            background-color: var(--active-bg);
-            color: var(--active-color);
+            background-color: var(--active-color);
+            color: #ffffff;
             border-color: var(--active-color);
-            box-shadow: inset 0 2px 4px rgba(21, 101, 192, 0.15);
         }
 
         #categoryFilter {
             flex: 1;
             min-width: 0;
-            padding: 5px;
-            font-size: 0.85rem;
+            padding: 7px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            border-radius: 20px;
+            background-color: var(--bg-color);
         }
 
         /* 🔍 2行目の検索フォーム用のコンテナ */
@@ -148,85 +167,102 @@
         #searchField {
             width: 100%;
             box-sizing: border-box;
-            padding: 8px 12px;
-            font-size: 0.9rem;
+            padding: 10px 14px;
+            font-size: 0.92rem;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-color);
+            outline: none;
+        }
+        #searchField:focus {
+            border-color: var(--active-color);
         }
 
         .action-btn {
-            border-radius: 6px;
-            border: 1px solid rgba(0,0,0,0.15);
+            border-radius: 8px;
+            border: 1px solid rgba(0,0,0,0.1);
             transition: all 0.2s ease;
-        }
-        [data-theme="dark"] .action-btn {
-            border: 1px solid rgba(255,255,255,0.15);
         }
 
         /* ぷちっと可愛いステータス丸ボタン */
         .status-circle-btn {
-            width: 34px;
-            height: 34px;
+            width: 32px;
+            height: 32px;
             border-radius: 50% !important;
             border: none !important;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem;
             cursor: pointer;
-            box-shadow: inset 0 -3px 0 rgba(0,0,0,0.15), 0 2px 4px rgba(0,0,0,0.1);
             padding: 0 !important;
             flex-shrink: 0;
-            transition: background-color 0.2s, color 0.2s;
+            transition: transform 0.1s, background-color 0.2s;
         }
         .status-circle-btn:active {
-            transform: translateY(1px);
-            box-shadow: inset 0 2px 3px rgba(0,0,0,0.2);
+            transform: scale(0.92);
+        }
+        .status-circle-btn .material-symbols-outlined {
+            font-size: 1.15rem;
         }
 
         input, select, textarea {
-            padding: 8px;
-            border-radius: 6px;
+            padding: 10px;
+            border-radius: 10px;
             border: 1px solid var(--border-color);
             background: var(--bg-color);
             color: var(--text-color);
-            font-size: 0.9rem;
+            font-size: 0.95rem;
+            outline: none;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--active-color);
         }
 
         input[type="color"] {
-            padding: 2px;
-            width: 40px;
-            height: 38px;
+            padding: 4px;
+            width: 44px;
+            height: 42px;
             cursor: pointer;
             border: 1px solid var(--border-color);
-            background: none;
+            background: var(--bg-color);
+            border-radius: 10px;
             flex-shrink: 0;
+            box-sizing: border-box;
         }
 
         .todo-list {
-            padding: 10px;
+            padding: 12px;
             max-width: 600px;
             margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
         .todo-item {
             display: flex;
             align-items: flex-start;
-            padding: 15px 10px;
-            border-bottom: 1px solid var(--border-color);
-            gap: 12px;
+            padding: 16px;
+            background-color: var(--panel-bg);
+            border-radius: 14px;
+            border-bottom: none;
+            gap: 14px;
+            box-shadow: var(--shadow);
             opacity: 1;
             transform: translateY(0);
-            max-height: 200px; 
+            max-height: 300px; 
             overflow: hidden;
-            transition: opacity 0.4s ease, transform 0.4s ease, max-height 0.4s ease, padding 0.4s ease;
+            box-sizing: border-box;
+            transition: opacity 0.3s ease, transform 0.3s ease, max-height 0.3s ease, padding 0.3s ease;
         }
 
         .todo-item.transitioning {
             opacity: 0;
-            transform: translateY(-10px);
+            transform: translateY(-8px);
             max-height: 0 !important;
             padding-top: 0 !important;
             padding-bottom: 0 !important;
-            border-bottom-color: transparent;
+            margin: 0;
         }
 
         .todo-item.new-spawn {
@@ -234,69 +270,84 @@
         }
 
         @keyframes flash-animation {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.2; }
+            0%, 100% { opacity: 1; background-color: var(--panel-bg); }
+            50% { opacity: 0.5; background-color: var(--active-bg); }
         }
 
         .todo-left {
             display: flex;
             align-items: flex-start;
-            gap: 12px;
+            gap: 14px;
             flex: 1;
+            min-width: 0;
         }
 
         .todo-details {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 6px;
             flex: 1;
+            min-width: 0;
         }
 
         .todo-title {
-            font-size: 1.05rem;
-            font-weight: bold;
-            line-height: 1.3;
+            font-size: 1.02rem;
+            font-weight: 600;
+            line-height: 1.4;
             transition: color 0.3s;
+            word-wrap: break-word;
         }
 
         .completed .todo-title {
             text-decoration: line-through;
             color: var(--sub-text);
-            opacity: 0.7;
+            opacity: 0.6;
         }
 
         .repeat-row {
             font-size: 0.8rem;
-            color: #ff9800;
-            font-weight: bold;
+            color: #e65100;
+            font-weight: 700;
+            background: #fff3e0;
+            padding: 3px 8px;
+            border-radius: 4px;
+            align-self: flex-start;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .repeat-row .material-symbols-outlined {
+            font-size: 0.95rem;
         }
         [data-theme="dark"] .repeat-row {
             color: #ffb74d;
+            background: #2c1e11;
         }
 
         .todo-sub {
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             color: var(--sub-text);
+            font-weight: 500;
         }
 
         .overdue {
-            color: #ff6b6b !important;
-            font-weight: bold;
+            color: var(--btn-delete-text) !important;
+            font-weight: 700;
         }
 
         .memo-row {
             font-size: 0.85rem;
             color: #00796b;
             white-space: pre-wrap;
-            margin-top: 2px;
-            background: rgba(0, 0, 0, 0.02);
-            padding: 4px 8px;
-            border-radius: 4px;
-            border-left: 3px solid var(--border-color);
+            margin-top: 4px;
+            background: var(--bg-color);
+            padding: 8px 12px;
+            border-radius: 8px;
+            border-left: 3px solid var(--active-color);
         }
         [data-theme="dark"] .memo-row {
             color: #80deea;
-            background: rgba(255, 255, 255, 0.02);
+            border-left-color: var(--active-color);
         }
 
         .todo-right {
@@ -304,6 +355,7 @@
             flex-direction: column;
             gap: 5px;
             justify-content: center;
+            align-self: center;
         }
 
         .footer-panel {
@@ -311,106 +363,100 @@
             bottom: 0;
             width: 100%;
             background-color: var(--panel-bg);
-            padding: 15px 0;
+            padding: 16px 0;
             text-align: center;
             border-top: 1px solid var(--border-color);
             z-index: 10;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.02);
         }
 
         .add-btn {
-            background-color: #fff3e0;
-            color: #e65100;
-            border: 1px solid #ffb74d;
-            font-size: 1rem;
-            padding: 10px 24px;
-            border-radius: 20px;
-            font-weight: bold;
-            transition: all 0.2s ease;
-        }
-        [data-theme="dark"] .add-btn {
-            background-color: #e65100;
+            background-color: var(--active-color);
             color: #ffffff;
-            border: 1px solid #ff8f00;
+            border: none;
+            font-size: 0.95rem;
+            padding: 12px 28px;
+            border-radius: 24px;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(26, 115, 232, 0.23);
+            transition: all 0.2s ease;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin: 0 auto;
+        }
+        .add-btn:active {
+            transform: scale(0.96);
         }
 
         .modal {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.35);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
             justify-content: center;
             align-items: center;
             z-index: 100;
         }
 
         .modal-content {
-            background: var(--bg-color);
-            padding: 20px;
-            border-radius: 12px;
-            width: 85%;
+            background: var(--modal-bg);
+            padding: 24px;
+            border-radius: 20px;
+            width: 88%;
             max-width: 380px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 14px;
             box-sizing: border-box;
+            box-shadow: var(--shadow);
         }
 
         .modal-btn {
-            padding: 8px 20px;
+            padding: 10px 22px;
             border-radius: 20px;
             font-weight: bold;
-            font-size: 0.95rem;
+            font-size: 0.92rem;
             border: 1px solid var(--border-color);
             background-color: var(--panel-bg);
             color: var(--text-color);
             cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
             transition: all 0.15s ease;
         }
 
         .modal-btn.primary {
-            background-color: #2196f3;
+            background-color: var(--active-color);
             color: #ffffff;
-            border-color: #1e88e5;
-            box-shadow: inset 0 -2px 0 rgba(0,0,0,0.15), 0 2px 4px rgba(33, 150, 243, 0.2);
-        }
-        [data-theme="dark"] .modal-btn.primary {
-            background-color: #1565c0;
-            border-color: #0d47a1;
+            border-color: var(--active-color);
         }
 
         .modal-btn:active {
-            transform: translateY(1px);
-            box-shadow: inset 0 2px 3px rgba(0,0,0,0.15);
-        }
-        .modal-btn.primary:active {
-            box-shadow: inset 0 2px 3px rgba(0,0,0,0.3);
-        }
-
-        .filter-btn:hover, .action-btn:hover, .add-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            opacity: 0.9;
+            transform: scale(0.95);
         }
 
         .theme-option {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px;
-            border-radius: 8px;
+            padding: 12px 16px;
+            border-radius: 12px;
             background: var(--option-bg);
             cursor: pointer;
             text-align: left;
+            font-weight: 600;
+            font-size: 0.95rem;
         }
 
-        /* 🛠️ カテゴリコンボボックスのエリアを再設計 */
+        /* 🛠️ カテゴリコンボボックスのエリア */
         .category-combobox-wrapper {
             display: flex;
             align-items: center;
             gap: 8px;
             width: 100%;
-            position: relative; /* 子要素のカスタムリストを正しい位置に配置するために必須 */
+            position: relative;
         }
 
         .combobox-container {
@@ -422,41 +468,40 @@
         .combobox-input-field {
             width: 100%;
             box-sizing: border-box;
-            padding-right: 30px; /* 右端の自作▼ボタンと文字が重ならないように隙間をあける */
+            padding-right: 30px;
         }
 
-        /* 入力欄の右端に配置する可愛い「▼」矢印アイコン */
         .combobox-arrow {
             position: absolute;
-            right: 10px;
+            right: 12px;
             top: 50%;
             transform: translateY(-50%);
             font-size: 0.75rem;
             color: var(--sub-text);
-            pointer-events: none; /* 矢印の上をタップしても入力欄にタップが通るようにする */
+            pointer-events: none;
         }
 
-        /* 🆕 スマホでもズレない！入力欄の真下にくっつくカスタムドロップダウン */
+        /* カスタムドロップダウン */
         .custom-dropdown-list {
-            display: none; /* 通常時は非表示 */
+            display: none;
             position: absolute;
-            top: 102%; /* 入力欄のすぐ下に配置 */
+            top: 105%;
             left: 0;
             width: 100%;
-            max-height: 150px; /* 履歴が多くなっても画面を突き抜けないようにスクロール化 */
+            max-height: 150px;
             overflow-y: auto;
             background: var(--modal-bg);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            z-index: 999; /* モーダルの中で最前面に表示 */
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            z-index: 999;
             box-sizing: border-box;
-            padding: 4px 0;
+            padding: 6px 0;
         }
 
         .custom-dropdown-item {
-            padding: 10px 12px;
-            font-size: 0.9rem;
+            padding: 10px 14px;
+            font-size: 0.92rem;
             cursor: pointer;
             color: var(--text-color);
             text-align: left;
@@ -470,63 +515,52 @@
         .menu-trigger-btn {
             background: transparent;
             border: none;
-            color: var(--text-color);
-            font-size: 1.2rem;
-            font-weight: bold;
+            color: var(--sub-text);
             cursor: pointer;
-            padding: 6px 12px;
-            border-radius: 6px;
-            opacity: 0.6;
+            padding: 8px;
+            border-radius: 50%;
             transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .menu-trigger-btn:hover {
-            opacity: 1;
-            background-color: var(--panel-bg);
+        .menu-trigger-btn:active {
+            background-color: var(--bg-color);
         }
 
         .menu-option {
-            padding: 12px;
-            border-radius: 8px;
+            padding: 14px;
+            border-radius: 12px;
             background: var(--option-bg);
             cursor: pointer;
             font-weight: bold;
             text-align: center;
             border: 1px solid var(--border-color);
             color: var(--text-color);
-            font-size: 1rem;
+            font-size: 0.98rem;
             transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
-        .menu-option:hover {
-            filter: brightness(0.9);
+        .menu-option:active {
+            transform: scale(0.97);
         }
         .menu-option.danger {
             background-color: var(--btn-delete-bg);
             color: var(--btn-delete-text);
-            border-color: rgba(255,0,0,0.2);
+            border-color: rgba(255,0,0,0.05);
         }
 
         /* 💻 PC用の調整 */
         @media (min-width: 600px) {
-            header {
-                padding: 12px 20px;
-            }
-            .header-top-row {
-                gap: 15px;
-            }
-            .filter-btn {
-                padding: 6px 16px;
-                font-size: 0.9rem;
-            }
-            #categoryFilter {
-                font-size: 0.9rem;
-                padding: 8px;
-            }
-            .custom-dropdown-item:hover {
-                background-color: var(--panel-bg);
-            }
+            header { padding: 14px 24px; }
+            .filter-btn { padding: 8px 18px; font-size: 0.9rem; }
+            #categoryFilter { font-size: 0.9rem; padding: 8px 14px; }
         }
         
-        /* 📅 日付入力欄を可愛い絵文字アイコン付きにするスタイル */
+        /* 📅 日付入力欄 */
         .date-input-wrapper {
             position: relative;
             width: 100%;
@@ -535,29 +569,32 @@
         .date-input-wrapper input[type="date"] {
             width: 100%;
             box-sizing: border-box;
-            padding-right: 40px; /* 右側の📅絵文字と文字が被らないように隙間をあける */
+            padding-right: 40px;
             position: relative;
         }
 
-        /* ブラウザ標準の薄いカレンダーマークや矢印を完全に消してスッキリさせる */
         .date-input-wrapper input[type="date"]::-webkit-calendar-picker-indicator {
             position: absolute;
             width: 100%;
             height: 100%;
-            opacity: 0; /* 透明にして全体に広げることで、どこをタップしてもカレンダーが開くようにします */
+            opacity: 0;
             cursor: pointer;
             z-index: 2;
         }
 
-        /* 代わりに乗せる可愛い 📅 絵文字の設定 */
         .date-icon-emoji {
             position: absolute;
-            right: 12px;
+            right: 14px;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 1.1rem;
-            pointer-events: none; /* タップイベントを邪魔しない */
+            pointer-events: none;
             z-index: 1;
+            color: var(--sub-text);
+            display: flex;
+            align-items: center;
+        }
+        .date-icon-emoji .material-symbols-outlined {
+            font-size: 1.2rem;
         }
     </style>
 </head>
@@ -565,33 +602,39 @@
 
     <header>
         <div class="header-top-row">
-            <a href="index.html" style="text-decoration: none; font-size: 1.4rem; color: var(--text-color); line-height: 1; padding: 4px;" title="トップページに戻る">🏠</a>
+            <a href="index.html" class="home-link-btn" title="トップページに戻る">
+                <span class="material-icons-round">arrow_back</span>
+            </a>
             
             <div class="filters">
                 <button id="filterAll" class="filter-btn active" onclick="setFilter('ALL')">すべて</button>
                 <button id="filterActive" class="filter-btn" onclick="setFilter('ACTIVE')">未完了</button>
                 <select id="categoryFilter" onchange="renderTodos()">
-                    <option value="ALL">すべてのカテゴリ</option>
+                    <option value="ALL">全てのカテゴリ</option>
                 </select>
             </div>
             
-            <button class="theme-trigger-btn" onclick="openThemeModal()">⚙️</button>
+            <button class="theme-trigger-btn" onclick="openThemeModal()">
+                <span class="material-icons-round">settings</span>
+            </button>
         </div>
         
         <div class="header-bottom-row">
-            <input type="text" id="searchField" placeholder="検索..." oninput="renderTodos()">
+            <input type="text" id="searchField" placeholder="タスク名やカテゴリを検索..." oninput="renderTodos()">
         </div>
     </header>
 
     <div class="todo-list" id="todoList"></div>
 
     <div class="footer-panel">
-        <button class="add-btn" onclick="openAddModal()">＋ 新しいタスクを追加</button>
+        <button class="add-btn" onclick="openAddModal()">
+            <span class="material-symbols-outlined">add</span>タスクを追加する
+        </button>
     </div>
 
     <div class="modal" id="themeModal">
         <div class="modal-content">
-            <h3 style="margin:0 0 10px 0; text-align: left;">画面モードの設定</h3>
+            <h3 style="margin:0 0 4px 0; text-align: left; font-size: 1.1rem;">画面モードの設定</h3>
             <label class="theme-option" onclick="changeThemeSetting('auto')">
                 <span>システム設定に従う</span>
                 <input type="radio" name="themeGroup" id="themeAuto" checked>
@@ -604,7 +647,7 @@
                 <span>ダークモード</span>
                 <input type="radio" name="themeGroup" id="themeDark">
             </label>
-            <div style="display:flex; justify-content: flex-end; margin-top: 10px;">
+            <div style="display:flex; justify-content: flex-end; margin-top: 6px;">
                 <button class="modal-btn primary" onclick="closeThemeModal()">閉じる</button>
             </div>
         </div>
@@ -612,25 +655,29 @@
 
     <div class="modal" id="actionMenuModal">
         <div class="modal-content">
-            <h3 id="menuModalTitle" style="margin:0 0 10px 0; font-size:1.1rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align: left;">タスクの操作</h3>
-            <button class="menu-option" onclick="triggerEdit()">✏️ 編集する</button>
-            <button class="menu-option danger" onclick="triggerDelete()">❌ 削除する</button>
-            <div style="display:flex; justify-content: flex-end; margin-top: 10px;">
-                <button class="modal-btn" onclick="closeActionMenu()">キャンセル</button>
+            <h3 id="menuModalTitle" style="margin:0 0 6px 0; font-size:1.1rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align: left;">タスクの操作</h3>
+            <button class="menu-option" onclick="triggerEdit()">
+                <span class="material-symbols-outlined">edit</span>編集する
+            </button>
+            <button class="menu-option danger" onclick="triggerDelete()">
+                <span class="material-symbols-outlined">delete</span>削除する
+            </button>
+            <div style="display:flex; justify-content: flex-end; margin-top: 6px;">
+                <button class="modal-btn" style="width: 100%; border-radius: 12px; background: var(--border-color);" onclick="closeActionMenu()">キャンセル</button>
             </div>
         </div>
     </div>
 
     <div class="modal" id="taskModal">
         <div class="modal-content">
-            <h3 id="modalTitle" style="margin:0 0 5px 0;">新しいタスク</h3>
-            <input type="text" id="taskName" placeholder="タスク名">
+            <h3 id="modalTitle" style="margin:0 0 4px 0; font-size: 1.1rem;">新しいタスク</h3>
+            <input type="text" id="taskName" placeholder="タスク名を入力...">
             
             <div class="category-combobox-wrapper">
                 <input type="color" id="taskColor" value="#00796b" title="カテゴリの色を選択">
                 
                 <div class="combobox-container">
-                    <input type="text" id="taskCategory" class="combobox-input-field" placeholder="カテゴリ(入力or履歴)" oninput="handleCategoryInput()" onclick="showCustomDropdown(event)" autocomplete="off">
+                    <input type="text" id="taskCategory" class="combobox-input-field" placeholder="カテゴリ(入力または履歴から選択)" oninput="handleCategoryInput()" onclick="showCustomDropdown(event)" autocomplete="off">
                     <span class="combobox-arrow">▼</span>
                     
                     <div id="customDropdownList" class="custom-dropdown-list"></div>
@@ -639,7 +686,7 @@
             
             <div class="date-input-wrapper">
                 <input type="date" id="taskDueDate">
-                <span class="date-icon-emoji">📅</span>
+                <span class="date-icon-emoji"><span class="material-symbols-outlined">calendar_month</span></span>
             </div>
             <select id="taskRepeat" onchange="autoAdjustDueDate()">
                 <option value="NONE">繰り返しなし</option>
@@ -650,8 +697,8 @@
                 <option value="MONTH_END">毎月末/営業日</option>
                 <option value="YEARLY">毎年</option>
             </select>
-            <textarea id="taskMemo" placeholder="メモ・詳細" rows="3"></textarea>
-            <div style="display:flex; justify-content: flex-end; gap: 10px; margin-top: 5px;">
+            <textarea id="taskMemo" placeholder="メモ・詳細を入力..." rows="3"></textarea>
+            <div style="display:flex; justify-content: flex-end; gap: 10px; margin-top: 6px;">
                 <button class="modal-btn" onclick="closeModal()">キャンセル</button>
                 <button id="saveBtn" class="modal-btn primary">保存</button>
             </div>
@@ -745,10 +792,9 @@
                 }
             }
             
-            buildCustomDropdownList(); // カスタムドロップダウンのデータも最新にする
+            buildCustomDropdownList(); 
         }
 
-        // 🆕 自作ドロップダウンの中身を組み立てる関数
         function buildCustomDropdownList() {
             const dropdown = document.getElementById('customDropdownList');
             if (!dropdown) return;
@@ -756,7 +802,6 @@
             const categories = getUniqueCategories();
             const currentInputText = document.getElementById('taskCategory').value.trim().toLowerCase();
 
-            // ユーザーが文字を打っている場合は、部分一致するものだけに絞り込む
             const filteredCategories = categories.filter(cat => {
                 if (!currentInputText) return true;
                 return cat.toLowerCase().includes(currentInputText);
@@ -774,18 +819,16 @@
                 item.className = 'custom-dropdown-item';
                 item.textContent = cat;
                 
-                // 履歴をタップした時の処理
                 item.onclick = function(e) {
-                    e.stopPropagation(); // 親のイベント発火を防ぐ
+                    e.stopPropagation(); 
                     document.getElementById('taskCategory').value = cat;
-                    matchExistingColor(); // 色を連動させる
-                    dropdown.style.display = 'none'; // リストを閉じる
+                    matchExistingColor(); 
+                    dropdown.style.display = 'none'; 
                 };
                 dropdown.appendChild(item);
             });
         }
 
-        // 🆕 タップした時にドロップダウンをパッと開く処理
         function showCustomDropdown(e) {
             e.stopPropagation();
             buildCustomDropdownList();
@@ -795,7 +838,6 @@
             }
         }
 
-        // 🆕 文字を入力しているときの処理
         function handleCategoryInput() {
             buildCustomDropdownList();
             const dropdown = document.getElementById('customDropdownList');
@@ -807,7 +849,6 @@
             matchExistingColor();
         }
 
-        // モーダルの外側や別の場所をタップしたときにドロップダウンを自動で閉じる
         document.addEventListener('click', function() {
             const dropdown = document.getElementById('customDropdownList');
             if (dropdown) dropdown.style.display = 'none';
@@ -938,38 +979,38 @@
                 const dateInfo = formatDueDateWithCountdown(todo.dueDate, todo.isCompleted);
                 
                 let repeatLabel = '';
-                if (todo.repeatType === 'DAILY') repeatLabel = '🗘 毎日';
-                if (todo.repeatType === 'WEEKLY') repeatLabel = '🗘 毎週';
-                if (todo.repeatType === 'MONTHLY') repeatLabel = '🗘 毎月';
-                if (todo.repeatType === 'MONTH_START') repeatLabel = '🗘 毎月初/営業日';
-                if (todo.repeatType === 'MONTH_END') repeatLabel = '🗘 毎月末/営業日';
-                if (todo.repeatType === 'YEARLY') repeatLabel = '🗘 毎年';
+                if (todo.repeatType === 'DAILY') repeatLabel = '<span class="material-symbols-outlined">sync</span> 毎日';
+                if (todo.repeatType === 'WEEKLY') repeatLabel = '<span class="material-symbols-outlined">sync</span> 毎週';
+                if (todo.repeatType === 'MONTHLY') repeatLabel = '<span class="material-symbols-outlined">sync</span> 毎月';
+                if (todo.repeatType === 'MONTH_START') repeatLabel = '<span class="material-symbols-outlined">sync</span> 毎月初/営業日';
+                if (todo.repeatType === 'MONTH_END') repeatLabel = '<span class="material-symbols-outlined">sync</span> 毎月末/営業日';
+                if (todo.repeatType === 'YEARLY') repeatLabel = '<span class="material-symbols-outlined">sync</span> 毎年';
 
                 const catColor = todo.categoryColor || '#00796b';
 
                 let statusBtnStyle = '';
-                let statusSymbol = '●';
+                let statusIconName = 'circle';
                 
                 if (todo.isCompleted) {
                     statusBtnStyle = 'background-color: var(--btn-status-complete-bg); color: var(--btn-status-complete-dot);';
-                    statusSymbol = '✔';
+                    statusIconName = 'check';
                 } else if (dateInfo.isOverdue) {
                     statusBtnStyle = 'background-color: var(--btn-status-uncomplete-bg); color: var(--btn-status-overdue-dot);';
-                    statusSymbol = '●';
+                    statusIconName = 'circle';
                 } else {
                     statusBtnStyle = 'background-color: var(--btn-status-uncomplete-bg); color: var(--btn-status-uncomplete-dot);';
-                    statusSymbol = '●';
+                    statusIconName = 'circle';
                 }
 
                 item.innerHTML = `
                     <div class="todo-left">
                         <button class="status-circle-btn" style="${statusBtnStyle}" onclick="toggleComplete('${todo.id}')">
-                            ${statusSymbol}
+                            <span class="material-symbols-outlined">${statusIconName}</span>
                         </button>
                         
                         <div class="todo-details">
                             <div class="todo-title">
-                                ${todo.category && todo.category !== 'なし' ? `<span style="color:${catColor};">[${todo.category}]</span> ` : ''}${todo.name}
+                                ${todo.category && todo.category !== 'なし' ? `<span style="color:${catColor}; font-weight:700;">[${todo.category}]</span> ` : ''}${todo.name}
                             </div>
                             
                             ${repeatLabel ? `<div class="repeat-row">${repeatLabel}</div>` : ''}
@@ -983,7 +1024,9 @@
                     </div>
                     
                     <div class="todo-right">
-                        <button class="menu-trigger-btn" onclick="openActionMenu('${todo.id}', '${todo.name.replace(/'/g, "\\'")}')" title="操作メニュー">•••</button>
+                        <button class="menu-trigger-btn" onclick="openActionMenu('${todo.id}', '${todo.name.replace(/'/g, "\\'")}')" title="操作メニュー">
+                            <span class="material-symbols-outlined">more_horiz</span>
+                        </button>
                     </div>
                 `;
                 listContainer.appendChild(item);
@@ -1001,12 +1044,13 @@
                 element.classList.toggle('completed', todo.isCompleted);
                 const btn = element.querySelector('.status-circle-btn');
                 if (btn) {
+                    const iconSpan = btn.querySelector('.material-symbols-outlined');
                     if (todo.isCompleted) {
                         btn.style = 'background-color: var(--btn-status-complete-bg); color: var(--btn-status-complete-dot);';
-                        btn.textContent = '✔';
+                        if(iconSpan) iconSpan.textContent = 'check';
                     } else {
                         btn.style = 'background-color: var(--btn-status-uncomplete-bg); color: var(--btn-status-uncomplete-dot);';
-                        btn.textContent = '●';
+                        if(iconSpan) iconSpan.textContent = 'circle';
                     }
                 }
                 
@@ -1085,7 +1129,7 @@
             document.getElementById('saveBtn').onclick = saveTodo;
             
             updateCategoryDropdowns();
-            document.getElementById('customDropdownList').style.display = 'none'; // リストは閉じておく
+            document.getElementById('customDropdownList').style.display = 'none'; 
             document.getElementById('taskModal').style.display = 'flex';
         }
 
@@ -1104,7 +1148,7 @@
             document.getElementById('saveBtn').onclick = saveTodo;
             
             updateCategoryDropdowns();
-            document.getElementById('customDropdownList').style.display = 'none'; // リストは閉じておく
+            document.getElementById('customDropdownList').style.display = 'none'; 
             document.getElementById('taskModal').style.display = 'flex';
         }
 

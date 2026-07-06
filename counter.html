@@ -1,323 +1,408 @@
 <!DOCTYPE html>
-
 <html lang="ja">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>文字数カウンター</title>
-    
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <style>
-        /* 通常モード（ライトモード）の色を設定する変数（パーツの色置き場） */
-        :root { 
-            --bg-color: #ffffff;      /* 画面全体の背景色（白） */
-            --panel-bg: #f5f5f5;      /* カウンター表示エリアの背景色（薄いグレー） */
-            --text-color: #000000;    /* 文字の色（黒） */
-            --border-color: #cbd5e1;  /* 枠線の色（グレー） */
-            --active-color: #1565c0;  /* 数字を強調するメインカラー（青） */
-            
-            /* 🆕 ポップアップ用の色設定 */
-            --modal-bg: #ffffff;
-            --option-bg: #f5f5f5;
-        }
-        
-        /* ダークモードに切り替わったときの色（変数の上書き） */
-        [data-theme="dark"] { 
-            --bg-color: #1e1e1e;      /* 画面全体の背景色（濃いグレー） */
-            --panel-bg: #2d2d2d;      /* カウンター表示エリアの背景色（少し明るいグレー） */
-            --text-color: #ffffff;    /* 文字の色（白） */
-            --border-color: #555555;  /* 枠線の色（濃いグレー） */
-            --active-color: #2196f3;  /* 数字を強調するメインカラー（明るい青） */
-            
-            /* 🆕 ポップアップ用の色設定（ダーク） */
-            --modal-bg: #1e1e1e;
-            --option-bg: #3d3d3d;
-        }
-        
-        /* 画面全体の文字の種類や余白の設定 */
-        body { 
-            margin: 0; 
-            font-family: sans-serif; 
-            background-color: var(--bg-color); 
-            color: var(--text-color); 
-            transition: background 0.2s; /* 背景色が変わるときにふわっと変化させる */
-        }
-        
-        /* ヘッダー全体のデザイン */
-        header { 
-            background-color: var(--panel-bg); 
-            padding: 12px; 
-            display: flex;                  /* 横並びにする */
-            justify-content: space-between; /* 左右の端に配置する */
-            align-items: center;            /* 縦の真ん中で揃える */
-            border-bottom: 1px solid var(--border-color); 
-        }
-        
-        /* ヘッダーの中にあるモード切替ボタンだけをアイコン風にする設定 */
-        header button {
-            background: transparent !important; /* 背景を透明にする */
-            border: none !important;             /* 枠線を消す */
-            font-size: 1.5rem !important;        /* 🏠と同じサイズにする */
-            box-shadow: none !important;         /* 影を消す */
-            padding: 0 !important;               /* ボタンの内側の余白をゼロにする */
-            cursor: pointer;                     /* マウスが乗ったときに指マークにする */
-        }
-        
-        /* アプリの中身を中央に寄せるための外枠（コンテナ） */
-        .container { 
-            max-width: 600px; /* 横幅の最大サイズ */
-            margin: 20px auto; /* 画面の中央に配置する */
-            padding: 0 15px;  /* 左右に少しだけ隙間を作る */
-        }
-        
-        /* 文章を入力するテキストエリアのデザイン */
-        textarea { 
-            width: 100%; 
-            height: 200px; 
-            padding: 12px; 
-            border: 1px solid var(--border-color); 
-            border-radius: 8px; /* 角を丸くする */
-            background: var(--bg-color); 
-            color: var(--text-color); 
-            font-size: 1rem; 
-            box-sizing: border-box; /* パディングを含めて横幅を100%にする */
-        }
-        
-        /* 操作ボタン（クリア・コピー）を並べるグループ */
-        .btn-group { 
-            margin: 10px 0; 
-            display: flex; /* ボタンを横並びにする */
-            gap: 10px;     /* ボタンとボタンの間の隙間 */
-        }
-        
-        /* クリアボタンとコピーボタン共通のデザイン */
-        .btn-group button { 
-            padding: 8px 16px; 
-            border-radius: 6px; 
-            border: 1px solid var(--border-color); 
-            cursor: pointer; 
-            background: var(--panel-bg); 
-            color: var(--text-color); 
-            transition: all 0.2s ease; /* アニメーションをふわっとさせる */
-            font-size: 1rem; 
-            font-weight: normal !important; /* 太字を解除 */
-        }
-        
-        /* すべてのボタン共通：マウスが乗ったときに少し上に浮き上がらせる */
-        button:hover {
-            transform: translateY(-2px);       /* 上に2ピクセル移動させる */
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* 下に柔らかい影をつける */
-        }
-        
-        /* カウンターの数字を表示するエリア（2列のグリッド） */
-        .result-grid { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; /* 均等に2分割する */
-            gap: 10px; 
-            margin-top: 15px; 
-        }
-        
-        /* カウンターの数字が入る四角いボックス */
-        .result-box { 
-            background: var(--panel-bg); 
-            padding: 15px; 
-            border-radius: 8px; 
-            text-align: center; /* 文字を真ん中に寄せる */
-        }
-        
-        /* カカウントされた「数字」自体のデザイン */
-        .count-val { 
-            font-size: 1.5rem; 
-            font-weight: bold; 
-            color: var(--active-color); 
-            display: block; /* 改行して独立した行にする */
-        }
-        
-        /* SNSの制限文字数などを表示する一番下のボックス */
-        .sns-box { 
-            margin-top: 15px; 
-            padding: 12px; 
-            border: 1px solid var(--border-color); 
-            border-radius: 8px; 
-            font-size: 0.9rem; 
-            line-height: 1.6; /* 行の間隔を少し広げて読みやすくする */
+        /* === 🎨 カラー変数の設定 === */
+        :root {
+            --bg-color: #f8f9fa;
+            --panel-bg: #ffffff;
+            --text-color: #202124;
+            --sub-text: #5f6368;
+            --border-color: #e8eaed;
+            --primary-color: #1a73e8;   /* 知的なブルー */
+            --primary-bg: #e8f0fe;
+            --danger-text: #d93025;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
 
-        /* 🆕 ポップアップ画面（モーダル設定） */
+        [data-theme="dark"] {
+            --bg-color: #121212;
+            --panel-bg: #1e1e1e;
+            --text-color: #e8eaed;
+            --sub-text: #9aa0a6;
+            --border-color: #2f3134;
+            --primary-color: #8ab4f8;
+            --primary-bg: #1a233a;
+            --danger-text: #ef9a9a;
+            --shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-bottom: 40px;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        header {
+            background-color: var(--panel-bg);
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        .back-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            border-radius: 50%;
+        }
+        .back-btn:active { background: var(--bg-color); }
+
+        .header-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            flex: 1;
+            letter-spacing: 0.5px;
+        }
+
+        .settings-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--sub-text);
+            border-radius: 50%;
+        }
+        .settings-btn:active { background: var(--bg-color); }
+
+        .container {
+            max-width: 480px;
+            margin: 20px auto;
+            padding: 0 16px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* 📊 カウンター数字グリッド */
+        .count-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .count-box {
+            background-color: var(--panel-bg);
+            padding: 16px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+        .count-num {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin-bottom: 4px;
+        }
+        .count-label {
+            font-size: 0.8rem;
+            color: var(--sub-text);
+            font-weight: 600;
+        }
+
+        /* 📝 テキストエリア */
+        .textarea-wrapper {
+            position: relative;
+            background-color: var(--panel-bg);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            padding: 12px;
+            border: 1px solid var(--border-color);
+        }
+        .textarea-wrapper:focus-within { border-color: var(--primary-color); }
+
+        textarea {
+            width: 100%;
+            height: 180px;
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            font-size: 1rem;
+            line-height: 1.5;
+            resize: none;
+            outline: none;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: text;
+            -webkit-user-select: text;
+        }
+
+        /* 🗑️ アクション行 */
+        .action-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .read-time {
+            font-size: 0.82rem;
+            color: var(--sub-text);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .clear-btn {
+            background-color: var(--primary-bg);
+            color: var(--primary-color);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: transform 0.1s;
+        }
+        .clear-btn:active { transform: scale(0.96); }
+
+        /* 📱 SNS目安パネル */
+        .sns-panel {
+            background-color: var(--panel-bg);
+            border-radius: 16px;
+            padding: 18px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .sns-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+        .sns-name {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-color);
+        }
+        .sns-left { font-size: 0.85rem; color: var(--sub-text); }
+        .sns-left.over { color: var(--danger-text); font-weight: 700; }
+
+        /* ⚙️ モーダル */
         .modal {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
             justify-content: center;
             align-items: center;
-            z-index: 100;
+            z-index: 1000;
         }
         .modal-content {
-            background: var(--modal-bg);
-            padding: 20px;
-            border-radius: 12px;
+            background: var(--panel-bg);
+            padding: 24px;
+            border-radius: 20px;
             width: 85%;
-            max-width: 380px;
+            max-width: 360px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            text-align: left;
-            border: 1px solid var(--border-color);
-            box-sizing: border-box;
+            gap: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
         }
-        .theme-option {
+        .menu-option {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px;
-            border-radius: 8px;
-            background: var(--option-bg);
+            padding: 14px;
+            border-radius: 12px;
+            background: var(--bg-color);
             cursor: pointer;
+            border: none;
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 0.95rem;
+            width: 100%;
+            box-sizing: border-box;
         }
         .modal-close-btn {
-            padding: 6px 12px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            background-color: #2165f2;
-            color: white;
+            padding: 12px;
+            border-radius: 12px;
             cursor: pointer;
-            font-size: 1rem;
-            align-self: flex-end;
-            margin-top: 10px;
+            font-size: 0.95rem;
+            background: #1a73e8; 
+            color: white;
+            font-weight: 700;
+            border: none;
+            margin-top: 8px;
         }
     </style>
 </head>
 <body>
 
-<header>
-    <div style="display: flex; align-items: center; gap: 15px;">
-        <a href="index.html" style="text-decoration: none; font-size: 1.5rem; color: var(--text-color); line-height: 1;" title="トップページに戻る">🏠</a>
-        <strong>文字数カウンター</strong>
-    </div>
-    <button onclick="openThemeModal()">⚙️</button>
-</header>
+    <header>
+        <button class="back-btn" onclick="location.href='index.html'">
+            <span class="material-icons-round">arrow_back</span>
+        </button>
+        <div class="header-title">文字数カウンター</div>
+        <button class="settings-btn" onclick="openThemeModal()">
+            <span class="material-icons-round">settings</span>
+        </button>
+    </header>
 
-<div class="container">
-    <textarea id="textInput" placeholder="ここに文章を入力..." oninput="updateCounter()"></textarea>
-    
-    <div class="btn-group">
-        <button onclick="clearText()">クリア</button>
-        <button onclick="copyText()">結果をコピー</button>
-    </div>
-    
-    <div class="result-grid">
-        <div class="result-box">文字数(空白込) <span id="charCount" class="count-val">0</span></div>
-        <div class="result-box">文字数(空白除) <span id="noSpaceCount" class="count-val">0</span></div>
-    </div>
-    
-    <div class="sns-box" id="infoBox">
-        読み上げ時間: 約 0 分<br>
-        Twitter: 140文字まであと 140 文字<br>
-        Instagram: 2200文字まであと 2200 文字
-    </div>
-</div>
+    <div class="container">
+        <div class="count-grid">
+            <div class="count-box">
+                <div class="count-num" id="charCount">0</div>
+                <div class="count-label">文字数 (スペース込)</div>
+            </div>
+            <div class="count-box">
+                <div class="count-num" id="noSpaceCount">0</div>
+                <div class="count-label">文字数 (スペース除)</div>
+            </div>
+        </div>
 
-<div class="modal" id="themeModal">
-    <div class="modal-content">
-        <h3 style="margin:0 0 10px 0;">画面モードの設定</h3>
-        <label class="theme-option" onclick="changeThemeSetting('auto')">
-            <span>システム設定に従う</span>
-            <input type="radio" name="themeGroup" id="themeAuto" checked>
-        </label>
-        <label class="theme-option" onclick="changeThemeSetting('light')">
-            <span>ライトモード</span>
-            <input type="radio" name="themeGroup" id="themeLight">
-        </label>
-        <label class="theme-option" onclick="changeThemeSetting('dark')">
-            <span>ダークモード</span>
-            <input type="radio" name="themeGroup" id="themeDark">
-        </label>
-        <button class="modal-close-btn" onclick="closeThemeModal()">閉じる</button>
+        <div class="textarea-wrapper">
+            <textarea id="textInput" placeholder="ここに文章を入力またはペーストしてください..." oninput="countCharacters()"></textarea>
+        </div>
+
+        <div class="action-row">
+            <div class="read-time">
+                <span class="material-icons-round" style="font-size:1.1rem;">schedule</span>
+                <span id="readingTime">読了時間: 約 0 分</span>
+            </div>
+            <button class="clear-btn" onclick="clearText()">
+                <span class="material-icons-round" style="font-size:1rem;">delete_outline</span>クリア
+            </button>
+        </div>
+
+        <div class="sns-panel">
+            <div class="sns-row">
+                <div class="sns-name">💬 X (旧Twitter)</div>
+                <div class="sns-left" id="xLeft">残り 140 文字</div>
+            </div>
+            <div class="sns-row">
+                <div class="sns-name">📸 Instagram</div>
+                <div class="sns-left" id="instaLeft">残り 2200 文字</div>
+            </div>
+        </div>
     </div>
-</div>
 
-<script>
-    // 🆕 3モードテーマ設定の読み込みと自動連動ロジック
-    let themeSetting = localStorage.getItem('themeSetting') || 'auto';
+    <div class="modal" id="themeModal">
+        <div class="modal-content">
+            <h3 style="margin:0 0 4px 0; font-size:1.1rem; font-weight:700;">画面モードの設定</h3>
+            <label class="menu-option" onclick="changeThemeSetting('auto')">
+                <span>システム設定に従う</span><input type="radio" name="themeGroup" id="themeAuto" checked>
+            </label>
+            <label class="menu-option" onclick="changeThemeSetting('light')">
+                <span>ライトモード</span><input type="radio" name="themeGroup" id="themeLight">
+            </label>
+            <label class="menu-option" onclick="changeThemeSetting('dark')">
+                <span>ダークモード</span><input type="radio" name="themeGroup" id="themeDark">
+            </label>
+            <button class="modal-close-btn" onclick="closeThemeModal()">閉じる</button>
+        </div>
+    </div>
 
-    function applyCurrentTheme() {
-        if (themeSetting === 'auto') {
-            const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            document.documentElement.setAttribute('data-theme', isSystemDark ? 'dark' : 'light');
-        } else {
-            document.documentElement.setAttribute('data-theme', themeSetting);
+    <script>
+        let themeSetting = localStorage.getItem('themeSetting') || 'auto';
+
+        function applyCurrentTheme() {
+            if (themeSetting === 'auto') {
+                const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                document.documentElement.setAttribute('data-theme', isSystemDark ? 'dark' : 'light');
+            } else {
+                document.documentElement.setAttribute('data-theme', themeSetting);
+            }
         }
-    }
-
-    // パソコンやスマホ自体の設定が途中で切り替わったときにも自動連動させる
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-        if (themeSetting === 'auto') applyCurrentTheme();
-    });
-
-    // ポップアップを開く命令
-    function openThemeModal() {
-        document.getElementById('themeAuto').checked = (themeSetting === 'auto');
-        document.getElementById('themeLight').checked = (themeSetting === 'light');
-        document.getElementById('themeDark').checked = (themeSetting === 'dark');
-        document.getElementById('themeModal').style.display = 'flex';
-    }
-
-    // 設定を切り替えた時の命令
-    function changeThemeSetting(newSetting) {
-        themeSetting = newSetting;
-        localStorage.setItem('themeSetting', themeSetting);
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+            if (themeSetting === 'auto') applyCurrentTheme();
+        });
+        function openThemeModal() {
+            document.getElementById('themeAuto').checked = (themeSetting === 'auto');
+            document.getElementById('themeLight').checked = (themeSetting === 'light');
+            document.getElementById('themeDark').checked = (themeSetting === 'dark');
+            document.getElementById('themeModal').style.display = 'flex';
+        }
+        function changeThemeSetting(newSetting) {
+            themeSetting = newSetting;
+            localStorage.setItem('themeSetting', themeSetting);
+            applyCurrentTheme();
+        }
+        function closeThemeModal() { document.getElementById('themeModal').style.display = 'none'; }
         applyCurrentTheme();
-    }
 
-    // ポップアップを閉じる命令
-    function closeThemeModal() {
-        document.getElementById('themeModal').style.display = 'none';
-    }
+        // 📝 文字数カウント処理
+        function countCharacters() {
+            const textarea = document.getElementById('textInput');
+            const text = textarea.value;
 
-    // 起動時に現在のテーマを反映
-    applyCurrentTheme();
+            // ローカルストレージに保持（インデックスバッジ連動用）
+            localStorage.setItem('counter_text', text);
+            localStorage.setItem('savedText', text);
 
+            const len = text.length;
+            const noSpaceLen = text.replace(/\s/g, '').length;
 
-    // 文字が入力されるたびに、リアルタイムで数字を計算して書き換える命令
-    function updateCounter() {
-        // 入力欄に書かれている文章（文字列）を取得する
-        const text = document.getElementById('textInput').value;
-        // 文章全体の文字数を数える
-        const len = text.length;
-        
-        // 【文字数(込)】の数字を書き換える
-        document.getElementById('charCount').textContent = len;
-        // 【文字数(除)】改行やスペースをすべて消した状態の文字数を計算して書き換える
-        document.getElementById('noSpaceCount').textContent = text.replace(/\s/g, '').length;
-        
-        // 1分間に400文字読めると仮定して、何分かかるかを計算（切り上げ）
-        const time = Math.ceil(len / 400);
-        
-        // 一番下のSNS情報パネルの中身を、計算結果を元に作り直して書き換える
-        document.getElementById('infoBox').innerHTML = `
-            読み上げ時間: 約 ${time} 分<br>
-            Twitter: 140文字まであと ${Math.max(0, 140 - len)} 文字${len > 140 ? ' <span style="color:red;">(超!)</span>' : ''}<br>
-            Instagram: 2200文字まであと ${Math.max(0, 2200 - len)} 文字${len > 2200 ? ' <span style="color:red;">(超!)</span>' : ''}
-        `;
-    }
+            document.getElementById('charCount').textContent = len.toLocaleString();
+            document.getElementById('noSpaceCount').textContent = noSpaceLen.toLocaleString();
 
-    // 「クリア」ボタンが押されたときに、中身を全部消す命令
-    function clearText() { 
-        // 確認ダイアログを出して、OKが押されたときだけ実行する
-        if(confirm('消去しますか？')) { 
-            document.getElementById('textInput').value = ''; // 入力欄を空っぽにする
-            updateCounter(); // カウンターの数字も0にリセットするために計算命令を呼ぶ
-        } 
-    }
+            // 読了時間（1分400文字計算）
+            const time = Math.ceil(len / 400);
+            document.getElementById('readingTime').textContent = `読了時間: 約 ${len > 0 ? time : 0} 分`;
 
-    // 「結果をコピー」ボタンが押されたときに、入力された文章をクリップボードにコピーする命令
-    function copyText() { 
-        // 入力欄の文章をコピーする命令を実行
-        navigator.clipboard.writeText(document.getElementById('textInput').value).then(() => {
-            alert('コピーしました！'); // 成功したら画面にポップアップを出す
-        }); 
-    }
-</script>
+            // X (旧Twitter) 制限
+            const xLeft = 140 - len;
+            const xEl = document.getElementById('xLeft');
+            if (xLeft >= 0) {
+                xEl.textContent = `残り ${xLeft} 文字`;
+                xEl.classList.remove('over');
+            } else {
+                xEl.textContent = `${Math.abs(xLeft)} 文字超過`;
+                xEl.classList.add('over');
+            }
+
+            // Instagram 制限
+            const instaLeft = 2200 - len;
+            const instaEl = document.getElementById('instaLeft');
+            if (instaLeft >= 0) {
+                instaEl.textContent = `残り ${instaLeft} 文字`;
+                instaEl.classList.remove('over');
+            } else {
+                instaEl.textContent = `${Math.abs(instaLeft)} 文字超過`;
+                instaEl.classList.add('over');
+            }
+        }
+
+        function clearText() {
+            if (document.getElementById('textInput').value.length === 0) return;
+            if (confirm('入力されているテキストをすべて消去しますか？')) {
+                document.getElementById('textInput').value = '';
+                countCharacters();
+            }
+        }
+
+        // ページ読み込み時にストレージから復元
+        window.addEventListener('DOMContentLoaded', () => {
+            const saved = localStorage.getItem('counter_text') || localStorage.getItem('savedText') || '';
+            document.getElementById('textInput').value = saved;
+            countCharacters();
+        });
+    </script>
 </body>
 </html>

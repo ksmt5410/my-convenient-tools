@@ -4,34 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>お買い物リスト</title>
+    <!-- 🆕 Google Material Icons の読み込み -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <style>
-        /* === デザイン設定（CSS） === */
+        /* === 🎨 カラー変数の設定 === */
         :root {
-            --bg-color: #f9f9fb;
+            --bg-color: #f8f9fa;
             --panel-bg: #ffffff;
-            --text-color: #333333;
-            --sub-text: #757575;
-            --border-color: #e2e8f0;
-            --primary-color: #4caf50;
-            --primary-bg: #e8f5e9;
-            --danger-bg: #ffebee;
-            --danger-text: #c62828;
-            --history-bg: #f1f5f9;
-            --modal-option-bg: #e0e0e0;
+            --text-color: #202124;
+            --sub-text: #5f6368;
+            --border-color: #e8eaed;
+            --primary-color: #34a853;   /* 買い物らしい爽やかなグリーン */
+            --primary-bg: #e6f4ea;
+            --danger-bg: #fce8e6;
+            --danger-text: #d93025;
+            --history-bg: #f1f3f4;
+            --modal-option-bg: #f1f3f4;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
 
         [data-theme="dark"] {
             --bg-color: #121212;
             --panel-bg: #1e1e1e;
-            --text-color: #e2e8f0;
-            --sub-text: #94a3b8;
-            --border-color: #334155;
+            --text-color: #e8eaed;
+            --sub-text: #9aa0a6;
+            --border-color: #2f3134;
             --primary-color: #81c784;
             --primary-bg: #1b5e20;
             --danger-bg: #b71c1c;
             --danger-text: #ef9a9a;
-            --history-bg: #334155;
+            --history-bg: #2d2d2d;
             --modal-option-bg: #2d2d2d;
+            --shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
         }
 
         body {
@@ -39,115 +43,135 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
-            padding-bottom: 30px;
+            padding-bottom: 40px;
             user-select: none;
             -webkit-user-select: none;
         }
 
         header {
             background-color: var(--panel-bg);
-            padding: 15px;
+            padding: 14px 16px;
             border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
         }
 
+        /* 🆕 戻るボタンをモダンな矢印アイコンに変更 */
+        .back-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            border-radius: 50%;
+        }
+        .back-btn:active { background: var(--history-bg); }
+
         .header-title {
-            font-size: 1.25rem;
-            font-weight: bold;
+            font-size: 1.15rem;
+            font-weight: 600;
             flex: 1;
+            letter-spacing: 0.5px;
         }
 
         .settings-btn {
             background: transparent;
-            font-size: 1.3rem;
+            border: none;
             cursor: pointer;
-            padding: 4px;
+            padding: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--text-color);
+            color: var(--sub-text);
+            border-radius: 50%;
         }
+        .settings-btn:active { background: var(--history-bg); }
 
         .modal {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
             justify-content: center;
             align-items: center;
             z-index: 1000;
         }
         .modal-content {
             background: var(--panel-bg);
-            padding: 20px;
-            border-radius: 12px;
+            padding: 24px;
+            border-radius: 20px;
             width: 85%;
-            max-width: 380px;
+            max-width: 360px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            text-align: left;
+            gap: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
         }
         .theme-option, .menu-option {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px;
-            border-radius: 8px;
+            padding: 14px;
+            border-radius: 12px;
             background: var(--modal-option-bg);
             cursor: pointer;
-            border: 1px solid var(--border-color);
+            border: none;
             color: var(--text-color);
-            font-weight: bold;
+            font-weight: 600;
             font-size: 0.95rem;
-            text-align: left;
             width: 100%;
             box-sizing: border-box;
+            transition: transform 0.1s;
         }
         .menu-option:active {
-            filter: brightness(0.9);
+            transform: scale(0.98);
+            filter: brightness(0.95);
         }
 
         .container {
-            max-width: 600px;
+            max-width: 480px;
             margin: 20px auto;
-            padding: 0 15px;
+            padding: 0 16px;
             box-sizing: border-box;
         }
 
         .input-panel {
             background-color: var(--panel-bg);
-            padding: 15px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            padding: 16px;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
             margin-bottom: 20px;
         }
 
         .input-row {
             display: flex;
-            gap: 8px;
+            gap: 10px;
             width: 100%;
         }
 
-        input, select {
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid rgba(0,0,0,0.08);
-            background: #f1f5f9; 
+        input {
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-color); 
             color: var(--text-color);
-            font-size: 1rem;
+            font-size: 0.95rem;
             box-sizing: border-box;
             min-width: 0;
+            outline: none;
         }
-        [data-theme="dark"] input {
-            background: #2d2d2d;
-            border: 1px solid #444444;
+        input:focus {
+            border-color: var(--primary-color);
         }
 
         #itemName { flex: 2; }
@@ -162,15 +186,14 @@
         #itemCategory {
             flex: 1;
             width: 100%;
-            border-radius: 8px; 
-            padding-right: 30px;
+            padding-right: 34px;
         }
         .combobox-arrow {
             position: absolute;
-            right: 10px;
+            right: 12px;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 0.7rem;
+            font-size: 0.8rem;
             color: var(--sub-text);
             pointer-events: none;
         }
@@ -185,18 +208,17 @@
             overflow-y: auto;
             background: var(--panel-bg);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             z-index: 999;
             box-sizing: border-box;
-            padding: 4px 0;
+            padding: 6px 0;
         }
         .custom-dropdown-item {
-            padding: 10px 12px;
+            padding: 10px 14px;
             font-size: 0.95rem;
             cursor: pointer;
             color: var(--text-color);
-            text-align: left;
         }
         .custom-dropdown-item:active {
             background-color: var(--primary-bg);
@@ -204,105 +226,88 @@
 
         button {
             border: none;
-            border-radius: 8px;
-            font-weight: bold;
+            border-radius: 10px;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: transform 0.1s;
         }
 
         .add-btn {
             background-color: var(--primary-color);
             color: #ffffff;
-            width: 44px;
-            height: 42px;
-            font-size: 1.4rem;
+            width: 46px;
+            height: 46px;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
             padding: 0;
+            box-shadow: 0 4px 12px rgba(52, 168, 83, 0.2);
         }
-        [data-theme="dark"] .add-btn { color: #121212; }
+        .add-btn:active { transform: scale(0.94); }
+        .add-btn .material-icons-round { font-size: 1.5rem; }
 
         .summary-panel {
             background-color: var(--primary-bg);
             color: var(--text-color);
-            padding: 12px 15px;
-            border-radius: 8px;
-            font-weight: bold;
+            padding: 16px;
+            border-radius: 14px;
+            font-weight: 700;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
-            border: 1px solid var(--primary-color);
+            margin-bottom: 20px;
         }
 
         .list-section-title {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: var(--sub-text);
-            margin: 15px 0 5px 5px;
-            font-weight: bold;
+            margin: 20px 0 8px 4px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
         }
 
-        /* 📦 カテゴリの箱 */
         .category-group-box {
             background-color: var(--panel-bg);
-            border: 2px dashed var(--border-color);
-            border-radius: 12px;
-            padding: 12px;
-            margin-top: 15px;
-            margin-bottom: 5px;
-            transition: transform 0.2s, background-color 0.2s;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow);
             position: relative;
-            touch-action: translateY; /* スマホの横ブレ防止、上下スクロールは許可 */
+            touch-action: translateY;
         }
 
-        .category-group-box.box-dragging {
-            opacity: 0.4;
-            border-color: var(--primary-color);
-        }
-
-        .category-group-box.drag-over {
-            filter: brightness(0.92);
-            border-color: var(--primary-color);
-        }
-        [data-theme="dark"] .category-group-box.drag-over {
-            filter: brightness(1.2);
-        }
+        .category-group-box.box-dragging { opacity: 0.4; }
+        .category-group-box.drag-over { filter: brightness(0.95); }
 
         .category-box-header-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             cursor: grab;
-            padding: 4px;
-            border-radius: 6px;
-        }
-        .category-box-header-row:active {
-            cursor: grabbing;
         }
 
         .category-group-header {
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             color: var(--text-color);
-            font-weight: bold;
+            font-weight: 700;
             display: flex;
             align-items: center;
-            pointer-events: none; /* タッチイベントの誤発動を防ぐ */
+            pointer-events: none;
         }
 
         .box-menu-trigger-btn {
             background: transparent;
             border: none;
-            color: var(--text-color);
-            font-size: 1.1rem;
+            color: var(--sub-text);
             cursor: pointer;
-            padding: 2px 8px;
+            padding: 4px 8px;
             border-radius: 6px;
-            opacity: 0.6;
+            display: flex;
+            align-items: center;
         }
-        .box-menu-trigger-btn:hover { opacity: 1; }
+        .box-menu-trigger-btn:active { background: rgba(0,0,0,0.05); }
 
         .shopping-list {
             display: flex;
@@ -311,22 +316,17 @@
             min-height: 20px;
         }
 
-        /* 🛒 リストアイテム */
         .shopping-item {
-            background-color: var(--panel-bg);
-            padding: 12px 15px;
-            border-radius: 10px;
-            border: 1px solid var(--border-color);
+            background-color: var(--bg-color);
+            padding: 12px 14px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             gap: 12px;
             cursor: grab;
-            transition: opacity 0.3s, transform 0.3s;
-            touch-action: none; /* スマホ移動中、画面スクロールを止める */
+            touch-action: none;
         }
-        .shopping-item:active { cursor: grabbing; }
         .shopping-item.dragging { opacity: 0.3; }
-
         .shopping-item.transitioning {
             opacity: 0;
             transform: translateY(-8px);
@@ -334,36 +334,36 @@
             padding-top: 0 !important;
             padding-bottom: 0 !important;
             margin: 0;
+            transition: all 0.3s;
         }
 
         .shopping-item.checked {
             opacity: 0.4;
-            background-color: transparent;
             cursor: default;
-            touch-action: auto; /* チェック済みは通常通りスクロール可能に */
+            touch-action: auto;
         }
-        .shopping-item.checked .item-name { text-decoration: line-through; }
+        .shopping-item.checked .item-name { text-decoration: line-through; color: var(--sub-text); }
 
         .checkbox {
-            width: 24px;
-            height: 24px;
+            width: 22px;
+            height: 22px;
             border-radius: 50%;
-            border: 2px solid var(--border-color);
+            border: 2px solid var(--sub-text);
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: bold;
             transition: all 0.15s;
             flex-shrink: 0;
-            background-color: var(--bg-color);
+            background-color: var(--panel-bg);
         }
+        .checkbox .material-icons-round { font-size: 0.95rem; display: none; color: white; }
+        
         .shopping-item.checked .checkbox {
             background-color: var(--primary-color);
             border-color: var(--primary-color);
-            color: var(--panel-bg);
         }
+        .shopping-item.checked .checkbox .material-icons-round { display: block; }
 
         .item-info {
             display: flex;
@@ -371,22 +371,24 @@
             align-items: center;
             flex: 1;
         }
-        .item-name { font-weight: bold; font-size: 1.05rem; }
-        .item-price { color: var(--sub-text); font-size: 0.95rem; }
+        .item-name { font-weight: 600; font-size: 1rem; }
+        .item-price { color: var(--sub-text); font-size: 0.9rem; font-weight: 600; }
 
         .delete-btn {
             background-color: transparent;
             color: var(--sub-text);
-            font-size: 1.1rem;
-            padding: 4px 8px;
+            padding: 4px;
             cursor: pointer;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
         }
-        .delete-btn:hover { color: var(--danger-text); }
+        .delete-btn:active { background: rgba(0,0,0,0.05); color: var(--danger-text); }
 
         .history-panel {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 2px dashed var(--border-color);
+            margin-top: 32px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
         }
 
         .history-grid {
@@ -397,16 +399,17 @@
         }
 
         .history-chip {
-            background-color: var(--history-bg);
+            background-color: var(--panel-bg);
             color: var(--text-color);
             padding: 8px 14px;
             border-radius: 20px;
             font-size: 0.85rem;
-            font-weight: bold;
+            font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 5px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            gap: 6px;
+            box-shadow: var(--shadow);
+            border: none;
         }
         .history-chip:active { transform: scale(0.95); }
 
@@ -414,33 +417,39 @@
             display: flex;
             justify-content: flex-end;
             gap: 10px;
-            margin-top: 15px;
+            margin-top: 16px;
         }
         .clear-btn {
             background-color: var(--danger-bg);
             color: var(--danger-text);
-            padding: 6px 12px;
+            padding: 8px 14px;
             font-size: 0.85rem;
         }
+        .clear-btn:active { transform: scale(0.96); }
         
         .modal-close-btn {
-            padding: 8px 20px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
+            padding: 12px;
+            border-radius: 12px;
             cursor: pointer;
-            font-size: 1rem;
-            background: #2165f2; 
+            font-size: 0.95rem;
+            background: #1a73e8; 
             color: white;
-            font-weight: bold;
+            font-weight: 700;
+            border: none;
+            margin-top: 8px;
         }
     </style>
 </head>
 <body>
 
     <header>
-        <a href="index.html" style="text-decoration: none; font-size: 1.5rem; color: var(--text-color);" title="トップへ戻る">🏠</a>
+        <button class="back-btn" onclick="location.href='index.html'" title="トップへ戻る">
+            <span class="material-icons-round">arrow_back</span>
+        </button>
         <div class="header-title">お買い物リスト</div>
-        <button class="settings-btn" onclick="openThemeModal()" title="画面モードの設定">⚙️</button>
+        <button class="settings-btn" onclick="openThemeModal()" title="画面モードの設定">
+            <span class="material-icons-round">settings</span>
+        </button>
     </header>
 
     <div class="container">
@@ -455,13 +464,15 @@
                     <span class="combobox-arrow">▼</span>
                     <div id="customDropdownList" class="custom-dropdown-list"></div>
                 </div>
-                <button class="add-btn" onclick="addItem()">＋</button>
+                <button class="add-btn" onclick="addItem()">
+                    <span class="material-icons-round">add</span>
+                </button>
             </div>
         </div>
 
         <div class="summary-panel">
             <span>カゴ内の合計 (概算):</span>
-            <span id="totalPrice" style="font-size: 1.3rem;">￥0</span>
+            <span id="totalPrice" style="font-size: 1.25rem;">￥0</span>
         </div>
 
         <div class="list-section-title">買うものリスト</div>
@@ -478,9 +489,10 @@
         </div>
     </div>
 
+    <!-- モーダル類 -->
     <div class="modal" id="themeModal">
         <div class="modal-content">
-            <h3 style="margin:0 0 10px 0;">画面モードの設定</h3>
+            <h3 style="margin:0 0 4px 0; font-size:1.1rem; font-weight:700;">画面モードの設定</h3>
             <label class="theme-option" onclick="changeThemeSetting('auto')">
                 <span>システム設定に従う</span>
                 <input type="radio" name="themeGroup" id="themeAuto" checked>
@@ -490,19 +502,17 @@
                 <input type="radio" name="themeGroup" id="themeLight">
             </label>
             <label class="theme-option" onclick="changeThemeSetting('dark')">
-                <span>ダークモード</span>
+                <span>darkモード</span>
                 <input type="radio" name="themeGroup" id="themeDark">
             </label>
-            <div style="display:flex; justify-content: flex-end; margin-top: 10px;">
-                <button class="modal-close-btn" onclick="closeThemeModal()">閉じる</button>
-            </div>
+            <button class="modal-close-btn" onclick="closeThemeModal()">閉じる</button>
         </div>
     </div>
 
     <div class="modal" id="boxMenuModal">
         <div class="modal-content">
-            <h3 id="boxMenuTitle" style="margin:0 0 5px 0; font-size: 1.1rem;">カテゴリ設定</h3>
-            <p style="margin: 0 0 15px 0; font-size: 0.85rem; color: var(--sub-text);">このカテゴリ全体の設定を行います。</p>
+            <h3 id="boxMenuTitle" style="margin:0 0 4px 0; font-size: 1.1rem; font-weight:700;">カテゴリ設定</h3>
+            <p style="margin: 0 0 12px 0; font-size: 0.85rem; color: var(--sub-text);">このカテゴリ全体の設定を行います。</p>
             
             <button class="menu-option" onclick="triggerColorPicker()">
                 <span>🎨 カテゴリ色の変更</span>
@@ -513,9 +523,7 @@
                 <span>💰 登録単価の変更</span>
             </button>
             
-            <div style="display:flex; justify-content: flex-end; margin-top: 10px;">
-                <button class="modal-close-btn" style="background-color: var(--history-bg); color: var(--text-color);" onclick="closeBoxMenu()">キャンセル</button>
-            </div>
+            <button class="modal-close-btn" style="background-color: var(--history-bg); color: var(--text-color);" onclick="closeBoxMenu()">キャンセル</button>
         </div>
     </div>
 
@@ -527,7 +535,6 @@
         let draggedItemId = null;
         let draggedCategoryName = null;
         let themeSetting = localStorage.getItem('themeSetting') || 'auto';
-        
         let activeMenuCategory = null;
 
         try {
@@ -550,7 +557,7 @@
                 document.documentElement.setAttribute('data-theme', themeSetting);
             }
         }
-
+        
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
             if (themeSetting === 'auto') applyCurrentTheme();
         });
@@ -735,15 +742,13 @@
             const element = document.getElementById(`shop-${id}`);
             if (element) {
                 element.classList.toggle('checked', item.isChecked);
-                const checkEl = element.querySelector('.checkbox');
-                if (checkEl) checkEl.textContent = item.isChecked ? '✓' : '';
                 element.classList.add('transitioning');
             }
 
             setTimeout(() => {
                 saveToStorage();
                 render();
-            }, 400);
+            }, 300);
         }
 
         function deleteItem(id) {
@@ -845,7 +850,6 @@
             }
         }
 
-        // === 🎛️ PC版ドラッグ＆ドロップ用関数 ===
         function handleItemDragStart(e, id) {
             e.stopPropagation();
             draggedItemId = id;
@@ -875,7 +879,6 @@
             executeMoveLogic(targetCategory);
         }
 
-        // 移動実行コアロジック（PC・スマホ共通）
         function executeMoveLogic(targetCategory) {
             if (draggedItemId) {
                 const item = listItems.find(i => i.id === draggedItemId);
@@ -903,7 +906,6 @@
             draggedCategoryName = null;
         }
 
-        // 🆕 === 📱 スマホ専用 タッチスワイプ移動システム ===
         function setupTouchListeners(element, type, idOrName) {
             element.addEventListener('touchstart', (e) => {
                 if (e.touches.length > 1) return;
@@ -912,7 +914,6 @@
                     draggedCategoryName = null;
                     element.classList.add('dragging');
                 } else {
-                    // ヘッダー行をタッチした時のみ箱ドラッグ
                     if (e.target.closest('.box-menu-trigger-btn')) return;
                     draggedItemId = null;
                     draggedCategoryName = idOrName;
@@ -922,8 +923,6 @@
 
             element.addEventListener('touchmove', (e) => {
                 if (!draggedItemId && !draggedCategoryName) return;
-                
-                // スワイプ位置にある「下の要素」を検知
                 const touch = e.touches[0];
                 const targetEl = document.elementFromPoint(touch.clientX, touch.clientY);
                 if (!targetEl) return;
@@ -933,14 +932,12 @@
                 
                 if (targetBox) {
                     targetBox.classList.add('drag-over');
-                    // アイテムドラッグ時は画面スクロールを完全に停止
                     if (draggedItemId && e.cancelable) e.preventDefault();
                 }
             }, { passive: false });
 
             element.addEventListener('touchend', (e) => {
                 if (!draggedItemId && !draggedCategoryName) return;
-                
                 element.classList.remove('dragging', 'box-dragging');
                 
                 const touch = e.changedTouches[0];
@@ -960,8 +957,6 @@
             });
         }
 
-
-        // === 🖌️ レンダリング ===
         function render() {
             const mainListContainer = document.getElementById('listContainer');
             const historyGrid = document.getElementById('historyGrid');
@@ -971,7 +966,7 @@
             historyGrid.innerHTML = '';
 
             if (listItems.length === 0) {
-                mainListContainer.innerHTML = '<div style="text-align:center; color:gray; padding:20px; font-size:0.9rem;">リストは空っぽです</div>';
+                mainListContainer.innerHTML = '<div style="text-align:center; color:gray; padding:24px; font-size:0.9rem; font-weight:600;">リストは空っぽです</div>';
                 document.getElementById('clearActions').style.display = 'none';
                 document.getElementById('historyPanel').style.display = itemMaster.length > 0 ? 'block' : 'none';
                 renderHistoryOnly();
@@ -982,7 +977,6 @@
 
             const uncompletedItems = listItems.filter(i => !i.isChecked);
             const completedItems = listItems.filter(i => i.isChecked);
-
             const activeCategories = [...new Set(uncompletedItems.map(i => i.category))];
 
             activeCategories.forEach(c => {
@@ -1009,19 +1003,20 @@
                     div.setAttribute('draggable', 'true');
                     div.addEventListener('dragstart', (e) => handleItemDragStart(e, item.id));
                     div.addEventListener('dragend', handleItemDragEnd);
-                    // 🆕 スマホ用のタッチイベント登録
                     setupTouchListeners(div, 'item', item.id);
                 }
                 
                 div.innerHTML = `
                     <div class="checkbox" onclick="toggleCheck('${item.id}')">
-                        ${item.isChecked ? '✓' : ''}
+                        <span class="material-icons-round">done</span>
                     </div>
                     <div class="item-info" onclick="toggleCheck('${item.id}')">
                         <span class="item-name">${item.name}</span>
                         <span class="item-price">${item.price > 0 ? '￥' + item.price.toLocaleString() : ''}</span>
                     </div>
-                    <button class="delete-btn" onclick="deleteItem('${item.id}')">×</button>
+                    <button class="delete-btn" onclick="deleteItem('${item.id}')">
+                        <span class="material-icons-round" style="font-size:1.2rem;">close</span>
+                    </button>
                 `;
                 return div;
             }
@@ -1037,7 +1032,7 @@
 
                 if (categoryColors[cat]) {
                     box.style.backgroundColor = categoryColors[cat];
-                    box.style.borderColor = 'transparent';
+                    box.style.boxShadow = 'none';
                 }
 
                 box.addEventListener('dragover', handleDragOver);
@@ -1047,18 +1042,17 @@
 
                 const headerRow = document.createElement('div');
                 headerRow.className = 'category-box-header-row';
-                // 🆕 スマホ用のタッチイベント登録（箱の並び替え）
                 setupTouchListeners(headerRow, 'box', cat);
 
                 const header = document.createElement('div');
                 header.className = 'category-group-header';
-                header.textContent = cat === 'なし' ? 'その他（ドラッグで仕分け）' : cat;
+                header.textContent = cat === 'なし' ? 'その他' : cat;
                 headerRow.appendChild(header);
 
                 if (cat !== 'なし') {
                     const menuBtn = document.createElement('button');
                     menuBtn.className = 'box-menu-trigger-btn';
-                    menuBtn.textContent = '•••';
+                    menuBtn.innerHTML = '<span class="material-icons-round">more_horiz</span>';
                     menuBtn.title = 'カテゴリの設定を開く';
                     menuBtn.onclick = (e) => {
                         e.stopPropagation();
@@ -1082,11 +1076,12 @@
 
             if (completedItems.length > 0) {
                 const compBox = document.createElement('div');
-                compBox.style.marginTop = '20px';
+                compBox.style.marginTop = '24px';
                 
                 const compHeader = document.createElement('div');
                 compHeader.className = 'category-group-header';
                 compHeader.style.color = 'var(--sub-text)';
+                compHeader.style.marginBottom = '8px';
                 compHeader.textContent = 'カゴに入れたもの';
                 compBox.appendChild(compHeader);
                 
@@ -1118,9 +1113,9 @@
                     chip.onclick = () => addFromHistory(m.name, m.price, m.category);
                     chip.innerHTML = `
                         <span>${m.name}</span>
-                        ${m.category && m.category !== 'なし' ? `<span style=\"font-size:0.7rem; opacity:0.7; background:rgba(0,0,0,0.05); padding:1px 4px; border-radius:3px;\">${m.category}</span>` : ''}
-                        <span style=\"color:var(--sub-text); font-size:0.75rem; font-weight:normal;\">${m.price > 0 ? '￥'+m.price : ''}</span>
-                        <span style=\"margin-left:5px; color:var(--sub-text); font-size:0.8rem;\" onclick=\"deleteMaster('${m.name}')\">×</span>
+                        ${m.category && m.category !== 'なし' ? `<span style="font-size:0.7rem; opacity:0.7; background:rgba(0,0,0,0.05); padding:2px 6px; border-radius:4px;">${m.category}</span>` : ''}
+                        <span style="color:var(--sub-text); font-size:0.8rem; font-weight:normal;">${m.price > 0 ? '￥'+m.price : ''}</span>
+                        <span style="margin-left:4px; color:var(--sub-text); font-size:1.1rem; display:flex; align-items:center;" onclick="deleteMaster('${m.name}')">×</span>
                     `;
                     historyGrid.appendChild(chip);
                 });
