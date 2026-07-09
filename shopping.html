@@ -13,7 +13,7 @@
             --text-color: #202124;
             --sub-text: #5f6368;
             --border-color: #e8eaed;
-            --primary-color: #34a853;   /* 買い物らしい爽やかなグリーン */
+            --primary-color: #34a853;   
             --primary-bg: #e6f4ea;
             --danger-bg: #fce8e6;
             --danger-text: #d93025;
@@ -43,7 +43,6 @@
             background-color: var(--bg-color);
             color: var(--text-color);
             padding-bottom: 40px;
-            /* 🛠️ スマホの動作を邪魔する選択禁止バグを修正 */
             user-select: auto;
             -webkit-user-select: auto;
         }
@@ -266,6 +265,7 @@
             letter-spacing: 0.5px;
         }
 
+        /* 🚀 カテゴリボックス自体のドラッグ用スタイル */
         .category-group-box {
             background-color: var(--panel-bg);
             border-radius: 16px;
@@ -273,6 +273,11 @@
             margin-bottom: 12px;
             box-shadow: var(--shadow);
             position: relative;
+            touch-action: none; /* スマホドラッグ時の競合防止 */
+        }
+        .category-group-box.dragging-box {
+            opacity: 0.4;
+            border: 2px dashed var(--sub-text);
         }
 
         .category-box-header-row {
@@ -289,7 +294,19 @@
             font-weight: 700;
             display: flex;
             align-items: center;
+            gap: 6px;
         }
+
+        /* ⠿ ドラッグハンドルのデザイン */
+        .drag-handle {
+            color: var(--sub-text);
+            cursor: grab;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2px;
+        }
+        .drag-handle:active { cursor: grabbing; }
 
         .box-menu-trigger-btn {
             background: transparent;
@@ -317,10 +334,22 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            cursor: grab; 
+            touch-action: none; 
+            position: relative;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .shopping-item:active { cursor: grabbing; }
+        .shopping-item.dragging {
+            opacity: 0.5;
+            background-color: var(--border-color);
+            border: 2px dashed var(--sub-text);
         }
 
         .shopping-item.checked {
             opacity: 0.4;
+            cursor: default; 
         }
         .shopping-item.checked .item-name { text-decoration: line-through; color: var(--sub-text); }
 
@@ -378,18 +407,21 @@
             margin-top: 10px;
         }
 
+        /* ✨ 履歴チップのデザインを最適化 */
         .history-chip {
             background-color: var(--panel-bg);
             color: var(--text-color);
             padding: 8px 14px;
             border-radius: 20px;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             box-shadow: var(--shadow);
-            border: none;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
         }
         .history-chip:active { transform: scale(0.95); }
 
@@ -432,16 +464,9 @@
             font-size: 0.95rem;
             transition: background 0.2s, color 0.2s;
         }
-        .price-edit-btn:hover {
-            background-color: rgba(0, 0, 0, 0.05);
-            color: var(--text-color);
-        }
-        [data-theme="dark"] .price-edit-btn:hover {
-            background-color: rgba(255, 255, 255, 0.08);
-        }
-        .price-edit-btn:active {
-            transform: scale(0.9);
-        }
+        .price-edit-btn:hover { background-color: rgba(0, 0, 0, 0.05); color: var(--text-color); }
+        [data-theme="dark"] .price-edit-btn:hover { background-color: rgba(255, 255, 255, 0.08); }
+        .price-edit-btn:active { transform: scale(0.9); }
 
         .inline-color-input {
             position: absolute;
@@ -456,6 +481,11 @@
             border: none;
             pointer-events: none;
             visibility: hidden;
+        }
+
+        @keyframes fadeInItem {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
@@ -735,15 +765,18 @@
             const item = listItems.find(i => i.id === id);
             if (!item) return;
 
-            item.isChecked = !item.isChecked;
-
             const element = document.getElementById(`shop-${id}`);
             if (element) {
-                element.classList.toggle('checked', item.isChecked);
+                element.style.transition = 'all 0.2s ease-in-out';
+                element.style.opacity = '0';
+                element.style.transform = 'scale(0.95)';
             }
 
-            saveToStorage();
-            render();
+            setTimeout(() => {
+                item.isChecked = !item.isChecked;
+                saveToStorage();
+                render();
+            }, 200);
         }
 
         function deleteItem(id) {
@@ -799,8 +832,185 @@
             render();
         }
 
-        function setupTouchListeners(element, type, idOrName) {
-            // 何もしない
+        // 🚀 ① アイテム（子）のドラッグ＆ドロップシステム
+        let dragSrcElement = null;
+        let touchStartEl = null;
+
+        function handleDragStart(e) {
+            if (this.classList.contains('checked')) return;
+            this.classList.add('dragging');
+            dragSrcElement = this;
+            if(e.dataTransfer) {
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', this.id);
+            }
+        }
+        function handleDragOver(e) {
+            if (e.preventDefault) e.preventDefault();
+            if (this.classList.contains('checked')) return;
+            return false;
+        }
+        function handleDragEnter() {
+            if (this.classList.contains('checked') || this === dragSrcElement) return;
+            this.style.borderTop = '2px solid var(--primary-color)';
+        }
+        function handleDragLeave() { this.style.borderTop = ''; }
+        function handleDrop(e) {
+            if (e.stopPropagation) e.stopPropagation();
+            if (e.preventDefault) e.preventDefault();
+            if (dragSrcElement && dragSrcElement !== this && !this.classList.contains('checked')) {
+                const srcId = dragSrcElement.id.replace('shop-', '');
+                const targetId = this.id.replace('shop-', '');
+                reorderItemsArray(srcId, targetId);
+            }
+            return false;
+        }
+        function handleDragEnd() {
+            this.classList.remove('dragging');
+            document.querySelectorAll('.shopping-item').forEach(el => el.style.borderTop = '');
+        }
+
+        function handleTouchStart(e) {
+            if (this.classList.contains('checked')) return;
+            if (e.target.closest('.price-edit-btn') || e.target.closest('.delete-btn') || e.target.closest('.checkbox')) return;
+            touchStartEl = this;
+            this.classList.add('dragging');
+            dragSrcElement = this;
+        }
+        function handleTouchMove(e) {
+            if (!touchStartEl) return;
+            e.preventDefault();
+            const touch = e.touches[0];
+            const target = document.elementFromPoint(touch.clientX, touch.clientY);
+            if (!target) return;
+            const itemEl = target.closest('.shopping-item');
+            document.querySelectorAll('.shopping-item').forEach(el => el.style.borderTop = '');
+            if (itemEl && itemEl !== touchStartEl && !itemEl.classList.contains('checked')) {
+                itemEl.style.borderTop = '2px solid var(--primary-color)';
+            }
+        }
+        function handleTouchEnd(e) {
+            if (!touchStartEl) return;
+            touchStartEl.classList.remove('dragging');
+            const touch = e.changedTouches[0];
+            const target = document.elementFromPoint(touch.clientX, touch.clientY);
+            document.querySelectorAll('.shopping-item').forEach(el => el.style.borderTop = '');
+            if (target) {
+                const itemEl = target.closest('.shopping-item');
+                if (itemEl && itemEl !== touchStartEl && !itemEl.classList.contains('checked')) {
+                    const srcId = touchStartEl.id.replace('shop-', '');
+                    const targetId = itemEl.id.replace('shop-', '');
+                    reorderItemsArray(srcId, targetId);
+                }
+            }
+            touchStartEl = null;
+            dragSrcElement = null;
+        }
+
+        function reorderItemsArray(srcId, targetId) {
+            const srcIndex = listItems.findIndex(i => i.id === srcId);
+            const targetIndex = listItems.findIndex(i => i.id === targetId);
+            if (srcIndex !== -1 && targetIndex !== -1) {
+                const [movedItem] = listItems.splice(srcIndex, 1);
+                movedItem.category = listItems[targetIndex >= srcIndex ? targetIndex - 1 : targetIndex].category;
+                listItems.splice(targetIndex, 0, movedItem);
+                saveToStorage();
+                render();
+            }
+        }
+
+        // 🚀 ② カテゴリボックス（親）のドラッグ＆ドロップシステム
+        let dragBoxSrc = null;
+        let touchBoxStart = null;
+
+        function handleBoxDragStart(e) {
+            if (e.target.closest('.shopping-item')) return; // 子のドラッグ時は無視
+            this.classList.add('dragging-box');
+            dragBoxSrc = this;
+            if (e.dataTransfer) e.dataTransfer.setData('text/plain', this.getAttribute('data-category'));
+        }
+        function handleBoxDragOver(e) {
+            if (e.preventDefault) e.preventDefault();
+            return false;
+        }
+        function handleBoxDragEnter() {
+            if (this === dragBoxSrc) return;
+            this.style.borderTop = '3px dashed var(--primary-color)';
+        }
+        function handleBoxDragLeave() { this.style.borderTop = ''; }
+        function handleBoxDrop(e) {
+            if (e.stopPropagation) e.stopPropagation();
+            if (dragBoxSrc && dragBoxSrc !== this) {
+                const srcCat = dragBoxSrc.getAttribute('data-category');
+                const targetCat = this.getAttribute('data-category');
+                reorderCategoryArray(srcCat, targetCat);
+            }
+            return false;
+        }
+        function handleBoxDragEnd() {
+            this.classList.remove('dragging-box');
+            document.querySelectorAll('.category-group-box').forEach(el => el.style.borderTop = '');
+        }
+
+        function handleBoxTouchStart(e) {
+            // ハンドル（⠿）を触ったときだけカテゴリ移動を発動させる
+            if (!e.target.closest('.drag-handle')) return;
+            touchBoxStart = this;
+            this.classList.add('dragging-box');
+            dragBoxSrc = this;
+        }
+        function handleBoxTouchMove(e) {
+            if (!touchBoxStart) return;
+            e.preventDefault();
+            const touch = e.touches[0];
+            const target = document.elementFromPoint(touch.clientX, touch.clientY);
+            if (!target) return;
+            const boxEl = target.closest('.category-group-box');
+            document.querySelectorAll('.category-group-box').forEach(el => el.style.borderTop = '');
+            if (boxEl && boxEl !== touchBoxStart) {
+                boxEl.style.borderTop = '3px dashed var(--primary-color)';
+            }
+        }
+        function handleBoxTouchEnd(e) {
+            if (!touchBoxStart) return;
+            touchBoxStart.classList.remove('dragging-box');
+            const touch = e.changedTouches[0];
+            const target = document.elementFromPoint(touch.clientX, touch.clientY);
+            document.querySelectorAll('.category-group-box').forEach(el => el.style.borderTop = '');
+            if (target) {
+                const boxEl = target.closest('.category-group-box');
+                if (boxEl && boxEl !== touchBoxStart) {
+                    const srcCat = touchBoxStart.getAttribute('data-category');
+                    const targetCat = boxEl.getAttribute('data-category');
+                    reorderCategoryArray(srcCat, targetCat);
+                }
+            }
+            touchBoxStart = null;
+            dragBoxSrc = null;
+        }
+
+        function reorderCategoryArray(srcCat, targetCat) {
+            const srcIdx = categoryOrder.indexOf(srcCat);
+            const targetIdx = categoryOrder.indexOf(targetCat);
+            if (srcIdx !== -1 && targetIdx !== -1) {
+                const [moved] = categoryOrder.splice(srcIdx, 1);
+                categoryOrder.splice(targetIdx, 0, moved);
+                saveToStorage();
+                render();
+            }
+        }
+
+        // 🎨 カラーコードを不透明度15%のRGBAに変換する便利関数
+        function getLightenColor(hex, opacity = 0.15) {
+            if (!hex || hex === '#ffffff') return 'var(--panel-bg)';
+            hex = hex.replace('#', '');
+            if (hex.length === 3) {
+                hex = hex.split('').map(s => s + s).join('');
+            }
+            const r = parseInt(hex.substring(0, 2), 16);
+            const g = parseInt(hex.substring(2, 4), 16);
+            const b = parseInt(hex.substring(4, 6), 16);
+            return `rgba(${r}, ${g}, ${b}, ${opacity})`;
         }
 
         function render() {
@@ -831,6 +1041,13 @@
                 }
             });
 
+            // 履歴に含まれる未登録のカテゴリもあらかじめ登録しておく
+            itemMaster.forEach(m => {
+                if (m.category && m.category !== 'なし' && !categoryOrder.includes(m.category)) {
+                    categoryOrder.push(m.category);
+                }
+            });
+
             const sortedCategories = categoryOrder.filter(c => activeCategories.includes(c));
             if (activeCategories.includes('なし')) {
                 sortedCategories.push('なし');
@@ -845,6 +1062,21 @@
                 div.id = `shop-${item.id}`;
                 div.className = `shopping-item ${item.isChecked ? 'checked' : ''}`;
                 
+                if (!item.isChecked) {
+                    div.draggable = true;
+                    div.addEventListener('dragstart', handleDragStart, false);
+                    div.addEventListener('dragenter', handleDragEnter, false);
+                    div.addEventListener('dragover', handleDragOver, false);
+                    div.addEventListener('dragleave', handleDragLeave, false);
+                    div.addEventListener('drop', handleDrop, false);
+                    div.addEventListener('dragend', handleDragEnd, false);
+                    div.addEventListener('touchstart', handleTouchStart, {passive: false});
+                    div.addEventListener('touchmove', handleTouchMove, {passive: false});
+                    div.addEventListener('touchend', handleTouchEnd, false);
+                }
+
+                div.style.animation = 'fadeInItem 0.25s ease-out forwards';
+                
                 div.innerHTML = `
                     <div class="checkbox" onclick="toggleCheck('${item.id}')">
                         <span class="material-icons-round">done</span>
@@ -853,7 +1085,7 @@
                         <span class="item-name" onclick="toggleCheck('${item.id}')">${item.name}</span>
                         <span class="item-price">${item.price > 0 ? '￥' + item.price.toLocaleString() : ''}</span>
                     </div>
-                    <button class="price-edit-btn" onclick="event.stopPropagation(); editItemPrice('${item.id}')" title="単価を変更">
+                    <button class="price-edit-btn" onclick="event.stopPropagation(); openPriceModal('${item.id}')" title="単価を変更">
                         <span class="material-icons-round" style="font-size:1.1rem; pointer-events: none;">edit</span>
                     </button>
                     <button class="delete-btn" onclick="event.stopPropagation(); deleteItem('${item.id}')">
@@ -869,6 +1101,18 @@
                 box.className = 'category-group-box';
                 box.setAttribute('data-category', cat);
 
+                // 📦 カテゴリ単位のドラッグ＆ドロップ用設定
+                box.draggable = true;
+                box.addEventListener('dragstart', handleBoxDragStart, false);
+                box.addEventListener('dragover', handleBoxDragOver, false);
+                box.addEventListener('dragenter', handleBoxDragEnter, false);
+                box.addEventListener('dragleave', handleBoxDragLeave, false);
+                box.addEventListener('drop', handleBoxDrop, false);
+                box.addEventListener('dragend', handleBoxDragEnd, false);
+                box.addEventListener('touchstart', handleBoxTouchStart, {passive: false});
+                box.addEventListener('touchmove', handleBoxTouchMove, {passive: false});
+                box.addEventListener('touchend', handleBoxTouchEnd, false);
+
                 if (categoryColors[cat]) {
                     box.style.backgroundColor = categoryColors[cat];
                     box.style.boxShadow = 'none';
@@ -879,7 +1123,11 @@
 
                 const header = document.createElement('div');
                 header.className = 'category-group-header';
-                header.textContent = cat === 'なし' ? 'その他' : cat;
+                // ⠿ つまみハンドルをヘッダーの左側に追加
+                header.innerHTML = `
+                    <span class="material-icons-round drag-handle">drag_indicator</span>
+                    <span>${cat === 'なし' ? 'その他' : cat}</span>
+                `;
                 headerRow.appendChild(header);
 
                 if (cat !== 'なし') {
@@ -922,6 +1170,7 @@
                 compHeader.className = 'category-group-header';
                 compHeader.style.color = 'var(--sub-text)';
                 compHeader.style.marginBottom = '8px';
+                compHeader.style.paddingLeft = '8px';
                 compHeader.textContent = 'カゴに入れたもの';
                 compBox.appendChild(compHeader);
                 
@@ -943,6 +1192,7 @@
             renderHistoryGrid();
         }
 
+        // 🎨 履歴グリッドのレンダリング（デザイン更新版）
         function renderHistoryGrid() {
             const historyGrid = document.getElementById('historyGrid');
             if (itemMaster.length > 0) {
@@ -951,11 +1201,18 @@
                     const chip = document.createElement('button');
                     chip.className = 'history-chip';
                     chip.onclick = () => addFromHistory(m.name, m.price, m.category);
+                    
+                    // 💡 設定されているカテゴリ色をほんのり薄く（15%）した背景色を計算
+                    let bgStyle = 'var(--panel-bg)';
+                    if (m.category && categoryColors[m.category]) {
+                        bgStyle = getLightenColor(categoryColors[m.category], 0.3);
+                    }
+                    chip.style.backgroundColor = bgStyle;
+
+                    // 💡 買い物名だけに超シンプル化！×ボタンだけ右端に残す
                     chip.innerHTML = `
                         <span>${m.name}</span>
-                        ${m.category && m.category !== 'なし' ? `<span style="font-size:0.7rem; opacity:0.7; background:rgba(0,0,0,0.05); padding:2px 6px; border-radius:4px;">${m.category}</span>` : ''}
-                        <span style="color:var(--sub-text); font-size:0.8rem; font-weight:normal;">${m.price > 0 ? '￥'+m.price : ''}</span>
-                        <span style="margin-left:4px; color:var(--sub-text); font-size:1.1rem; display:flex; align-items:center;" onclick="deleteMaster('${m.name}')">×</span>
+                        <span style="margin-left:6px; color:var(--sub-text); font-size:1.1rem; display:flex; align-items:center; opacity:0.6;" onclick="deleteMaster('${m.name}')">×</span>
                     `;
                     historyGrid.appendChild(chip);
                 });
@@ -966,32 +1223,62 @@
 
         render();
 
-        // ✏️ 個々の単価を変更する関数（削除ボタンと完全に同じ設定値に統一）
-        function editItemPrice(id) {
-            // 💡 ユーザーさんの言う通り、削除ボタンと同じ「listItems」から真っ直ぐ探すように直しました！
+        // 📝 === Todoアプリ風のモダンなポップアップ処理 ===
+        let currentEditingItemId = null;
+
+        const modalHtml = `
+            <div class="modal" id="priceModal">
+                <div class="modal-content">
+                    <h3 id="priceModalTitle" style="margin:0 0 4px 0; font-size:1.1rem; font-weight:700;">単価の変更</h3>
+                    <p id="priceModalSub" style="margin:0 0 12px 0; font-size:0.85rem; color:var(--sub-text);"></p>
+                    <input type="number" id="modalPriceInput" placeholder="新しい単価を入力" inputmode="numeric" style="width:100%; padding:12px; margin-bottom:10px;">
+                    <div style="display:flex; gap:10px; width:100%;">
+                        <button class="menu-option" onclick="closePriceModal()" style="flex:1; background:var(--history-bg); justify-content:center;">キャンセル</button>
+                        <button class="modal-close-btn" onclick="savePriceModal()" style="flex:1; margin:0; justify-content:center; display:flex; align-items:center;">保存する</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+        function openPriceModal(id) {
             const item = listItems.find(i => i.id === id);
             if (!item) return;
 
-            const currentPrice = item.price || 0;
-            const input = prompt(`「${item.name}」の新しい単価を入力してください（半角数字）:`, currentPrice);
+            currentEditingItemId = id;
+            document.getElementById('priceModalTitle').textContent = `「${item.name}」の単価変更`;
+            document.getElementById('modalPriceInput').value = item.price || '';
+            document.getElementById('priceModal').style.display = 'flex';
             
-            if (input === null) return;
+            setTimeout(() => document.getElementById('modalPriceInput').focus(), 50);
+        }
 
-            const newPrice = parseInt(input.trim(), 10);
+        function closePriceModal() {
+            document.getElementById('priceModal').style.display = 'none';
+            currentEditingItemId = null;
+        }
 
-            if (isNaN(newPrice) || newPrice < 0) {
-                alert("⚠️ 正しい金額（0以上の数字）を入力してください。");
-                return;
+        function savePriceModal() {
+            if (!currentEditingItemId) return;
+            
+            const item = listItems.find(i => i.id === currentEditingItemId);
+            const inputVal = document.getElementById('modalPriceInput').value.trim();
+            
+            if (item) {
+                const newPrice = parseInt(inputVal, 10) || 0;
+                if (newPrice < 0) {
+                    alert("⚠️ 0以上の数字を入力してください。");
+                    return;
+                }
+                item.price = newPrice;
+
+                const master = itemMaster.find(m => m.name === item.name);
+                if (master) master.price = newPrice;
+
+                saveToStorage();
+                render();
             }
-
-            item.price = newPrice;
-            
-            // 履歴データ（itemMaster）があればそっちも一緒に更新
-            const master = itemMaster.find(m => m.name === item.name);
-            if (master) master.price = newPrice;
-
-            saveToStorage();
-            render();
+            closePriceModal();
         }
     </script>
 </body>

@@ -104,7 +104,8 @@
         .home-link-btn, 
         header button.theme-trigger-btn {
             text-decoration: none;
-            color: var(--text-color);
+            /* 🔽 カウンターアプリと完全に同じ色に統一 */
+            color: #5f6368 !important; 
             background: transparent !important;
             border: none !important;
             box-shadow: none !important;
@@ -114,7 +115,6 @@
             align-items: center;
             justify-content: center;
             transition: opacity 0.2s;
-            /* 🔽 完全にカウンターの見た目と合わせるための指定 */
             font-family: 'Material Icons Round';
             font-size: 24px;
         }
@@ -122,6 +122,13 @@
         header button.theme-trigger-btn:active {
             opacity: 0.5;
         }
+
+        /* 🔽 ダークモードのときの色もカウンターと同じに合わせる */
+        [data-theme="dark"] .home-link-btn,
+        [data-theme="dark"] header button.theme-trigger-btn {
+            color: #9aa0a6 !important;
+        }
+        
         .filters {
             display: flex;
             gap: 8px;
