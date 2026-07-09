@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>お買い物リスト</title>
-    <!-- 🆕 Google Material Icons の読み込み -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <style>
         /* === 🎨 カラー変数の設定 === */
@@ -58,7 +57,6 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.02);
         }
 
-        /* 🆕 戻るボタンをモダンな矢印アイコンに変更 */
         .back-btn {
             background: transparent;
             border: none;
@@ -286,6 +284,7 @@
             align-items: center;
             margin-bottom: 12px;
             cursor: grab;
+            position: relative;
         }
 
         .category-group-header {
@@ -438,6 +437,45 @@
             border: none;
             margin-top: 8px;
         }
+
+        .price-edit-btn {
+            background: transparent;
+            border: none;
+            color: var(--sub-text);
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+            transition: background 0.2s, color 0.2s;
+        }
+        .price-edit-btn:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+            color: var(--text-color);
+        }
+        [data-theme="dark"] .price-edit-btn:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+        .price-edit-btn:active {
+            transform: scale(0.9);
+        }
+
+        .inline-color-input {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            opacity: 0;
+            padding: 0;
+            margin: 0;
+            border: none;
+            pointer-events: none;
+            visibility: hidden;
+        }
     </style>
 </head>
 <body>
@@ -489,7 +527,6 @@
         </div>
     </div>
 
-    <!-- モーダル類 -->
     <div class="modal" id="themeModal">
         <div class="modal-content">
             <h3 style="margin:0 0 4px 0; font-size:1.1rem; font-weight:700;">画面モードの設定</h3>
@@ -502,28 +539,10 @@
                 <input type="radio" name="themeGroup" id="themeLight">
             </label>
             <label class="theme-option" onclick="changeThemeSetting('dark')">
-                <span>darkモード</span>
+                <span>ダークモード</span>
                 <input type="radio" name="themeGroup" id="themeDark">
             </label>
             <button class="modal-close-btn" onclick="closeThemeModal()">閉じる</button>
-        </div>
-    </div>
-
-    <div class="modal" id="boxMenuModal">
-        <div class="modal-content">
-            <h3 id="boxMenuTitle" style="margin:0 0 4px 0; font-size: 1.1rem; font-weight:700;">カテゴリ設定</h3>
-            <p style="margin: 0 0 12px 0; font-size: 0.85rem; color: var(--sub-text);">このカテゴリ全体の設定を行います。</p>
-            
-            <button class="menu-option" onclick="triggerColorPicker()">
-                <span>🎨 カテゴリ色の変更</span>
-                <input type="color" id="hiddenColorInput" style="width:0; height:0; opacity:0; padding:0; border:none;" onchange="handleColorPicked(this.value)">
-            </button>
-            
-            <button class="menu-option" onclick="triggerPriceChange()">
-                <span>💰 登録単価の変更</span>
-            </button>
-            
-            <button class="modal-close-btn" style="background-color: var(--history-bg); color: var(--text-color);" onclick="closeBoxMenu()">キャンセル</button>
         </div>
     </div>
 
@@ -782,72 +801,26 @@
             }
         }
 
-        function openBoxMenu(category) {
+        function openDirectColorPicker(category, boxId) {
             activeMenuCategory = category;
-            document.getElementById('boxMenuTitle').textContent = `「${category}」のカテゴリ設定`;
-            document.getElementById('boxMenuModal').style.display = 'flex';
+            const picker = document.getElementById(`picker-${boxId}`);
+            if (picker) {
+                picker.style.visibility = 'visible';
+                picker.value = categoryColors[category] || '#ffffff';
+                picker.click();
+            }
         }
 
-        function closeBoxMenu() {
-            document.getElementById('boxMenuModal').style.display = 'none';
-            activeMenuCategory = null;
-        }
-
-        function triggerColorPicker() {
-            const picker = document.getElementById('hiddenColorInput');
-            picker.value = categoryColors[activeMenuCategory] || '#ffffff';
-            picker.click();
-        }
-
-        function handleColorPicked(colorHex) {
+        function handleColorPicked(colorHex, boxId) {
             if (!activeMenuCategory) return;
             categoryColors[activeMenuCategory] = colorHex;
             saveToStorage();
-            closeBoxMenu();
+            activeMenuCategory = null;
+            
+            const picker = document.getElementById(`picker-${boxId}`);
+            if (picker) picker.style.visibility = 'hidden';
+            
             render();
-        }
-
-        function triggerPriceChange() {
-            if (!activeMenuCategory) return;
-            
-            const belongs = itemMaster.filter(m => m.category === activeMenuCategory);
-            if (belongs.length === 0) {
-                alert('このカテゴリに事前に登録されたよく買うもの（履歴商品）がありません。');
-                return;
-            }
-
-            let msg = `「${activeMenuCategory}」に登録されている商品の単価を変更します。\n変更したい商品の新しい価格を半角数字で入力してください。\n\n`;
-            belongs.forEach((b, idx) => {
-                msg += `${idx + 1}. ${b.name} (現在: ￥${b.price})\n`;
-            });
-            
-            const selectNum = prompt(msg + '\n変更する商品の番号を入力してください (例: 1):');
-            const targetIdx = parseInt(selectNum) - 1;
-
-            if (!isNaN(targetIdx) && belongs[targetIdx]) {
-                const targetItem = belongs[targetIdx];
-                const newPriceInput = prompt(`「${targetItem.name}」の新しい単価を入力してください:`, targetItem.price);
-                const newPrice = parseInt(newPriceInput);
-                
-                if (!isNaN(newPrice) && newPrice >= 0) {
-                    targetItem.price = newPrice;
-                    
-                    listItems.forEach(i => {
-                        if (i.name === targetItem.name && !i.isChecked) {
-                            i.price = newPrice;
-                        }
-                    });
-
-                    saveToStorage();
-                    alert(`「${targetItem.name}」の単価を￥${newPrice}に更新しました！`);
-                    closeBoxMenu();
-                    render();
-                } else if (newPriceInput !== null) {
-                    alert('正しい数値を入力してください。');
-                }
-            } else if (selectNum !== null) {
-                alert('正しい番号が選択されませんでした。');
-            }
         }
 
         function handleItemDragStart(e, id) {
@@ -906,55 +879,9 @@
             draggedCategoryName = null;
         }
 
+        // 🗑️ 並び替え機能を完全に消去（中身を空っぽにします）
         function setupTouchListeners(element, type, idOrName) {
-            element.addEventListener('touchstart', (e) => {
-                if (e.touches.length > 1) return;
-                if (type === 'item') {
-                    draggedItemId = idOrName;
-                    draggedCategoryName = null;
-                    element.classList.add('dragging');
-                } else {
-                    if (e.target.closest('.box-menu-trigger-btn')) return;
-                    draggedItemId = null;
-                    draggedCategoryName = idOrName;
-                    element.classList.add('box-dragging');
-                }
-            }, { passive: true });
-
-            element.addEventListener('touchmove', (e) => {
-                if (!draggedItemId && !draggedCategoryName) return;
-                const touch = e.touches[0];
-                const targetEl = document.elementFromPoint(touch.clientX, touch.clientY);
-                if (!targetEl) return;
-
-                const targetBox = targetEl.closest('.category-group-box');
-                document.querySelectorAll('.category-group-box').forEach(b => b.classList.remove('drag-over'));
-                
-                if (targetBox) {
-                    targetBox.classList.add('drag-over');
-                    if (draggedItemId && e.cancelable) e.preventDefault();
-                }
-            }, { passive: false });
-
-            element.addEventListener('touchend', (e) => {
-                if (!draggedItemId && !draggedCategoryName) return;
-                element.classList.remove('dragging', 'box-dragging');
-                
-                const touch = e.changedTouches[0];
-                const targetEl = document.elementFromPoint(touch.clientX, touch.clientY);
-                document.querySelectorAll('.category-group-box').forEach(b => b.classList.remove('drag-over'));
-                
-                if (targetEl) {
-                    const targetBox = targetEl.closest('.category-group-box');
-                    if (targetBox) {
-                        const targetCategory = targetBox.getAttribute('data-category');
-                        executeMoveLogic(targetCategory);
-                        return;
-                    }
-                }
-                draggedItemId = null;
-                draggedCategoryName = null;
-            });
+            // 何もしない
         }
 
         function render() {
@@ -992,6 +919,7 @@
 
             let totalPrice = 0;
 
+            // 💡 ここが超シンプルになりました！
             function createItemElement(item) {
                 if (item.isChecked) totalPrice += item.price;
 
@@ -999,13 +927,7 @@
                 div.id = `shop-${item.id}`;
                 div.className = `shopping-item ${item.isChecked ? 'checked' : ''}`;
                 
-                if (!item.isChecked) {
-                    div.setAttribute('draggable', 'true');
-                    div.addEventListener('dragstart', (e) => handleItemDragStart(e, item.id));
-                    div.addEventListener('dragend', handleItemDragEnd);
-                    setupTouchListeners(div, 'item', item.id);
-                }
-                
+                // 余計なイベント（dragやtouch）をすべて排除し、普通のクリック（タップ）だけに
                 div.innerHTML = `
                     <div class="checkbox" onclick="toggleCheck('${item.id}')">
                         <span class="material-icons-round">done</span>
@@ -1014,6 +936,9 @@
                         <span class="item-name">${item.name}</span>
                         <span class="item-price">${item.price > 0 ? '￥' + item.price.toLocaleString() : ''}</span>
                     </div>
+                    <button class="price-edit-btn" onclick="editItemPrice(event, '${item.id}')" title="単価を変更">
+                        <span class="material-icons-round" style="font-size:1.1rem;">edit</span>
+                    </button>
                     <button class="delete-btn" onclick="deleteItem('${item.id}')">
                         <span class="material-icons-round" style="font-size:1.2rem;">close</span>
                     </button>
@@ -1021,28 +946,19 @@
                 return div;
             }
 
-            sortedCategories.forEach(cat => {
+            sortedCategories.forEach((cat, index) => {
+                const boxId = `box-${index}`;
                 const box = document.createElement('div');
                 box.className = 'category-group-box';
                 box.setAttribute('data-category', cat);
-                
-                box.setAttribute('draggable', 'true');
-                box.addEventListener('dragstart', (e) => handleBoxDragStart(e, cat));
-                box.addEventListener('dragend', handleBoxDragEnd);
 
                 if (categoryColors[cat]) {
                     box.style.backgroundColor = categoryColors[cat];
                     box.style.boxShadow = 'none';
                 }
 
-                box.addEventListener('dragover', handleDragOver);
-                box.addEventListener('dragenter', handleDragEnter);
-                box.addEventListener('dragleave', handleDragLeave);
-                box.addEventListener('drop', (e) => handleDrop(e, cat));
-
                 const headerRow = document.createElement('div');
                 headerRow.className = 'category-box-header-row';
-                setupTouchListeners(headerRow, 'box', cat);
 
                 const header = document.createElement('div');
                 header.className = 'category-group-header';
@@ -1052,13 +968,20 @@
                 if (cat !== 'なし') {
                     const menuBtn = document.createElement('button');
                     menuBtn.className = 'box-menu-trigger-btn';
-                    menuBtn.innerHTML = '<span class="material-icons-round">more_horiz</span>';
-                    menuBtn.title = 'カテゴリの設定を開く';
+                    menuBtn.innerHTML = '<span class="material-icons-round">palette</span>';
+                    menuBtn.title = 'カテゴリの色を変更';
                     menuBtn.onclick = (e) => {
                         e.stopPropagation();
-                        openBoxMenu(cat);
+                        openDirectColorPicker(cat, boxId);
                     };
                     headerRow.appendChild(menuBtn);
+
+                    const inlinePicker = document.createElement('input');
+                    inlinePicker.type = 'color';
+                    inlinePicker.id = `picker-${boxId}`;
+                    inlinePicker.className = 'inline-color-input';
+                    inlinePicker.onchange = (e) => handleColorPicked(e.target.value, boxId);
+                    headerRow.appendChild(inlinePicker);
                 }
                 box.appendChild(headerRow);
 
@@ -1125,6 +1048,32 @@
         }
 
         render();
+
+        // ✏️ 個々の単価を変更する関数
+        function editItemPrice(id) {
+            const item = listItems.find(i => i.id === id);
+            if (!item) return;
+
+            const currentPrice = item.price || 0;
+            const input = prompt(`「${item.name}」の新しい単価を入力してください（半角数字）:`, currentPrice);
+            
+            if (input === null) return;
+
+            const newPrice = parseInt(input.trim(), 10);
+
+            if (isNaN(newPrice) || newPrice < 0) {
+                alert("⚠️ 正しい金額（0以上の数字）を入力してください。");
+                return;
+            }
+
+            item.price = newPrice;
+            
+            const master = itemMaster.find(m => m.name === item.name);
+            if (master) master.price = newPrice;
+
+            saveToStorage();
+            render();
+        }
     </script>
 </body>
 </html>
