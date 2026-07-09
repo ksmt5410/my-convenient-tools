@@ -43,8 +43,9 @@
             background-color: var(--bg-color);
             color: var(--text-color);
             padding-bottom: 40px;
-            user-select: none;
-            -webkit-user-select: none;
+            /* 🛠️ スマホの動作を邪魔する選択禁止バグを修正 */
+            user-select: auto;
+            -webkit-user-select: auto;
         }
 
         header {
@@ -272,18 +273,13 @@
             margin-bottom: 12px;
             box-shadow: var(--shadow);
             position: relative;
-            touch-action: translateY;
         }
-
-        .category-group-box.box-dragging { opacity: 0.4; }
-        .category-group-box.drag-over { filter: brightness(0.95); }
 
         .category-box-header-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 12px;
-            cursor: grab;
             position: relative;
         }
 
@@ -293,7 +289,6 @@
             font-weight: 700;
             display: flex;
             align-items: center;
-            pointer-events: none;
         }
 
         .box-menu-trigger-btn {
@@ -322,24 +317,10 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            cursor: grab;
-            touch-action: none;
-        }
-        .shopping-item.dragging { opacity: 0.3; }
-        .shopping-item.transitioning {
-            opacity: 0;
-            transform: translateY(-8px);
-            max-height: 0 !important;
-            padding-top: 0 !important;
-            padding-bottom: 0 !important;
-            margin: 0;
-            transition: all 0.3s;
         }
 
         .shopping-item.checked {
             opacity: 0.4;
-            cursor: default;
-            touch-action: auto;
         }
         .shopping-item.checked .item-name { text-decoration: line-through; color: var(--sub-text); }
 
@@ -551,8 +532,6 @@
         let itemMaster = [];
         let categoryColors = {};
         let categoryOrder = [];
-        let draggedItemId = null;
-        let draggedCategoryName = null;
         let themeSetting = localStorage.getItem('themeSetting') || 'auto';
         let activeMenuCategory = null;
 
@@ -761,13 +740,10 @@
             const element = document.getElementById(`shop-${id}`);
             if (element) {
                 element.classList.toggle('checked', item.isChecked);
-                element.classList.add('transitioning');
             }
 
-            setTimeout(() => {
-                saveToStorage();
-                render();
-            }, 300);
+            saveToStorage();
+            render();
         }
 
         function deleteItem(id) {
@@ -823,63 +799,6 @@
             render();
         }
 
-        function handleItemDragStart(e, id) {
-            e.stopPropagation();
-            draggedItemId = id;
-            draggedCategoryName = null;
-            e.currentTarget.classList.add('dragging');
-        }
-        function handleItemDragEnd(e) {
-            e.currentTarget.classList.remove('dragging');
-            document.querySelectorAll('.category-group-box').forEach(b => b.classList.remove('drag-over'));
-            draggedItemId = null;
-        }
-        function handleBoxDragStart(e, categoryName) {
-            draggedItemId = null;
-            draggedCategoryName = categoryName;
-            e.currentTarget.classList.add('box-dragging');
-        }
-        function handleBoxDragEnd(e) {
-            e.currentTarget.classList.remove('box-dragging');
-            document.querySelectorAll('.category-group-box').forEach(b => b.classList.remove('drag-over'));
-            draggedCategoryName = null;
-        }
-        function handleDragOver(e) { e.preventDefault(); }
-        function handleDragEnter(e) { e.currentTarget.classList.add('drag-over'); }
-        function handleDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
-        function handleDrop(e, targetCategory) {
-            e.preventDefault();
-            executeMoveLogic(targetCategory);
-        }
-
-        function executeMoveLogic(targetCategory) {
-            if (draggedItemId) {
-                const item = listItems.find(i => i.id === draggedItemId);
-                if (item) {
-                    item.category = targetCategory;
-                    updateMasterData(item.name, targetCategory, item.price);
-                    if (targetCategory !== 'なし' && !categoryOrder.includes(targetCategory)) {
-                        categoryOrder.push(targetCategory);
-                    }
-                    saveToStorage();
-                    render();
-                }
-            }
-            if (draggedCategoryName && draggedCategoryName !== targetCategory) {
-                const fromIdx = categoryOrder.indexOf(draggedCategoryName);
-                const toIdx = categoryOrder.indexOf(targetCategory);
-                if (fromIdx >= 0 && toIdx >= 0) {
-                    categoryOrder.splice(fromIdx, 1);
-                    categoryOrder.splice(toIdx, 0, draggedCategoryName);
-                    saveToStorage();
-                    render();
-                }
-            }
-            draggedItemId = null;
-            draggedCategoryName = null;
-        }
-
-        // 🗑️ 並び替え機能を完全に消去（中身を空っぽにします）
         function setupTouchListeners(element, type, idOrName) {
             // 何もしない
         }
@@ -919,7 +838,6 @@
 
             let totalPrice = 0;
 
-            // 💡 ここが超シンプルになりました！
             function createItemElement(item) {
                 if (item.isChecked) totalPrice += item.price;
 
@@ -927,20 +845,19 @@
                 div.id = `shop-${item.id}`;
                 div.className = `shopping-item ${item.isChecked ? 'checked' : ''}`;
                 
-                // 余計なイベント（dragやtouch）をすべて排除し、普通のクリック（タップ）だけに
                 div.innerHTML = `
                     <div class="checkbox" onclick="toggleCheck('${item.id}')">
                         <span class="material-icons-round">done</span>
                     </div>
-                    <div class="item-info" onclick="toggleCheck('${item.id}')">
-                        <span class="item-name">${item.name}</span>
+                    <div class="item-info">
+                        <span class="item-name" onclick="toggleCheck('${item.id}')">${item.name}</span>
                         <span class="item-price">${item.price > 0 ? '￥' + item.price.toLocaleString() : ''}</span>
                     </div>
-                    <button class="price-edit-btn" onclick="editItemPrice(event, '${item.id}')" title="単価を変更">
-                        <span class="material-icons-round" style="font-size:1.1rem;">edit</span>
+                    <button class="price-edit-btn" onclick="event.stopPropagation(); editItemPrice('${item.id}')" title="単価を変更">
+                        <span class="material-icons-round" style="font-size:1.1rem; pointer-events: none;">edit</span>
                     </button>
-                    <button class="delete-btn" onclick="deleteItem('${item.id}')">
-                        <span class="material-icons-round" style="font-size:1.2rem;">close</span>
+                    <button class="delete-btn" onclick="event.stopPropagation(); deleteItem('${item.id}')">
+                        <span class="material-icons-round" style="font-size:1.2rem; pointer-events: none;">close</span>
                     </button>
                 `;
                 return div;
@@ -1049,8 +966,9 @@
 
         render();
 
-        // ✏️ 個々の単価を変更する関数
+        // ✏️ 個々の単価を変更する関数（削除ボタンと完全に同じ設定値に統一）
         function editItemPrice(id) {
+            // 💡 ユーザーさんの言う通り、削除ボタンと同じ「listItems」から真っ直ぐ探すように直しました！
             const item = listItems.find(i => i.id === id);
             if (!item) return;
 
@@ -1068,6 +986,7 @@
 
             item.price = newPrice;
             
+            // 履歴データ（itemMaster）があればそっちも一緒に更新
             const master = itemMaster.find(m => m.name === item.name);
             if (master) master.price = newPrice;
 
