@@ -90,6 +90,19 @@
         }
         .settings-btn:active { background: var(--history-bg); }
 
+        .icon-svg {
+            width: 1.25rem;
+            height: 1.25rem;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            pointer-events: none;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -265,60 +278,81 @@
             letter-spacing: 0.5px;
         }
 
-        /* 🚀 カテゴリボックス自体のドラッグ用スタイル */
+        /* === 📦 カテゴリーボックス用スタイル（冷蔵庫管理リストから移植・統合） === */
         .category-group-box {
             background-color: var(--panel-bg);
             border-radius: 16px;
             padding: 16px;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
             box-shadow: var(--shadow);
             position: relative;
-            touch-action: none; /* スマホドラッグ時の競合防止 */
+            touch-action: none;
         }
         .category-group-box.dragging-box {
             opacity: 0.4;
             border: 2px dashed var(--sub-text);
         }
 
-        .category-box-header-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-            position: relative;
-        }
-
         .category-group-header {
-            font-size: 0.95rem;
-            color: var(--text-color);
-            font-weight: 700;
             display: flex;
             align-items: center;
-            gap: 6px;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
         }
 
-        /* ⠿ ドラッグハンドルのデザイン */
+        .header-left-zone {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
         .drag-handle {
             color: var(--sub-text);
             cursor: grab;
-            display: inline-flex;
+            user-select: none;
+            display: flex;
             align-items: center;
-            justify-content: center;
             padding: 2px;
         }
         .drag-handle:active { cursor: grabbing; }
 
-        .box-menu-trigger-btn {
+        .category-title-text {
+            font-size: 1rem;
+            color: var(--text-color);
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .color-palette-btn {
             background: transparent;
             border: none;
             color: var(--sub-text);
+            opacity: 0.6;
             cursor: pointer;
             padding: 4px 8px;
             border-radius: 6px;
             display: flex;
             align-items: center;
+            transition: opacity 0.2s, background-color 0.2s;
         }
-        .box-menu-trigger-btn:active { background: rgba(0,0,0,0.05); }
+        .color-palette-btn:hover { opacity: 1; background-color: var(--history-bg); }
+
+        .inline-color-input {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            opacity: 0;
+            padding: 0;
+            margin: 0;
+            border: none;
+            pointer-events: none;
+            visibility: hidden;
+        }
 
         .shopping-list {
             display: flex;
@@ -339,6 +373,10 @@
             position: relative;
             user-select: none;
             -webkit-user-select: none;
+            max-height: 100px; 
+            overflow: hidden;
+            box-sizing: border-box;
+            transition: opacity 0.35s ease, transform 0.35s ease, max-height 0.35s ease, padding 0.35s ease, margin 0.35s ease;
         }
         .shopping-item:active { cursor: grabbing; }
         .shopping-item.dragging {
@@ -383,6 +421,16 @@
         .item-name { font-weight: 600; font-size: 1rem; }
         .item-price { color: var(--sub-text); font-size: 0.9rem; font-weight: 600; }
 
+        .shopping-item.transitioning {
+            opacity: 0 !important;
+            transform: scale(0.95) translateY(-4px);
+            max-height: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+            border: none !important;
+        }
         .delete-btn {
             background-color: transparent;
             color: var(--sub-text);
@@ -407,7 +455,6 @@
             margin-top: 10px;
         }
 
-        /* ✨ 履歴チップのデザインを最適化 */
         .history-chip {
             background-color: var(--panel-bg);
             color: var(--text-color);
@@ -468,21 +515,6 @@
         [data-theme="dark"] .price-edit-btn:hover { background-color: rgba(255, 255, 255, 0.08); }
         .price-edit-btn:active { transform: scale(0.9); }
 
-        .inline-color-input {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 0;
-            height: 0;
-            opacity: 0;
-            padding: 0;
-            margin: 0;
-            border: none;
-            pointer-events: none;
-            visibility: hidden;
-        }
-
         @keyframes fadeInItem {
             from { opacity: 0; transform: translateY(6px); }
             to { opacity: 1; transform: translateY(0); }
@@ -497,7 +529,10 @@
         </button>
         <div class="header-title">お買い物リスト</div>
         <button class="settings-btn" onclick="openThemeModal()" title="画面モードの設定">
-            <span class="material-icons-round">settings</span>
+            <svg class="icon-svg" viewBox="0 0 24 24">
+                <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+                <circle cx="12" cy="12" r="3"/>
+            </svg>
         </button>
     </header>
 
@@ -509,7 +544,7 @@
             </div>
             <div class="input-row">
                 <div class="category-combobox">
-                    <input type="text" id="itemCategory" placeholder="カテゴリ (例: 肉類)" oninput="handleCategoryInput()" onclick="showCustomDropdown(event)" autocomplete="off">
+                    <input type="text" id="itemCategory" placeholder="カテゴリ (例: 冷蔵)" oninput="handleCategoryInput()" onclick="showCustomDropdown(event)" autocomplete="off">
                     <span class="combobox-arrow">▼</span>
                     <div id="customDropdownList" class="custom-dropdown-list"></div>
                 </div>
@@ -767,16 +802,15 @@
 
             const element = document.getElementById(`shop-${id}`);
             if (element) {
-                element.style.transition = 'all 0.2s ease-in-out';
-                element.style.opacity = '0';
-                element.style.transform = 'scale(0.95)';
+                item.isChecked = !item.isChecked;
+                element.classList.toggle('checked', item.isChecked);
+                element.classList.add('transitioning');
             }
 
             setTimeout(() => {
-                item.isChecked = !item.isChecked;
                 saveToStorage();
                 render();
-            }, 200);
+            }, 350);
         }
 
         function deleteItem(id) {
@@ -795,10 +829,62 @@
         }
 
         function clearChecked() {
-            if(confirm('カゴに入れたアイテムをリストから消去しますか？')) {
+            const checkedItems = listItems.filter(i => i.isChecked);
+            
+            if (checkedItems.length === 0) {
+                alert('カゴの中にアイテムがありません。');
+                return;
+            }
+
+            if (confirm(`カゴ内の ${checkedItems.length} 件を消去しますか？\n（食材は自動で冷蔵庫に登録されます）`)) {
+                
+                let fridgeItems = [];
+                let fridgeMaster = []; 
+                try {
+                    fridgeItems = JSON.parse(localStorage.getItem('fridge_items')) || [];
+                    fridgeMaster = JSON.parse(localStorage.getItem('fridge_master')) || [];
+                } catch(e) {
+                    fridgeItems = [];
+                    fridgeMaster = [];
+                }
+
+                checkedItems.forEach(item => {
+                    let mappedCategory = 'その他';
+                    
+                    if (['冷蔵', '冷凍', '野菜'].includes(item.category)) {
+                        mappedCategory = item.category;
+                    } else if (['肉類', '魚類', '食品', '調味料', '乳製品'].includes(item.category)) {
+                        mappedCategory = '冷蔵';
+                    } else if (item.category === 'なし' || item.category === 'その他') {
+                        mappedCategory = 'null'; 
+                        mappedCategory = 'その他';
+                    }
+
+                    const newFridgeItem = {
+                        id: Date.now().toString() + Math.random().toString(36).substr(2, 4),
+                        name: item.name,
+                        category: mappedCategory,
+                        expiry: '' 
+                    };
+                    fridgeItems.push(newFridgeItem);
+
+                    const existingMasterIndex = fridgeMaster.findIndex(m => m.name === item.name);
+                    if (existingMasterIndex === -1) {
+                        fridgeMaster.push({ name: item.name, category: mappedCategory });
+                    } else {
+                        fridgeMaster[existingMasterIndex].category = mappedCategory;
+                    }
+                });
+
+                localStorage.setItem('fridge_items', JSON.stringify(fridgeItems));
+                localStorage.setItem('fridge_master', JSON.stringify(fridgeMaster));
+                localStorage.setItem('refrigerator_badge_count', fridgeItems.length);
+
                 listItems = listItems.filter(i => !i.isChecked);
                 saveToStorage();
                 render();
+                
+                alert('カゴ内を消去しました。食材を冷蔵庫に追加しました！');
             }
         }
 
@@ -832,7 +918,6 @@
             render();
         }
 
-        // 🚀 ① アイテム（子）のドラッグ＆ドロップシステム
         let dragSrcElement = null;
         let touchStartEl = null;
 
@@ -919,12 +1004,11 @@
             }
         }
 
-        // 🚀 ② カテゴリボックス（親）のドラッグ＆ドロップシステム
         let dragBoxSrc = null;
         let touchBoxStart = null;
 
         function handleBoxDragStart(e) {
-            if (e.target.closest('.shopping-item')) return; // 子のドラッグ時は無視
+            if (e.target.closest('.shopping-item')) return; 
             this.classList.add('dragging-box');
             dragBoxSrc = this;
             if (e.dataTransfer) e.dataTransfer.setData('text/plain', this.getAttribute('data-category'));
@@ -953,7 +1037,6 @@
         }
 
         function handleBoxTouchStart(e) {
-            // ハンドル（⠿）を触ったときだけカテゴリ移動を発動させる
             if (!e.target.closest('.drag-handle')) return;
             touchBoxStart = this;
             this.classList.add('dragging-box');
@@ -1000,7 +1083,6 @@
             }
         }
 
-        // 🎨 カラーコードを不透明度15%のRGBAに変換する便利関数
         function getLightenColor(hex, opacity = 0.15) {
             if (!hex || hex === '#ffffff') return 'var(--panel-bg)';
             hex = hex.replace('#', '');
@@ -1041,7 +1123,6 @@
                 }
             });
 
-            // 履歴に含まれる未登録のカテゴリもあらかじめ登録しておく
             itemMaster.forEach(m => {
                 if (m.category && m.category !== 'なし' && !categoryOrder.includes(m.category)) {
                     categoryOrder.push(m.category);
@@ -1101,7 +1182,6 @@
                 box.className = 'category-group-box';
                 box.setAttribute('data-category', cat);
 
-                // 📦 カテゴリ単位のドラッグ＆ドロップ用設定
                 box.draggable = true;
                 box.addEventListener('dragstart', handleBoxDragStart, false);
                 box.addEventListener('dragover', handleBoxDragOver, false);
@@ -1118,37 +1198,38 @@
                     box.style.boxShadow = 'none';
                 }
 
-                const headerRow = document.createElement('div');
-                headerRow.className = 'category-box-header-row';
-
+                // === 🛠 冷蔵庫管理リストのヘッダー構造・CSSに合わせる ===
                 const header = document.createElement('div');
                 header.className = 'category-group-header';
-                // ⠿ つまみハンドルをヘッダーの左側に追加
+                
+                const titleText = cat === 'なし' ? 'その他' : cat;
+                
                 header.innerHTML = `
-                    <span class="material-icons-round drag-handle">drag_indicator</span>
-                    <span>${cat === 'なし' ? 'その他' : cat}</span>
+                    <div class="header-left-zone">
+                        <span class="material-icons-round drag-handle">drag_indicator</span>
+                        <span class="category-title-text">${titleText}</span>
+                    </div>
                 `;
-                headerRow.appendChild(header);
 
                 if (cat !== 'なし') {
                     const menuBtn = document.createElement('button');
-                    menuBtn.className = 'box-menu-trigger-btn';
-                    menuBtn.innerHTML = '<span class="material-icons-round">palette</span>';
+                    menuBtn.className = 'color-palette-btn';
+                    menuBtn.innerHTML = '<span class="material-icons-round" style="font-size: 1.15rem;">palette</span>';
                     menuBtn.title = 'カテゴリの色を変更';
                     menuBtn.onclick = (e) => {
                         e.stopPropagation();
                         openDirectColorPicker(cat, boxId);
                     };
-                    headerRow.appendChild(menuBtn);
+                    header.appendChild(menuBtn);
 
                     const inlinePicker = document.createElement('input');
                     inlinePicker.type = 'color';
                     inlinePicker.id = `picker-${boxId}`;
                     inlinePicker.className = 'inline-color-input';
                     inlinePicker.onchange = (e) => handleColorPicked(e.target.value, boxId);
-                    headerRow.appendChild(inlinePicker);
+                    header.appendChild(inlinePicker);
                 }
-                box.appendChild(headerRow);
+                box.appendChild(header);
 
                 const subList = document.createElement('div');
                 subList.className = 'shopping-list';
@@ -1192,7 +1273,6 @@
             renderHistoryGrid();
         }
 
-        // 🎨 履歴グリッドのレンダリング（デザイン更新版）
         function renderHistoryGrid() {
             const historyGrid = document.getElementById('historyGrid');
             if (itemMaster.length > 0) {
@@ -1202,14 +1282,12 @@
                     chip.className = 'history-chip';
                     chip.onclick = () => addFromHistory(m.name, m.price, m.category);
                     
-                    // 💡 設定されているカテゴリ色をほんのり薄く（15%）した背景色を計算
                     let bgStyle = 'var(--panel-bg)';
                     if (m.category && categoryColors[m.category]) {
                         bgStyle = getLightenColor(categoryColors[m.category], 0.3);
                     }
                     chip.style.backgroundColor = bgStyle;
 
-                    // 💡 買い物名だけに超シンプル化！×ボタンだけ右端に残す
                     chip.innerHTML = `
                         <span>${m.name}</span>
                         <span style="margin-left:6px; color:var(--sub-text); font-size:1.1rem; display:flex; align-items:center; opacity:0.6;" onclick="deleteMaster('${m.name}')">×</span>
@@ -1223,7 +1301,6 @@
 
         render();
 
-        // 📝 === Todoアプリ風のモダンなポップアップ処理 ===
         let currentEditingItemId = null;
 
         const modalHtml = `

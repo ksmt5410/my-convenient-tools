@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>便利ツール集</title>
-    <!-- Google Material Icons の読み込み -->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <style>
         /* === 🎨 カラー変数の設定 === */
         :root {
@@ -119,9 +117,11 @@
             color: var(--sub-text);
         }
         
-        .card:nth-child(1) .card-icon-wrapper { background-color: #e8f0fe; color: #1a73e8; }
-        .card:nth-child(2) .card-icon-wrapper { background-color: #fce8e6; color: #d93025; }
-        .card:nth-child(3) .card-icon-wrapper { background-color: #e6f4ea; color: #137333; }
+        /* 各ツールのアイコン背景色・アイコンカラースタイル定義 */
+        .card:nth-child(1) .card-icon-wrapper { background-color: #e8f0fe; color: #1a73e8; } /* ToDo: 青 */
+        .card:nth-child(2) .card-icon-wrapper { background-color: #fce8e6; color: #d93025; } /* カウンター: 赤 */
+        .card:nth-child(3) .card-icon-wrapper { background-color: #e6f4ea; color: #137333; } /* お買い物: 緑 */
+        .card:nth-child(4) .card-icon-wrapper { background-color: #e2f7f9; color: #00838f; } /* 冷蔵庫管理: 水色 (新規追加) */
 
         .card-title {
             font-size: 1.05rem;
@@ -143,6 +143,10 @@
         
         #counterBadge {
             background-color: var(--primary-color);
+        }
+
+        #fridgeBadge {
+            background-color: #00838f; /* 水色のブランドカラーに合わせた冷蔵庫専用バッジ */
         }
 
         .admin-panel {
@@ -187,9 +191,6 @@
         }
         .admin-btn:active {
             filter: brightness(0.95);
-        }
-        .admin-btn .material-icons-round {
-            font-size: 1.1rem;
         }
 
         .policy-link {
@@ -275,6 +276,25 @@
         .modal-close-btn:active {
             filter: brightness(0.9);
         }
+        
+        /* ✨ SVGアイコン用の最新共通スタイルに最適化 */
+        .icon-svg {
+            width: 1.25rem;
+            height: 1.25rem;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            pointer-events: none;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+        /* 管理パネル内などの少し小さめのアイコン用 */
+        .admin-btn .icon-svg {
+            width: 1.1rem;
+            height: 1.1rem;
+        }
     </style>
 </head>
 <body>
@@ -282,43 +302,90 @@
     <header>
         便利ツール集
         <button class="settings-btn" onclick="openThemeModal()">
-            <span class="material-icons-round">settings</span>
+            <!-- ⚙️ 歯車アイコン -->
+            <svg class="icon-svg" viewBox="0 0 24 24">
+                <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+                <circle cx="12" cy="12" r="3"/>
+            </svg>
         </button>
     </header>
 
     <div class="container">
+        <!-- 1. ToDoアプリ -->
         <a href="todo.html" class="card">
             <div class="card-icon-wrapper">
-                <span class="material-icons-round">playlist_add_check</span>
+                <!-- ☑️ ToDo（チェックリスト）アイコン -->
+                <svg class="icon-svg" viewBox="0 0 24 24">
+                    <path d="M9 11l3 3L22 4"/>
+                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                </svg>
             </div>
             <span class="card-title">ToDoアプリ</span>
             <span id="todoBadge" class="badge">0</span>
         </a>
         
+        <!-- 2. 文字数カウンター -->
         <a href="counter.html" class="card">
             <div class="card-icon-wrapper">
-                <span class="material-icons-round">pin</span>
+                <!-- 🔢 カウンター（数式・テキスト）アイコン -->
+                <svg class="icon-svg" viewBox="0 0 24 24">
+                    <path d="M4 19h16"/>
+                    <path d="M4 14h16"/>
+                    <path d="M8 3v11"/>
+                    <path d="M16 3v11"/>
+                </svg>
             </div>
             <span class="card-title">文字数カウンター</span>
             <span id="counterBadge" class="badge">0</span>
         </a>
 
+        <!-- 3. お買い物リスト -->
         <a href="shopping.html" class="card">
             <div class="card-icon-wrapper">
-                <span class="material-icons-round">shopping_cart</span>
+                <!-- 🛒 ショッピングカートアイコン -->
+                <svg class="icon-svg" viewBox="0 0 24 24">
+                    <circle cx="9" cy="21" r="1"/>
+                    <circle cx="20" cy="21" r="1"/>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                </svg>
             </div>
             <span class="card-title">お買い物リスト</span>
             <span id="shoppingBadge" class="badge">0</span>
+        </a>
+
+        <!-- 4. 冷蔵庫管理リスト (追加) -->
+        <a href="refrigerator.html" class="card">
+            <div class="card-icon-wrapper">
+                <!-- ❄️ 冷蔵庫アイコン -->
+                <svg class="icon-svg" viewBox="0 0 24 24">
+                    <rect x="5" y="2" width="14" height="20" rx="2"/>
+                    <line x1="5" y1="10" x2="19" y2="10"/>
+                    <line x1="9" y1="5" x2="9" y2="7"/>
+                    <line x1="9" y1="13" x2="9" y2="16"/>
+                </svg>
+            </div>
+            <span class="card-title">冷蔵庫管理リスト</span>
+            <span id="fridgeBadge" class="badge">0</span>
         </a>
 
         <div class="admin-panel">
             <p class="admin-title">データのバックアップ・復元</p>
             <div class="admin-row">
                 <button class="admin-btn" onclick="exportAllData()">
-                    <span class="material-icons-round">file_download</span>データを保存
+                    <!-- 📥 保存（ダウンロード）アイコン -->
+                    <svg class="icon-svg" viewBox="0 0 24 24">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>データを保存
                 </button>
                 <button class="admin-btn" onclick="triggerImport()">
-                    <span class="material-icons-round">file_upload</span>データを読込
+                    <!-- 📤 読込（アップロード）アイコン -->
+                    <svg class="icon-svg" viewBox="0 0 24 24">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="17 8 12 3 7 8"/>
+                        <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>データを読込
                 </button>
             </div>
             <input type="file" id="importFileInput" style="display: none;" accept=".json" onchange="importAllData(this)">
@@ -350,7 +417,7 @@
         <div class="modal-content">
             <h3 class="modal-title">プライバシーポリシー</h3>
             <div class="modal-body-text">【データの取り扱いについて】
-本アプリで入力されたデータ（ToDoタスク、お買い物リスト、各種設定など）は、すべてお客様のご利用端末内（localStorage）にのみ保存されます。
+本アプリで入力されたデータ（ToDoタスク、お買い物リスト、冷蔵庫管理リスト、各種設定など）は、すべてお客様のご利用端末内（localStorage）にのみ保存されます。
 
 【外部へのデータ送信】
 当アプリがお客様の個人情報を収集したり、外部のサーバーへ送信することは一切ありません。完全オフラインで安心してご利用いただけます。
@@ -401,6 +468,7 @@
             document.getElementById('policyModal').style.display = 'none';
         }
 
+        // バックアップ書き出し（冷蔵庫データも統合）
         function exportAllData() {
             const backupData = {
                 todo_items: localStorage.getItem('todos'),
@@ -409,6 +477,12 @@
                 shopping_master: localStorage.getItem('shopping_master'),
                 shopping_category_colors: localStorage.getItem('shopping_category_colors'),
                 shopping_category_order: localStorage.getItem('shopping_category_order'),
+                
+                // 冷蔵庫管理用のデータも含めてバックアップ
+                fridge_items: localStorage.getItem('fridge_items'),
+                fridge_categories: localStorage.getItem('fridge_categories'),
+                fridge_category_colors: localStorage.getItem('fridge_category_colors'),
+                
                 themeSetting: localStorage.getItem('themeSetting'),
                 exportedAt: new Date().toISOString()
             };
@@ -430,6 +504,7 @@
             document.getElementById('importFileInput').click();
         }
 
+        // バックアップ読み込み復元（冷蔵庫データも統合）
         function importAllData(input) {
             const file = input.files[0];
             if (!file) return;
@@ -453,6 +528,12 @@
                         if (data.shopping_master) localStorage.setItem('shopping_master', data.shopping_master);
                         if (data.shopping_category_colors) localStorage.setItem('shopping_category_colors', data.shopping_category_colors);
                         if (data.shopping_category_order) localStorage.setItem('shopping_category_order', data.shopping_category_order);
+                        
+                        // 冷蔵庫データのインポート復元
+                        if (data.fridge_items) localStorage.setItem('fridge_items', data.fridge_items);
+                        if (data.fridge_categories) localStorage.setItem('fridge_categories', data.fridge_categories);
+                        if (data.fridge_category_colors) localStorage.setItem('fridge_category_colors', data.fridge_category_colors);
+                        
                         if (data.themeSetting) localStorage.setItem('themeSetting', data.themeSetting);
 
                         alert('データの復元が完了しました！');
@@ -466,7 +547,9 @@
             input.value = '';
         }
 
+        // 各種カード横バッジ数の動的カウント処理
         function updateBadges() {
+            // ToDo数カウント
             try {
                 const todos = JSON.parse(localStorage.getItem('todos')) || [];
                 const uncompletedTodos = todos.filter(t => !t.isCompleted).length;
@@ -481,6 +564,7 @@
                 document.getElementById('todoBadge').style.display = 'none';
             }
 
+            // カウンター文字数カウント
             try {
                 const savedText = localStorage.getItem('counter_text') || localStorage.getItem('savedText') || "";
                 const counterBadge = document.getElementById('counterBadge');
@@ -494,6 +578,7 @@
                 document.getElementById('counterBadge').style.display = 'none';
             }
 
+            // お買い物リスト未チェック数カウント
             try {
                 const shoppingItems = JSON.parse(localStorage.getItem('shopping_items')) || [];
                 const uncompletedShopping = shoppingItems.filter(i => !i.isChecked).length;
@@ -506,6 +591,21 @@
                 }
             } catch(e) {
                 document.getElementById('shoppingBadge').style.display = 'none';
+            }
+
+            // 冷蔵庫管理の残りアイテム数カウント (追加)
+            try {
+                const fridgeItems = JSON.parse(localStorage.getItem('fridge_items')) || [];
+                const activeFridgeCount = fridgeItems.length; // すべての保管アイテム数
+                const fridgeBadge = document.getElementById('fridgeBadge');
+                if (activeFridgeCount > 0) {
+                    fridgeBadge.textContent = activeFridgeCount;
+                    fridgeBadge.style.display = 'inline-block';
+                } else {
+                    fridgeBadge.style.display = 'none';
+                }
+            } catch(e) {
+                document.getElementById('fridgeBadge').style.display = 'none';
             }
         }
 

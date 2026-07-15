@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>冷蔵庫管理リスト</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
+
+    <style>
+        /* === 🎨 カラー変数の設定 === */
+        :root {
+            --bg-color: #f8f9fa;
+            --panel-bg: #ffffff;
+            --text-color: #202124;
+            --sub-text: #5f6368;
+            --border-color: #e8eaed;
+            --primary-color: #34a853;   
+            --primary-bg: #e8f0fe;
+            --danger-bg: #fce8e6;
+            --danger-text: #d93025;
+            --warning-bg: #feefc3;
+            --warning-text: #b06000;
+            --history-bg: #f1f3f4;
+            --modal-option-bg: #f1f3f4;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #121212;
+            --panel-bg: #1e1e1e;
+            --text-color: #e8eaed;
+            --sub-text: #9aa0a6;
+            --border-color: #2f3134;
+            --primary-color: #81c784;
+            --primary-bg: #1a233a;
+            --danger-bg: #b71c1c;
+            --danger-text: #ef9a9a;
+            --warning-bg: #5c4300;
+            --warning-text: #ffe082;
+            --history-bg: #2d2d2d;
+            --modal-option-bg: #2d2d2d;
+            --shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-bottom: 40px;
+            user-select: auto;
+            -webkit-user-select: auto;
+        }
+
+        header {
+            background-color: var(--panel-bg);
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        .back-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            border-radius: 50%;
+        }
+        .back-btn:active { background: var(--history-bg); }
+
+        .header-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            flex: 1;
+            letter-spacing: 0.5px;
+        }
+
+        .settings-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--sub-text);
+            border-radius: 50%;
+        }
+        .settings-btn:active { background: var(--history-bg); }
+
+        .icon-svg {
+            width: 1.25rem;
+            height: 1.25rem;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            pointer-events: none;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 20px auto;
+            padding: 0 16px;
+            box-sizing: border-box;
+        }
+
+        .input-panel {
+            background-color: var(--panel-bg);
+            padding: 16px;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+        }
+
+        input, select {
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-color); 
+            color: var(--text-color);
+            font-size: 0.95rem;
+            box-sizing: border-box;
+            min-width: 0;
+            outline: none;
+        }
+        input:focus, select:focus {
+            border-color: var(--primary-color);
+        }
+
+        #itemName { flex: 2; }
+        #itemCategory { flex: 1.2; }
+        #itemQuantity { width: 70px; text-align: center; } /* 数量入力用の幅を追加 */
+
+        .date-input-wrapper {
+            position: relative;
+            flex: 1.5;
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            box-sizing: border-box;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .date-input-wrapper:focus-within {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.12);
+        }
+
+        .date-input-wrapper input {
+            width: 100%;
+            height: 44px;
+            border: none !important;
+            background: transparent !important;
+            padding: 0 40px 0 12px;
+            font-size: 0.95rem;
+            color: var(--text-color);
+            outline: none;
+            box-shadow: none !important;
+        }
+
+        .date-input-wrapper input::placeholder {
+            color: var(--sub-text);
+            opacity: 0.6;
+        }
+
+        .date-icon-emoji {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--sub-text);
+            display: flex;
+            align-items: center;
+            pointer-events: none;
+        }
+
+        .add-btn {
+            background-color: var(--primary-color);
+            color: #ffffff;
+            width: 46px;
+            height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(26, 115, 232, 0.2);
+            transition: transform 0.1s;
+        }
+        .add-btn:active { transform: scale(0.94); }
+        .add-btn .material-icons-round { font-size: 1.5rem; }
+
+        /* === 📦 カテゴリーボックス用スタイル === */
+        .category-group-box {
+            background-color: var(--panel-bg);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+            position: relative;
+            touch-action: none;
+        }
+        .category-group-box.dragging-box {
+            opacity: 0.4;
+            border: 2px dashed var(--sub-text);
+        }
+
+        .category-group-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        .header-left-zone {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .drag-handle {
+            color: var(--sub-text);
+            cursor: grab;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            padding: 2px;
+        }
+        .drag-handle:active { cursor: grabbing; }
+
+        .category-title-text {
+            font-size: 1rem;
+            color: var(--text-color);
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .color-palette-btn {
+            background: transparent;
+            border: none;
+            color: var(--sub-text);
+            opacity: 0.6;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            transition: opacity 0.2s, background-color 0.2s;
+        }
+        .color-palette-btn:hover { opacity: 1; background-color: var(--history-bg); }
+
+        .inline-color-input {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            opacity: 0;
+            padding: 0;
+            margin: 0;
+            border: none;
+            pointer-events: none;
+            visibility: hidden;
+        }
+
+        /* 💡 縦長圧迫を防ぐため、グリッド（2列）でコンパクトに並べる構成に変更 */
+        .fridge-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 8px;
+        }
+
+        .empty-message {
+            grid-column: 1 / -1;
+            text-align: center;
+            color: var(--sub-text);
+            padding: 16px 12px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            opacity: 0.5;
+        }
+
+        /* 💡 各アイテムの高さをコンパクト化 */
+        .fridge-item {
+            background-color: var(--bg-color);
+            padding: 8px 10px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 6px;
+            box-sizing: border-box;
+            animation: fadeInItem 0.25s ease-out forwards;
+            border: 1px solid var(--border-color);
+        }
+
+        .item-info {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            gap: 2px;
+        }
+
+        .item-main-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .item-name { 
+            font-weight: 600; 
+            font-size: 0.9rem; 
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex: 1;
+        }
+
+        .item-sub-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            color: var(--sub-text);
+        }
+
+        .expiry-status {
+            font-weight: 700;
+            border-radius: 4px;
+            padding: 1px 4px;
+        }
+
+        .status-danger { background-color: var(--danger-bg); color: var(--danger-text); }
+        .status-warning { background-color: var(--warning-bg); color: var(--warning-text); }
+
+        /* 💡 数量操作用のカウンターUI */
+        .qty-control {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: var(--panel-bg);
+            border-radius: 6px;
+            padding: 2px 4px;
+            border: 1px solid var(--border-color);
+            margin-top: 2px;
+        }
+
+        .qty-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+        }
+        .qty-btn:active { background-color: var(--history-bg); }
+        .qty-btn .material-icons-round { font-size: 1rem; }
+
+        .qty-val {
+            font-size: 0.82rem;
+            font-weight: 700;
+            min-width: 24px;
+            text-align: center;
+        }
+
+        .delete-btn {
+            background: transparent;
+            border: none;
+            color: var(--sub-text);
+            padding: 4px;
+            cursor: pointer;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+        }
+        .delete-btn:active { background: rgba(0,0,0,0.05); color: var(--danger-text); }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: var(--panel-bg);
+            padding: 24px;
+            border-radius: 20px;
+            width: 85%;
+            max-width: 360px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        .theme-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px;
+            border-radius: 12px;
+            background: var(--modal-option-bg);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        .modal-close-btn {
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            background: #1a73e8; 
+            color: white;
+            font-weight: 700;
+            border: none;
+            margin-top: 8px;
+        }
+
+        @keyframes fadeInItem {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }  
+    </style>
+</head>
+<body>
+
+    <header>
+        <button class="back-btn" onclick="location.href='index.html'" title="トップへ戻る">
+            <span class="material-icons-round">arrow_back</span>
+        </button>
+        <div class="header-title">冷蔵庫管理リスト</div>
+        <button class="settings-btn" onclick="openThemeModal()" title="画面モードの設定">
+            <svg class="icon-svg" viewBox="0 0 24 24">
+                <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+                <circle cx="12" cy="12" r="3"/>
+            </svg>
+        </button>
+    </header>
+
+    <div class="container">
+        <div class="input-panel">
+            <div class="input-row">
+                <input type="text" id="itemName" placeholder="食材名を入力..." oninput="matchFridgeMaster()" onkeypress="handleKeyPress(event)">
+                <select id="itemCategory">
+                    <option value="冷蔵">冷蔵</option>
+                    <option value="冷凍">冷凍</option>
+                    <option value="野菜">野菜</option>
+                    <option value="その他">その他</option>
+                </select>
+                <!-- 💡 数量の初期設定欄を追加（デフォルト: 1） -->
+                <input type="number" id="itemQuantity" min="1" value="1" placeholder="個数" title="個数">
+            </div>
+            <div class="input-row">
+                <div class="date-input-wrapper">
+                    <input type="text" id="itemExpiry" placeholder="賞味期限を入力..." title="賞味期限">
+                    <span class="date-icon-emoji">
+                        <svg style="width:20px; height:20px;" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM7 11h2v2H7zm4 0h2v2h-2zm4 0h2v2h-2zm-8 4h2v2H7zm4 0h2v2h-2zm4 0h2v2h-2z"/>
+                        </svg>
+                    </span>
+                </div>
+                <button class="add-btn" onclick="addItem()">
+                    <span class="material-icons-round">add</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="categoriesContainer"></div>
+    </div>
+
+    <div class="modal" id="themeModal">
+        <div class="modal-content">
+            <h3 style="margin:0 0 4px 0; font-size:1.1rem; font-weight:700;">画面モードの設定</h3>
+            <label class="theme-option" onclick="changeThemeSetting('auto')">
+                <span>システム設定に従う</span>
+                <input type="radio" name="themeGroup" id="themeAuto" checked>
+            </label>
+            <label class="theme-option" onclick="changeThemeSetting('light')">
+                <span>ライトモード</span>
+                <input type="radio" name="themeGroup" id="themeLight">
+            </label>
+            <label class="theme-option" onclick="changeThemeSetting('dark')">
+                <span>ダークモード</span>
+                <input type="radio" name="themeGroup" id="themeDark">
+            </label>
+            <button class="modal-close-btn" onclick="closeThemeModal()">閉じる</button>
+        </div>
+    </div>
+
+    <script>
+        let fridgeItems = [];
+        let fridgeMaster = []; 
+        let categoryColors = {};
+        let categoryOrder = [];
+        let themeSetting = localStorage.getItem('themeSetting') || 'auto';
+        let expiryPicker;
+        let activeMenuCategory = null;
+
+        const defaultCategories = ['冷蔵', '冷凍', '野菜', 'その他'];
+        const emptyMessages = {
+            '冷蔵': '冷蔵庫は空です',
+            '冷凍': '冷凍庫は空です',
+            '野菜': '野菜室は空です',
+            'その他': 'その他は空です'
+        };
+
+        try {
+            fridgeItems = JSON.parse(localStorage.getItem('fridge_items')) || [];
+            fridgeMaster = JSON.parse(localStorage.getItem('fridge_master')) || [];
+            categoryColors = JSON.parse(localStorage.getItem('fridge_category_colors')) || {};
+            categoryOrder = JSON.parse(localStorage.getItem('fridge_category_order')) || [...defaultCategories];
+        } catch(e) {
+            fridgeItems = [];
+            fridgeMaster = [];
+            categoryColors = {};
+            categoryOrder = [...defaultCategories];
+        }
+
+        if (categoryOrder.length === 0) {
+            categoryOrder = [...defaultCategories];
+        }
+
+        function applyCurrentTheme() {
+            if (themeSetting === 'auto') {
+                const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                document.documentElement.setAttribute('data-theme', isSystemDark ? 'dark' : 'light');
+            } else {
+                document.documentElement.setAttribute('data-theme', themeSetting);
+            }
+        }
+        
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+            if (themeSetting === 'auto') applyCurrentTheme();
+        });
+
+        function openThemeModal() {
+            document.getElementById('themeAuto').checked = (themeSetting === 'auto');
+            document.getElementById('themeLight').checked = (themeSetting === 'light');
+            document.getElementById('themeDark').checked = (themeSetting === 'dark');
+            document.getElementById('themeModal').style.display = 'flex';
+        }
+
+        function changeThemeSetting(newSetting) {
+            themeSetting = newSetting;
+            localStorage.setItem('themeSetting', themeSetting);
+            applyCurrentTheme();
+        }
+
+        function closeThemeModal() {
+            document.getElementById('themeModal').style.display = 'none';
+        }
+
+        applyCurrentTheme();
+
+        document.addEventListener("DOMContentLoaded", function() {
+            expiryPicker = flatpickr("#itemExpiry", {
+                locale: "ja",
+                dateFormat: "Y-m-d",
+                disableMobile: "true",
+                allowInput: false,
+                animate: true,
+                onReady: function(selectedDates, dateStr, instance) {
+                    instance.calendarContainer.addEventListener("wheel", function(e) {
+                        e.preventDefault();
+                        if (e.deltaY > 0) {
+                            instance.changeMonth(1);
+                        } else {
+                            instance.changeMonth(-1);
+                        }
+                    });
+                }
+            });
+        });
+
+        function saveToStorage() {
+            localStorage.setItem('fridge_items', JSON.stringify(fridgeItems));
+            localStorage.setItem('fridge_master', JSON.stringify(fridgeMaster));
+            localStorage.setItem('fridge_category_colors', JSON.stringify(categoryColors));
+            localStorage.setItem('fridge_category_order', JSON.stringify(categoryOrder));
+            localStorage.setItem('refrigerator_badge_count', fridgeItems.length);
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') addItem();
+        }
+
+        function matchFridgeMaster() {
+            const currentName = document.getElementById('itemName').value.trim();
+            if (!currentName) return;
+
+            const found = fridgeMaster.find(m => m.name === currentName);
+            if (found) {
+                document.getElementById('itemCategory').value = found.category;
+            }
+        }
+
+        function addItem() {
+            const nameInput = document.getElementById('itemName');
+            const catInput = document.getElementById('itemCategory');
+            const qtyInput = document.getElementById('itemQuantity');
+            const expiryInput = document.getElementById('itemExpiry');
+            
+            const name = nameInput.value.trim();
+            const category = catInput.value;
+            const quantity = parseInt(qtyInput.value, 10) || 1;
+            const expiry = expiryInput.value;
+
+            if (!name) return;
+
+            const newItem = {
+                id: Date.now().toString() + Math.random().toString(36).substr(2, 4),
+                name: name,
+                category: category,
+                quantity: quantity, // 💡 数量の情報を追加
+                expiry: expiry 
+            };
+
+            fridgeItems.push(newItem);
+
+            const existingMasterIndex = fridgeMaster.findIndex(m => m.name === name);
+            if (existingMasterIndex === -1) {
+                fridgeMaster.push({ name: name, category: category });
+            } else {
+                fridgeMaster[existingMasterIndex].category = category;
+            }
+
+            nameInput.value = '';
+            qtyInput.value = '1'; // 数量を初期値のリセット
+            if (expiryPicker) {
+                expiryPicker.clear(); 
+            } else {
+                expiryInput.value = '';
+            }
+            
+            nameInput.focus();
+
+            saveToStorage();
+            render();
+        }
+
+        // 💡 数量をボタンで直感的に変更する機能
+        function changeQty(id, change) {
+            const itemIndex = fridgeItems.findIndex(i => i.id === id);
+            if (itemIndex === -1) return;
+
+            const item = fridgeItems[itemIndex];
+            const currentQty = item.quantity || 1;
+            const newQty = currentQty + change;
+
+            if (newQty <= 0) {
+                // 数量が0以下になったら自動的に削除
+                deleteItem(id);
+            } else {
+                item.quantity = newQty;
+                saveToStorage();
+                render();
+            }
+        }
+
+        function deleteItem(id) {
+            fridgeItems = fridgeItems.filter(i => i.id !== id);
+            saveToStorage();
+            render();
+        }
+
+        function getExpiryStatus(expiryStr) {
+            if (!expiryStr) {
+                return { text: '-', class: '' };
+            }
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const expiryDate = new Date(expiryStr);
+            expiryDate.setHours(0, 0, 0, 0);
+            
+            const diffTime = expiryDate - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays < 0) {
+                return { text: '期限切れ', class: 'status-danger' };
+            } else if (diffDays === 0) {
+                return { text: '今日まで', class: 'status-danger' };
+            } else if (diffDays <= 2) {
+                return { text: `あと ${diffDays}日`, class: 'status-warning' };
+            } else {
+                return { text: `あと ${diffDays}日`, class: '' };
+            }
+        }
+
+        function openDirectColorPicker(category, boxId) {
+            activeMenuCategory = category;
+            const picker = document.getElementById(`picker-${boxId}`);
+            if (picker) {
+                picker.style.visibility = 'visible';
+                picker.value = categoryColors[category] || '#ffffff';
+                picker.click();
+            }
+        }
+
+        function handleColorPicked(colorHex, boxId) {
+            if (!activeMenuCategory) return;
+            categoryColors[activeMenuCategory] = colorHex;
+            saveToStorage();
+            activeMenuCategory = null;
+            
+            const picker = document.getElementById(`picker-${boxId}`);
+            if (picker) picker.style.visibility = 'hidden';
+            
+            render();
+        }
+
+        let dragBoxSrc = null;
+        let touchBoxStart = null;
+
+        function handleBoxDragStart(e) {
+            this.classList.add('dragging-box');
+            dragBoxSrc = this;
+            if (e.dataTransfer) e.dataTransfer.setData('text/plain', this.getAttribute('data-category'));
+        }
+        function handleBoxDragOver(e) {
+            if (e.preventDefault) e.preventDefault();
+            return false;
+        }
+        function handleBoxDragEnter() {
+            if (this === dragBoxSrc) return;
+            this.style.borderTop = '3px dashed var(--primary-color)';
+        }
+        function handleBoxDragLeave() { this.style.borderTop = ''; }
+        function handleBoxDrop(e) {
+            if (e.stopPropagation) e.stopPropagation();
+            if (dragBoxSrc && dragBoxSrc !== this) {
+                const srcCat = dragBoxSrc.getAttribute('data-category');
+                const targetCat = this.getAttribute('data-category');
+                reorderCategoryArray(srcCat, targetCat);
+            }
+            return false;
+        }
+        function handleBoxDragEnd() {
+            this.classList.remove('dragging-box');
+            document.querySelectorAll('.category-group-box').forEach(el => el.style.borderTop = '');
+        }
+
+        function handleBoxTouchStart(e) {
+            if (!e.target.closest('.drag-handle')) return;
+            touchBoxStart = this;
+            this.classList.add('dragging-box');
+            dragBoxSrc = this;
+        }
+        function handleBoxTouchMove(e) {
+            if (!touchBoxStart) return;
+            e.preventDefault();
+            const touch = e.touches[0];
+            const target = document.elementFromPoint(touch.clientX, touch.clientY);
+            if (!target) return;
+            const boxEl = target.closest('.category-group-box');
+            document.querySelectorAll('.category-group-box').forEach(el => el.style.borderTop = '');
+            if (boxEl && boxEl !== touchBoxStart) {
+                boxEl.style.borderTop = '3px dashed var(--primary-color)';
+            }
+        }
+        function handleBoxTouchEnd(e) {
+            if (!touchBoxStart) return;
+            touchBoxStart.classList.remove('dragging-box');
+            const touch = e.changedTouches[0];
+            const target = document.elementFromPoint(touch.clientX, touch.clientY);
+            document.querySelectorAll('.category-group-box').forEach(el => el.style.borderTop = '');
+            if (target) {
+                const boxEl = target.closest('.category-group-box');
+                if (boxEl && boxEl !== touchBoxStart) {
+                    const srcCat = touchBoxStart.getAttribute('data-category');
+                    const targetCat = boxEl.getAttribute('data-category');
+                    reorderCategoryArray(srcCat, targetCat);
+                }
+            }
+            touchBoxStart = null;
+            dragBoxSrc = null;
+        }
+
+        function reorderCategoryArray(srcCat, targetCat) {
+            const srcIdx = categoryOrder.indexOf(srcCat);
+            const targetIdx = categoryOrder.indexOf(targetCat);
+            if (srcIdx !== -1 && targetIdx !== -1) {
+                const [moved] = categoryOrder.splice(srcIdx, 1);
+                categoryOrder.splice(targetIdx, 0, moved);
+                saveToStorage();
+                render();
+            }
+        }
+
+        function render() {
+            const mainContainer = document.getElementById('categoriesContainer');
+            mainContainer.innerHTML = '';
+
+            fridgeItems.sort((a, b) => {
+                if (!a.expiry && !b.expiry) return 0;
+                if (!a.expiry) return 1;  
+                if (!b.expiry) return -1; 
+                return new Date(a.expiry) - new Date(b.expiry);
+            });
+
+            categoryOrder.forEach((cat, index) => {
+                const boxId = `box-${index}`;
+                const box = document.createElement('div');
+                box.className = 'category-group-box';
+                box.setAttribute('data-category', cat);
+
+                box.draggable = true;
+                box.addEventListener('dragstart', handleBoxDragStart, false);
+                box.addEventListener('dragover', handleBoxDragOver, false);
+                box.addEventListener('dragenter', handleBoxDragEnter, false);
+                box.addEventListener('dragleave', handleBoxDragLeave, false);
+                box.addEventListener('drop', handleBoxDrop, false);
+                box.addEventListener('dragend', handleBoxDragEnd, false);
+                box.addEventListener('touchstart', handleBoxTouchStart, {passive: false});
+                box.addEventListener('touchmove', handleBoxTouchMove, {passive: false});
+                box.addEventListener('touchend', handleBoxTouchEnd, false);
+
+                if (categoryColors[cat]) {
+                    box.style.backgroundColor = categoryColors[cat];
+                    box.style.boxShadow = 'none';
+                }
+
+                const header = document.createElement('div');
+                header.className = 'category-group-header';
+                header.innerHTML = `
+                    <div class="header-left-zone">
+                        <span class="material-icons-round drag-handle">drag_indicator</span>
+                        <span class="category-title-text">${cat}</span>
+                    </div>
+                    <button class="color-palette-btn" onclick="event.stopPropagation(); openDirectColorPicker('${cat}', '${boxId}')" title="色を変更">
+                        <span class="material-icons-round" style="font-size: 1.15rem;">palette</span>
+                    </button>
+                    <input type="color" id="picker-${boxId}" class="inline-color-input">
+                `;
+                
+                const inlinePicker = header.querySelector(`#picker-${boxId}`);
+                inlinePicker.onchange = (e) => handleColorPicked(e.target.value, boxId);
+
+                box.appendChild(header);
+
+                const listDiv = document.createElement('div');
+                listDiv.className = 'fridge-list';
+
+                const catItems = fridgeItems.filter(item => item.category === cat);
+
+                if (catItems.length === 0) {
+                    const emptyMsg = document.createElement('div');
+                    emptyMsg.className = 'empty-message';
+                    emptyMsg.textContent = emptyMessages[cat];
+                    listDiv.appendChild(emptyMsg);
+                } else {
+                    catItems.forEach(item => {
+                        const div = document.createElement('div');
+                        div.className = 'fridge-item';
+                        
+                        const status = getExpiryStatus(item.expiry);
+                        const expiryTextToShow = item.expiry ? item.expiry.substring(5) : '<span style="opacity: 0.4;">-</span>'; // 日付表示も短く（MM-DDに）
+
+                        // 💡 数量のデフォルトフォールバックを1に設定
+                        const currentQty = item.quantity !== undefined ? item.quantity : 1;
+
+                        div.innerHTML = `
+                            <div class="item-info">
+                                <div class="item-main-row">
+                                    <span class="item-name" title="${item.name}">${item.name}</span>
+                                    <button class="delete-btn" onclick="deleteItem('${item.id}')">
+                                        <span class="material-icons-round" style="font-size:1rem;">close</span>
+                                    </button>
+                                </div>
+                                <div class="item-sub-row">
+                                    <span>${expiryTextToShow}</span>
+                                    <span class="expiry-status ${status.class}">${status.text}</span>
+                                </div>
+                            </div>
+                            <!-- 💡 その場で数を変更できる +/- コントロール -->
+                            <div class="qty-control">
+                                <button class="qty-btn" onclick="changeQty('${item.id}', -1)" title="減らす">
+                                    <span class="material-icons-round">remove</span>
+                                </button>
+                                <span class="qty-val">${currentQty}</span>
+                                <button class="qty-btn" onclick="changeQty('${item.id}', 1)" title="増やす">
+                                    <span class="material-icons-round">add</span>
+                                </button>
+                            </div>
+                        `;
+                        listDiv.appendChild(div);
+                    });
+                }
+
+                box.appendChild(listDiv);
+                mainContainer.appendChild(box);
+            });
+        }
+
+        render();
+    </script>
+</body>
+</html>
