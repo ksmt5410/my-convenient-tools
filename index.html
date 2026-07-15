@@ -121,7 +121,7 @@
         .card:nth-child(1) .card-icon-wrapper { background-color: #e8f0fe; color: #1a73e8; } /* ToDo: 青 */
         .card:nth-child(2) .card-icon-wrapper { background-color: #fce8e6; color: #d93025; } /* カウンター: 赤 */
         .card:nth-child(3) .card-icon-wrapper { background-color: #e6f4ea; color: #137333; } /* お買い物: 緑 */
-        .card:nth-child(4) .card-icon-wrapper { background-color: #e2f7f9; color: #00838f; } /* 冷蔵庫管理: 水色 (新規追加) */
+        .card:nth-child(4) .card-icon-wrapper { background-color: #e2f7f9; color: #00838f; } /* 冷蔵庫管理: 水色 */
 
         .card-title {
             font-size: 1.05rem;
@@ -353,8 +353,8 @@
             <span id="shoppingBadge" class="badge">0</span>
         </a>
 
-        <!-- 4. 冷蔵庫管理リスト (追加) -->
-        <a href="refrigerator.html" class="card">
+        <!-- 4. 冷蔵庫管理リスト (🚨リンク先：refrige.html) -->
+        <a href="refrige.html" class="card">
             <div class="card-icon-wrapper">
                 <!-- ❄️ 冷蔵庫アイコン -->
                 <svg class="icon-svg" viewBox="0 0 24 24">
@@ -480,7 +480,7 @@
                 
                 // 冷蔵庫管理用のデータも含めてバックアップ
                 fridge_items: localStorage.getItem('fridge_items'),
-                fridge_categories: localStorage.getItem('fridge_categories'),
+                fridge_category_order: localStorage.getItem('fridge_category_order'),
                 fridge_category_colors: localStorage.getItem('fridge_category_colors'),
                 
                 themeSetting: localStorage.getItem('themeSetting'),
@@ -531,7 +531,7 @@
                         
                         // 冷蔵庫データのインポート復元
                         if (data.fridge_items) localStorage.setItem('fridge_items', data.fridge_items);
-                        if (data.fridge_categories) localStorage.setItem('fridge_categories', data.fridge_categories);
+                        if (data.fridge_category_order) localStorage.setItem('fridge_category_order', data.fridge_category_order);
                         if (data.fridge_category_colors) localStorage.setItem('fridge_category_colors', data.fridge_category_colors);
                         
                         if (data.themeSetting) localStorage.setItem('themeSetting', data.themeSetting);
@@ -593,7 +593,7 @@
                 document.getElementById('shoppingBadge').style.display = 'none';
             }
 
-            // 冷蔵庫管理の残りアイテム数カウント (追加)
+            // 冷蔵庫管理の残りアイテム数カウント
             try {
                 const fridgeItems = JSON.parse(localStorage.getItem('fridge_items')) || [];
                 const activeFridgeCount = fridgeItems.length; // すべての保管アイテム数
