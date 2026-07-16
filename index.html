@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>便利ツール集</title>
+    <title>生活の「小さな面倒」お助けします</title>
     <style>
         /* === 🎨 カラー変数の設定 === */
         :root {
@@ -51,7 +51,7 @@
             background-color: var(--card-bg);
             padding: 18px 0;
             text-align: center;
-            font-size: 1.2rem;
+            font-size: 1.15rem; /* 文字数が少し増えたため、きれいに収まるよう微調整 */
             font-weight: 600;
             letter-spacing: 0.5px;
             border-bottom: 1px solid var(--border-color);
@@ -98,11 +98,27 @@
             text-decoration: none;
             color: var(--text-color);
             box-shadow: var(--shadow);
-            transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+            transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s;
+            cursor: grab;
+            position: relative;
+            touch-action: none; /* スマホでのスクロール誤動作防止 */
         }
 
         .card:active {
-            transform: scale(0.96); 
+            cursor: grabbing;
+        }
+
+        /* ドラッグ中のスタイル */
+        .card.dragging {
+            opacity: 0.6;
+            transform: scale(1.02);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            z-index: 10;
+        }
+
+        /* ドラッグ時の並び替えプレースホルダープレビュー用アニメーション */
+        .container {
+            transition: all 0.3s;
         }
 
         .card-icon-wrapper {
@@ -115,18 +131,20 @@
             justify-content: center;
             margin-right: 16px;
             color: var(--sub-text);
+            pointer-events: none; /* ドラッグイベントの邪魔をしないようにする */
         }
         
-        /* 各ツールのアイコン背景色・アイコンカラースタイル定義 */
-        .card:nth-child(1) .card-icon-wrapper { background-color: #e8f0fe; color: #1a73e8; } /* ToDo: 青 */
-        .card:nth-child(2) .card-icon-wrapper { background-color: #fce8e6; color: #d93025; } /* カウンター: 赤 */
-        .card:nth-child(3) .card-icon-wrapper { background-color: #e6f4ea; color: #137333; } /* お買い物: 緑 */
-        .card:nth-child(4) .card-icon-wrapper { background-color: #e2f7f9; color: #00838f; } /* 冷蔵庫管理: 水色 */
+        /* 🎨 各アイコン個別のカラー設定（順番が入れ替わっても崩れないように指定） */
+        .card[data-id="todo"] .card-icon-wrapper { background-color: #e8f0fe; color: #1a73e8; }
+        .card[data-id="counter"] .card-icon-wrapper { background-color: #fce8e6; color: #d93025; }
+        .card[data-id="shopping"] .card-icon-wrapper { background-color: #e6f4ea; color: #137333; }
+        .card[data-id="refrige"] .card-icon-wrapper { background-color: #e2f7f9; color: #00838f; }
 
         .card-title {
             font-size: 1.05rem;
             font-weight: 600;
             flex: 1;
+            pointer-events: none;
         }
 
         .badge {
@@ -139,6 +157,7 @@
             min-width: 18px;
             text-align: center;
             display: none;
+            pointer-events: none;
         }
         
         #counterBadge {
@@ -147,6 +166,13 @@
 
         #fridgeBadge {
             background-color: #00838f; /* 水色のブランドカラーに合わせた冷蔵庫専用バッジ */
+        }
+
+        /* 並べ替えのための並び替え可能エリアと、管理パネルエリアを区別 */
+        .cards-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
         }
 
         .admin-panel {
@@ -193,17 +219,25 @@
             filter: brightness(0.95);
         }
 
-        .policy-link {
+        /* 📋 フッター用リンクエリア（横並びで整理） */
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 4px;
+        }
+
+        .footer-link {
             font-size: 0.78rem;
             color: var(--sub-text);
-            text-align: center;
             cursor: pointer;
             text-decoration: none;
-            margin-top: 4px;
             opacity: 0.8;
+            transition: opacity 0.2s, text-decoration 0.2s;
         }
-        .policy-link:active {
+        .footer-link:hover, .footer-link:active {
             opacity: 1;
+            text-decoration: underline;
         }
 
         .modal {
@@ -300,7 +334,7 @@
 <body>
 
     <header>
-        便利ツール集
+        生活の「小さな面倒」お助けします
         <button class="settings-btn" onclick="openThemeModal()">
             <!-- ⚙️ 歯車アイコン -->
             <svg class="icon-svg" viewBox="0 0 24 24">
@@ -311,62 +345,66 @@
     </header>
 
     <div class="container">
-        <!-- 1. ToDoアプリ -->
-        <a href="todo.html" class="card">
-            <div class="card-icon-wrapper">
-                <!-- ☑️ ToDo（チェックリスト）アイコン -->
-                <svg class="icon-svg" viewBox="0 0 24 24">
-                    <path d="M9 11l3 3L22 4"/>
-                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
-                </svg>
-            </div>
-            <span class="card-title">ToDoアプリ</span>
-            <span id="todoBadge" class="badge">0</span>
-        </a>
-        
-        <!-- 2. 文字数カウンター -->
-        <a href="counter.html" class="card">
-            <div class="card-icon-wrapper">
-                <!-- 🔢 カウンター（数式・テキスト）アイコン -->
-                <svg class="icon-svg" viewBox="0 0 24 24">
-                    <path d="M4 19h16"/>
-                    <path d="M4 14h16"/>
-                    <path d="M8 3v11"/>
-                    <path d="M16 3v11"/>
-                </svg>
-            </div>
-            <span class="card-title">文字数カウンター</span>
-            <span id="counterBadge" class="badge">0</span>
-        </a>
+        <!-- 📲 アプリカード並び替えエリア -->
+        <div class="cards-list" id="cardsList">
+            <!-- 1. ToDoアプリ -->
+            <a href="todo.html" class="card" data-id="todo" draggable="true">
+                <div class="card-icon-wrapper">
+                    <!-- ☑️ ToDo（チェックリスト）アイコン -->
+                    <svg class="icon-svg" viewBox="0 0 24 24">
+                        <path d="M9 11l3 3L22 4"/>
+                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                    </svg>
+                </div>
+                <span class="card-title">やることリスト</span>
+                <span id="todoBadge" class="badge">0</span>
+            </a>
+            
+            <!-- 2. 文字数カウンター（📝 新しいドキュメント風アイコンに変更） -->
+            <a href="counter.html" class="card" data-id="counter" draggable="true">
+                <div class="card-icon-wrapper">
+                    <!-- 📝 ペンとドキュメント（文字数カウンター） -->
+                    <svg class="icon-svg" viewBox="0 0 24 24">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                        <polyline points="10 9 9 9 8 9"/>
+                    </svg>
+                </div>
+                <span class="card-title">文字数カウンター</span>
+                <span id="counterBadge" class="badge">0</span>
+            </a>
 
-        <!-- 3. お買い物リスト -->
-        <a href="shopping.html" class="card">
-            <div class="card-icon-wrapper">
-                <!-- 🛒 ショッピングカートアイコン -->
-                <svg class="icon-svg" viewBox="0 0 24 24">
-                    <circle cx="9" cy="21" r="1"/>
-                    <circle cx="20" cy="21" r="1"/>
-                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-                </svg>
-            </div>
-            <span class="card-title">お買い物リスト</span>
-            <span id="shoppingBadge" class="badge">0</span>
-        </a>
+            <!-- 3. お買い物リスト -->
+            <a href="shopping.html" class="card" data-id="shopping" draggable="true">
+                <div class="card-icon-wrapper">
+                    <!-- 🛒 ショッピングカートアイコン -->
+                    <svg class="icon-svg" viewBox="0 0 24 24">
+                        <circle cx="9" cy="21" r="1"/>
+                        <circle cx="20" cy="21" r="1"/>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                    </svg>
+                </div>
+                <span class="card-title">お買い物リスト</span>
+                <span id="shoppingBadge" class="badge">0</span>
+            </a>
 
-        <!-- 4. 冷蔵庫管理リスト (🚨リンク先：refrige.html) -->
-        <a href="refrige.html" class="card">
-            <div class="card-icon-wrapper">
-                <!-- ❄️ 冷蔵庫アイコン -->
-                <svg class="icon-svg" viewBox="0 0 24 24">
-                    <rect x="5" y="2" width="14" height="20" rx="2"/>
-                    <line x1="5" y1="10" x2="19" y2="10"/>
-                    <line x1="9" y1="5" x2="9" y2="7"/>
-                    <line x1="9" y1="13" x2="9" y2="16"/>
-                </svg>
-            </div>
-            <span class="card-title">冷蔵庫管理リスト</span>
-            <span id="fridgeBadge" class="badge">0</span>
-        </a>
+            <!-- 4. 冷蔵庫管理リスト -->
+            <a href="refrige.html" class="card" data-id="refrige" draggable="true">
+                <div class="card-icon-wrapper">
+                    <!-- ❄️ 冷蔵庫アイコン -->
+                    <svg class="icon-svg" viewBox="0 0 24 24">
+                        <rect x="5" y="2" width="14" height="20" rx="2"/>
+                        <line x1="5" y1="10" x2="19" y2="10"/>
+                        <line x1="9" y1="5" x2="9" y2="7"/>
+                        <line x1="9" y1="13" x2="9" y2="16"/>
+                    </svg>
+                </div>
+                <span class="card-title">冷蔵庫在庫リスト</span>
+                <span id="fridgeBadge" class="badge">0</span>
+            </a>
+        </div>
 
         <div class="admin-panel">
             <p class="admin-title">データのバックアップ・復元</p>
@@ -390,10 +428,16 @@
             </div>
             <input type="file" id="importFileInput" style="display: none;" accept=".json" onchange="importAllData(this)">
             
-            <div class="policy-link" onclick="openPolicyModal()">プライバシーポリシーを確認</div>
+            <!-- 📋 AdSense審査に必須のフッターナビゲーション -->
+            <div class="footer-links">
+                <div class="footer-link" onclick="openAboutModal()">運営者情報</div>
+                <div class="footer-link" onclick="openContactModal()">お問い合わせ</div>
+                <div class="footer-link" onclick="openPolicyModal()">プライバシーポリシー</div>
+            </div>
         </div>
     </div>
 
+    <!-- ⚙️ 画面モード設定モーダル -->
     <div class="modal" id="themeModal">
         <div class="modal-content">
             <h3 class="modal-title">画面モードの設定</h3>
@@ -413,14 +457,50 @@
         </div>
     </div>
 
+    <!-- ℹ️ 運営者情報モーダル -->
+    <div class="modal" id="aboutModal">
+        <div class="modal-content">
+            <h3 class="modal-title">運営者情報</h3>
+            <div class="modal-body-text">【運営者】
+生活お助け便利ツールズ 運営事務局
+
+【サイト概要】
+「毎日の小さな面倒を解決する」をコンセプトに、インストール不要でブラウザからすぐに使えるWebアプリを提供しています。個人情報の収集は一切行わず、すべてのデータをお客様のご利用端末内（localStorage）にのみ格納する、安心・安全なオフライン設計を追求しています。
+
+【お問い合わせ】
+ご要望や改善案、不具合の報告などは、お問い合わせフォームよりお気軽にご連絡ください。日々ユーザーの皆様の声を反映しながらアップデートを行っております。</div>
+            <button class="modal-close-btn" onclick="closeAboutModal()">閉じる</button>
+        </div>
+    </div>
+
+    <!-- ✉️ お問い合わせモーダル -->
+    <div class="modal" id="contactModal">
+        <div class="modal-content">
+            <h3 class="modal-title">お問い合わせ</h3>
+            <p style="font-size: 0.85rem; color: var(--sub-text); margin: 0 0 12px 0; text-align: left; line-height: 1.5;">
+                ご質問や不具合報告、ご要望などはこちらのフォームからお寄せください。別ウィンドウで送信フォームが開きます。
+            </p>
+            <!-- ⚠️ 下記の href="..." のURLをご自身のGoogleフォームのURLに書き換えてください -->
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSchxYt0meePFumVYEyqIaU63wybdkXdGs-I86IOHhQ9uDrpmA/viewform?usp=publish-editor" target="_blank" class="modal-close-btn" style="text-align: center; text-decoration: none; display: block; margin-bottom: 8px;">
+                お問い合わせフォームを開く ↗
+            </a>
+            <button class="modal-close-btn" style="background: var(--panel-bg); color: var(--text-color); box-shadow: none;" onclick="closeContactModal()">キャンセル</button>
+        </div>
+    </div>
+
+    <!-- 🛡️ プライバシーポリシーモーダル -->
     <div class="modal" id="policyModal">
         <div class="modal-content">
             <h3 class="modal-title">プライバシーポリシー</h3>
             <div class="modal-body-text">【データの取り扱いについて】
-本アプリで入力されたデータ（ToDoタスク、お買い物リスト、冷蔵庫管理リスト、各種設定など）は、すべてお客様のご利用端末内（localStorage）にのみ保存されます。
+本アプリで入力されたデータ（やることリスト、お買い物リスト、冷蔵庫在庫リスト、各種設定など）は、すべてお客様のご利用端末内にのみ保存されます。
 
 【外部へのデータ送信】
 当アプリがお客様の個人情報を収集したり、外部のサーバーへ送信することは一切ありません。完全オフラインで安心してご利用いただけます。
+
+【広告配信について】
+当サイトでは、第三者配信による広告サービスを利用する場合があります。このような広告配信事業者は、ユーザーの興味に応じた商品やサービスの広告を表示するため、
+当サイトや他サイトへのアクセスに関する情報（Cookie）を使用することがあります（氏名、住所、メールアドレス、電話番号は含まれません）。
 
 【データの管理】
 端末のキャッシュ消去やアプリの削除を行うとデータが消去される場合があります。大切なデータは「データを保存」ボタンより定期的にバックアップを保存してください。</div>
@@ -461,6 +541,23 @@
             document.getElementById('themeModal').style.display = 'none';
         }
 
+        // 運営者情報モーダルの開閉
+        function openAboutModal() {
+            document.getElementById('aboutModal').style.display = 'flex';
+        }
+        function closeAboutModal() {
+            document.getElementById('aboutModal').style.display = 'none';
+        }
+
+        // お問い合わせモーダルの開閉
+        function openContactModal() {
+            document.getElementById('contactModal').style.display = 'flex';
+        }
+        function closeContactModal() {
+            document.getElementById('contactModal').style.display = 'none';
+        }
+
+        // プライバシーポリシーモーダルの開閉
         function openPolicyModal() {
             document.getElementById('policyModal').style.display = 'flex';
         }
@@ -468,7 +565,7 @@
             document.getElementById('policyModal').style.display = 'none';
         }
 
-        // バックアップ書き出し（冷蔵庫データも統合）
+        // バックアップ書き出し（冷蔵庫データと並び順も統合）[cite: 4]
         function exportAllData() {
             const backupData = {
                 todo_items: localStorage.getItem('todos'),
@@ -482,6 +579,9 @@
                 fridge_items: localStorage.getItem('fridge_items'),
                 fridge_category_order: localStorage.getItem('fridge_category_order'),
                 fridge_category_colors: localStorage.getItem('fridge_category_colors'),
+                
+                // アプリ並び順バックアップ
+                cards_order: localStorage.getItem('cards_order'),
                 
                 themeSetting: localStorage.getItem('themeSetting'),
                 exportedAt: new Date().toISOString()
@@ -504,7 +604,7 @@
             document.getElementById('importFileInput').click();
         }
 
-        // バックアップ読み込み復元（冷蔵庫データも統合）
+        // バックアップ読み込み復元（冷蔵庫データと並び順も統合）[cite: 4]
         function importAllData(input) {
             const file = input.files[0];
             if (!file) return;
@@ -533,6 +633,9 @@
                         if (data.fridge_items) localStorage.setItem('fridge_items', data.fridge_items);
                         if (data.fridge_category_order) localStorage.setItem('fridge_category_order', data.fridge_category_order);
                         if (data.fridge_category_colors) localStorage.setItem('fridge_category_colors', data.fridge_category_colors);
+                        
+                        // 並び順復元
+                        if (data.cards_order) localStorage.setItem('cards_order', data.cards_order);
                         
                         if (data.themeSetting) localStorage.setItem('themeSetting', data.themeSetting);
 
@@ -609,6 +712,142 @@
             }
         }
 
+        // ==========================================
+        // 👆 ドラッグ＆ドロップ ＆ タッチスワイプの実装
+        // ==========================================
+        const cardsList = document.getElementById('cardsList');
+        let dragEl = null;
+        let isDragging = false; 
+        let startY = 0;
+        let currentTouchEl = null;
+
+        // --- 1. 保存された並び順の初期読み込み ---
+        function loadCardsOrder() {
+            const savedOrder = localStorage.getItem('cards_order');
+            if (savedOrder) {
+                const orderArray = JSON.parse(savedOrder);
+                const cards = Array.from(cardsList.children);
+                // 保存された順に並び替え
+                orderArray.forEach(id => {
+                    const card = cards.find(c => c.getAttribute('data-id') === id);
+                    if (card) {
+                        cardsList.appendChild(card);
+                    }
+                });
+            }
+        }
+
+        // --- 2. 並び順をLocalStorageに保存 ---
+        function saveCardsOrder() {
+            const orderArray = Array.from(cardsList.children).map(card => card.getAttribute('data-id'));
+            localStorage.setItem('cards_order', JSON.stringify(orderArray));
+        }
+
+        // --- 3. ドラッグ位置判定のロジック ---
+        function getDragAfterElement(container, y) {
+            const draggableElements = [...container.querySelectorAll('.card:not(.dragging)')];
+
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+
+        // --- 4. PC向けマウスドラッグイベント ---
+        cardsList.addEventListener('dragstart', (e) => {
+            // 設定ボタンなどのドラッグを防ぐため.cardのみ
+            const card = e.target.closest('.card');
+            if (!card) return;
+            
+            dragEl = card;
+            isDragging = true;
+            setTimeout(() => card.classList.add('dragging'), 0);
+        });
+
+        cardsList.addEventListener('dragend', (e) => {
+            const card = e.target.closest('.card');
+            if (card) {
+                card.classList.remove('dragging');
+            }
+            dragEl = null;
+            isDragging = false;
+            saveCardsOrder();
+        });
+
+        cardsList.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            const afterElement = getDragAfterElement(cardsList, e.clientY);
+            if (dragEl) {
+                if (afterElement == null) {
+                    cardsList.appendChild(dragEl);
+                } else {
+                    cardsList.insertBefore(dragEl, afterElement);
+                }
+            }
+        });
+
+        // --- 5. スマホ向けタッチスワイプイベント ---
+        cardsList.addEventListener('touchstart', (e) => {
+            const card = e.target.closest('.card');
+            if (!card) return;
+
+            currentTouchEl = card;
+            startY = e.touches[0].clientY;
+            isDragging = false; // まだドラッグかは確定しない（単なるタップの可能性あり）
+        }, { passive: true });
+
+        cardsList.addEventListener('touchmove', (e) => {
+            if (!currentTouchEl) return;
+            
+            const currentY = e.touches[0].clientY;
+            const diffY = Math.abs(currentY - startY);
+
+            // 10px以上動いたら「スクロール/タップ」ではなく「並び替えドラッグ開始」と判定
+            if (diffY > 10) {
+                isDragging = true;
+                currentTouchEl.classList.add('dragging');
+            }
+
+            if (isDragging) {
+                e.preventDefault(); // ドラッグ中は画面全体のスクロールを抑止
+                const afterElement = getDragAfterElement(cardsList, currentY);
+                if (afterElement == null) {
+                    cardsList.appendChild(currentTouchEl);
+                } else {
+                    cardsList.insertBefore(currentTouchEl, afterElement);
+                }
+            }
+        }, { passive: false });
+
+        cardsList.addEventListener('touchend', (e) => {
+            if (!currentTouchEl) return;
+
+            // ドラッグしたあ後の終了処理
+            if (isDragging) {
+                e.preventDefault(); // 予期せぬクリック遷移をブロック
+                currentTouchEl.classList.remove('dragging');
+                saveCardsOrder();
+            }
+            
+            currentTouchEl = null;
+            isDragging = false;
+        });
+
+        // --- 6. ドラッグ中の誤クリック（ページ遷移）を防ぐ処理 ---
+        cardsList.addEventListener('click', (e) => {
+            // もし微小にでもドラッグ操作が行われていた場合は、aタグの遷移リンクを無効化する
+            if (isDragging) {
+                e.preventDefault();
+            }
+        });
+
+        // --- 7. 初期セットアップの実行 ---
+        loadCardsOrder(); // 順番をロード
         applyCurrentTheme();
         updateBadges();
     </script>
