@@ -527,20 +527,29 @@
         <button class="back-btn" onclick="location.href='index.html'" title="トップへ戻る">
             <span class="material-icons-round">arrow_back</span>
         </button>
-        <div class="header-title">お買い物リスト</div>
-        <button class="settings-btn" onclick="openThemeModal()" title="画面モードの設定">
-            <svg class="icon-svg" viewBox="0 0 24 24">
-                <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
-                <circle cx="12" cy="12" r="3"/>
-            </svg>
-        </button>
+        <div class="header-title" style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">お買い物リスト</div>
+        
+        <!-- 🛠️ 右側のアクションボタンをグループ化 -->
+        <div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
+            <!-- ❔ ヘルプボタン -->
+            <button class="settings-btn" onclick="openHelpModal()" title="ヘルプを見る">
+                <span class="material-icons-round" style="font-size: 1.35rem;">help_outline</span>
+            </button>
+            <!-- ⚙️ 設定ボタン -->
+            <button class="settings-btn" onclick="openThemeModal()" title="画面モードの設定">
+                <svg class="icon-svg" viewBox="0 0 24 24">
+                    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                </svg>
+            </button>
+        </div>
     </header>
 
     <div class="container">
         <div class="input-panel">
             <div class="input-row">
                 <input type="text" id="itemName" placeholder="買うものを入力... (例: 牛肉)" oninput="matchHistoryData()" onkeypress="handleKeyPress(event)">
-                <input type="number" id="itemPrice" placeholder="￥単価" inputmode="numeric" onkeypress="handleKeyPress(event)">
+                <input type="number" id="itemPrice" placeholder="￥単価(任意)" inputmode="numeric" onkeypress="handleKeyPress(event)">
             </div>
             <div class="input-row">
                 <div class="category-combobox">
@@ -589,6 +598,55 @@
                 <input type="radio" name="themeGroup" id="themeDark">
             </label>
             <button class="modal-close-btn" onclick="closeThemeModal()">閉じる</button>
+        </div>
+    </div>
+
+    <!-- ❔ ヘルプモーダル -->
+    <div class="modal" id="helpModal">
+        <div class="modal-content" style="max-width: 420px; max-height: 80vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <h3 style="margin:0; font-size: 1.15rem; font-weight: bold; display: flex; align-items: center; gap: 6px;">
+                    <span class="material-icons-round" style="color: var(--primary-color); font-size: 1.3rem;">help_outline</span>
+                    お買い物リストの使い方のヒント
+                </h3>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 14px; font-size: 0.88rem; line-height: 1.5; color: var(--text-color); text-align: left;">
+                
+                <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+                    <strong style="color: var(--primary-color); display: block; margin-bottom: 4px;">❄️ 冷蔵庫在庫アプリとの連携</strong>
+                    買い物してカゴに入れた（チェックした）状態で「カゴ内を消去」を押すと、その食材が自動的に冷蔵庫在庫リストに登録されます。
+                    <span style="font-size: 0.8rem; display: block; margin-top: 2px; color: var(--sub-text);"
+                    >※カテゴリ設定が「冷蔵・冷凍・野菜・肉類・魚類・食品・調味料・乳製品」などの場合、自動で適切な冷凍・冷蔵・野菜室に振り分けられます。</span>
+                </div>
+
+                <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+                    <strong style="color: var(--primary-color); display: block; margin-bottom: 4px;">🎯 並び替え（ドラッグ＆ドロップ）</strong>
+                    <ul>
+                        <li style="margin-bottom: 2px;"><strong>商品の移動:</strong> 商品を長押し（ドラッグ）して別のカテゴリへ移動させたり、並び順を変えられます。</li>
+                        <li><strong>カテゴリ全体の移動:</strong> 各カテゴリの左上にある <strong>アイコン (⋮⋮)</strong> をドラッグすることで、カテゴリ枠ごと並び順を変更できます。</li>
+                    </ul>
+                </div>
+
+                <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+                    <strong style="color: var(--primary-color); display: block; margin-bottom: 4px;">🎨 カテゴリのカラー変更</strong>
+                    カテゴリヘッダーの右端にあるパレットアイコン (🎨) をタップすると、カテゴリ枠の背景色をお好みの色に変更できます。
+                </div>
+
+                <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+                    <strong style="color: var(--primary-color); display: block; margin-bottom: 4px;">🧠 入力アシストと学習機能</strong>
+                    一度登録した「商品名・カテゴリ・価格」は自動でアプリに記憶されます。次回、商品名を入力するだけで、カテゴリや価格が自動で呼び出されるほか、下部にある「よく買うもの」チップからワンタップで追加できます。
+                </div>
+
+                <div>
+                    <strong style="color: var(--primary-color); display: block; margin-bottom: 4px;">💰 概算合計（カゴの中）</strong>
+                    カゴに入れた（チェックを入れた）アイテムの価格のみをリアルタイムで合計して表示します。買い物をしながら予算内かチェックする際にご活用ください。
+                    <span style="font-size: 0.8rem; display: block; margin-top: 2px; color: var(--sub-text);"
+                    >※単価は未入力でも可。</span>
+                </div>
+            </div>
+            
+            <button class="modal-close-btn" onclick="closeHelpModal()" style="margin-top: 12px; width: 100%;">閉じる</button>
         </div>
     </div>
 
@@ -1357,6 +1415,25 @@
             }
             closePriceModal();
         }
+        // ❔ ヘルプモーダルの開閉
+        function openHelpModal() {
+            document.getElementById('helpModal').style.display = 'flex';
+        }
+        function closeHelpModal() {
+            document.getElementById('helpModal').style.display = 'none';
+        }
+
+        // 🚀 初回起動時のみ、ヘルプを自動的に表示する処理
+        function checkFirstVisitHelp() {
+            const hasVisited = localStorage.getItem('has_visited_shopping_help') === 'true';
+            if (!hasVisited) {
+                openHelpModal();
+                localStorage.setItem('has_visited_shopping_help', 'true');
+            }
+        }
+
+        // 初期化処理のどこか（または script の最下部など）で呼び出してください
+        checkFirstVisitHelp();
     </script>
 </body>
 </html>

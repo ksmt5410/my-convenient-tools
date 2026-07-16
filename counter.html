@@ -133,12 +133,14 @@
         textarea {
             width: 100%;
             height: 180px;
+            min-height: 100px; /* 極端に小さくならないように制限 */
+            max-height: 500px; /* 画面を突き抜けないように上限を設定 */
             background: transparent;
             border: none;
             color: var(--text-color);
             font-size: 1rem;
             line-height: 1.5;
-            resize: none;
+            resize: vertical;  /* ↕ 縦方向のサイズ変更ツマミを有効化 */
             outline: none;
             padding: 0;
             box-sizing: border-box;
@@ -259,10 +261,19 @@
         <button class="back-btn" onclick="location.href='index.html'">
             <span class="material-icons-round">arrow_back</span>
         </button>
-        <div class="header-title">文字数カウンター</div>
-        <button class="settings-btn" onclick="openThemeModal()">
-            <span class="material-icons-round">settings</span>
-        </button>
+        <div class="header-title" style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">文字数カウンター</div>
+        
+        <!-- 🛠️ 右側のアクションボタンをグループ化 -->
+        <div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
+            <!-- ❔ ヘルプボタン -->
+            <button class="settings-btn" onclick="openHelpModal()" title="ヘルプを見る">
+                <span class="material-icons-round" style="font-size: 1.35rem;">help_outline</span>
+            </button>
+            <!-- ⚙️ 設定ボタン -->
+            <button class="settings-btn" onclick="openThemeModal()" title="設定を開く">
+                <span class="material-icons-round" style="font-size: 1.35rem;">settings</span>
+            </button>
+        </div>
     </header>
 
     <div class="container">
@@ -319,6 +330,48 @@
         </div>
     </div>
 
+    <!-- ❔ ヘルプモーダル -->
+    <div class="modal" id="helpModal">
+        <div class="modal-content" style="max-width: 420px; max-height: 80vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <h3 style="margin:0; font-size: 1.15rem; font-weight: bold; display: flex; align-items: center; gap: 6px;">
+                    <span class="material-icons-round" style="color: var(--primary-color); font-size: 1.3rem;">help_outline</span>
+                    使い方のヒント
+                </h3>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 14px; font-size: 0.88rem; line-height: 1.5; color: var(--text-color); text-align: left;">
+                
+                <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+                    <strong style="color: var(--primary-color); display: block; margin-bottom: 4px;">💾 自動保存機能</strong>
+                    入力した文章は**リアルタイムで自動保存**されます。誤ってページを閉じたり、ブラウザをリロードしたりしても、元の文章が自動で復元されるので安心です。
+                </div>
+
+                <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+                    <strong style="color: var(--primary-color); display: block; margin-bottom: 4px;">⏱️ 読了時間の秒単位計算</strong>
+                    一般的な日本人が読む平均的なスピード（**分速400文字 ＝ 1秒あたり約6.7文字**）を基準に、読み終えるまでの時間を**「○分○秒」まで細かく計算**します。スピーチやナレーションの尺合わせに最適です。
+                </div>
+
+                <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+                    <strong style="color: var(--primary-color); display: block; margin-bottom: 4px;">↕ 入力枠のサイズ調整</strong>
+                    入力スペースの右下にある**「ツマミ（リサイズハンドル）」をドラッグ**すると、書きたい文章の長さに合わせて入力枠の縦幅を自由に広げることができます。
+                </div>
+
+                <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+                    <strong style="color: var(--primary-color); display: block; margin-bottom: 4px;">📱 SNSの文字数制限</strong>
+                    X（旧Twitter）の140文字制限、Instagramのキャプション最大2,200文字制限に対応しています。制限を超えると、超過した文字数が赤字でわかりやすく表示されます。
+                </div>
+
+                <div>
+                    <strong style="color: var(--primary-color); display: block; margin-bottom: 4px;">✂️ クイッククリア</strong>
+                    入力をすべてリセットしたいときは、右下の「クリア」ボタンを押すとワンタップで全消去できます（確認メッセージが表示されます）。
+                </div>
+            </div>
+            
+            <button class="modal-close-btn" onclick="closeHelpModal()" style="margin-top: 12px; width: 100%;">閉じる</button>
+        </div>
+    </div>
+
     <script>
         let themeSetting = localStorage.getItem('themeSetting') || 'auto';
 
@@ -338,6 +391,13 @@
             document.getElementById('themeLight').checked = (themeSetting === 'light');
             document.getElementById('themeDark').checked = (themeSetting === 'dark');
             document.getElementById('themeModal').style.display = 'flex';
+        }
+        // ❔ ヘルプモーダルの開閉処理
+        function openHelpModal() {
+            document.getElementById('helpModal').style.display = 'flex';
+        }
+        function closeHelpModal() {
+            document.getElementById('helpModal').style.display = 'none';
         }
         function changeThemeSetting(newSetting) {
             themeSetting = newSetting;
@@ -362,10 +422,25 @@
             document.getElementById('charCount').textContent = len.toLocaleString();
             document.getElementById('noSpaceCount').textContent = noSpaceLen.toLocaleString();
 
-            // 読了時間（1分400文字計算）
-            const time = Math.ceil(len / 400);
-            document.getElementById('readingTime').textContent = `読了時間: 約 ${len > 0 ? time : 0} 分`;
+            // 読了時間（分速400文字 ＝ 1秒あたり6.67文字として計算）
+            if (len === 0) {
+                document.getElementById('readingTime').textContent = "読了時間: 約 0 秒";
+            } else {
+                // 全体の秒数を計算（小数点以下は四捨五入）
+                const totalSeconds = Math.round(len / (400 / 60)); 
+                
+                const minutes = Math.floor(totalSeconds / 60);
+                const seconds = totalSeconds % 60;
 
+                let timeStr = "";
+                if (minutes > 0) {
+                    timeStr = `${minutes} 分 ${seconds} 秒`;
+                } else {
+                    timeStr = `${seconds} 秒`;
+                }
+                
+                document.getElementById('readingTime').textContent = `読了時間: 約 ${timeStr}`;
+            }
             // X (旧Twitter) 制限
             const xLeft = 140 - len;
             const xEl = document.getElementById('xLeft');
