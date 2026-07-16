@@ -185,8 +185,9 @@
             border-color: var(--primary-color);
         }
 
-        #itemName { flex: 2; }
-        #itemPrice { flex: 1; }
+        #itemName { flex: 2; min-width: 0; }
+        #itemPrice { flex: 1.1; min-width: 0; }
+        #itemQuantity { flex: 0.6; min-width: 0; }
         
         .category-combobox {
             display: flex;
@@ -550,6 +551,7 @@
             <div class="input-row">
                 <input type="text" id="itemName" placeholder="買うものを入力... (例: 牛肉)" oninput="matchHistoryData()" onkeypress="handleKeyPress(event)">
                 <input type="number" id="itemPrice" placeholder="￥単価(任意)" inputmode="numeric" onkeypress="handleKeyPress(event)">
+                <input type="number" id="itemQuantity" placeholder="数" min="1" value="1" inputmode="numeric" style="flex: 0.6; text-align: center;" onkeypress="handleKeyPress(event)">
             </div>
             <div class="input-row">
                 <div class="category-combobox">
@@ -794,10 +796,12 @@
         function addItem() {
             const nameInput = document.getElementById('itemName');
             const priceInput = document.getElementById('itemPrice');
+            const qtyInput = document.getElementById('itemQuantity'); // 追加
             const catInput = document.getElementById('itemCategory');
             
             const name = nameInput.value.trim();
             const price = parseInt(priceInput.value) || 0;
+            const quantity = parseInt(qtyInput.value) || 1; // 追加（未入力なら1個）
             const category = catInput.value.trim() || 'なし';
 
             if (!name) return;
@@ -806,6 +810,7 @@
                 id: Date.now().toString() + Math.random().toString(36).substr(2, 4),
                 name: name,
                 price: price,
+                quantity: quantity, // 追加
                 category: category,
                 isChecked: false
             };
@@ -819,6 +824,7 @@
 
             nameInput.value = '';
             priceInput.value = '';
+            qtyInput.value = '1'; // 個数を1にリセット
             catInput.value = '';
             nameInput.focus();
 
@@ -841,6 +847,7 @@
                 id: Date.now().toString() + Math.random().toString(36).substr(2, 4),
                 name: name,
                 price: price,
+                quantity: 1, // 追加
                 category: category || 'なし',
                 isChecked: false
             };
@@ -1195,7 +1202,11 @@
             let totalPrice = 0;
 
             function createItemElement(item) {
-                if (item.isChecked) totalPrice += item.price;
+                // デフォルトで個数データがない過去データへの対策
+                const qty = item.quantity || 1;
+                
+                // カゴに入っている場合、単価×個数で合計に加算
+                if (item.isChecked) totalPrice += (item.price * qty);
 
                 const div = document.createElement('div');
                 div.id = `shop-${item.id}`;
@@ -1216,15 +1227,24 @@
 
                 div.style.animation = 'fadeInItem 0.25s ease-out forwards';
                 
+                // 単価と個数表示の組み立て
+                let priceText = '';
+                if (item.price > 0) {
+                    priceText = `￥${(item.price * qty).toLocaleString()}`;
+                }
+                // 個数が2個以上のとき、または単価があって1個のとき、わかりやすく個数を表示
+                const qtyText = qty > 1 ? ` <span style="font-size:0.8rem; color:var(--sub-text); font-weight:normal;">(${qty}個)</span>` : '';
+                
                 div.innerHTML = `
                     <div class="checkbox" onclick="toggleCheck('${item.id}')">
                         <span class="material-icons-round">done</span>
                     </div>
                     <div class="item-info">
-                        <span class="item-name" onclick="toggleCheck('${item.id}')">${item.name}</span>
-                        <span class="item-price">${item.price > 0 ? '￥' + item.price.toLocaleString() : ''}</span>
+                        <span class="item-name" onclick="toggleCheck('${item.id}')">${item.name}${qtyText}</span>
+                        <span class="item-price">${priceText}</span>
                     </div>
-                    <button class="price-edit-btn" onclick="event.stopPropagation(); openPriceModal('${item.id}')" title="単価を変更">
+                    <!-- 🛠️ 編集ボタンで個数も編集できるようにします -->
+                    <button class="price-edit-btn" onclick="event.stopPropagation(); openPriceModal('${item.id}')" title="個数・単価を変更">
                         <span class="material-icons-round" style="font-size:1.1rem; pointer-events: none;">edit</span>
                     </button>
                     <button class="delete-btn" onclick="event.stopPropagation(); deleteItem('${item.id}')">
@@ -1361,12 +1381,19 @@
 
         let currentEditingItemId = null;
 
+        // 編集モーダルのHTML（個数入力欄を追加）
         const modalHtml = `
             <div class="modal" id="priceModal">
                 <div class="modal-content">
-                    <h3 id="priceModalTitle" style="margin:0 0 4px 0; font-size:1.1rem; font-weight:700;">単価の変更</h3>
+                    <h3 id="priceModalTitle" style="margin:0 0 4px 0; font-size:1.1rem; font-weight:700;">商品の編集</h3>
                     <p id="priceModalSub" style="margin:0 0 12px 0; font-size:0.85rem; color:var(--sub-text);"></p>
-                    <input type="number" id="modalPriceInput" placeholder="新しい単価を入力" inputmode="numeric" style="width:100%; padding:12px; margin-bottom:10px;">
+                    
+                    <label style="font-size:0.85rem; font-weight:600; margin-bottom:4px; display:block;">単価 (￥)</label>
+                    <input type="number" id="modalPriceInput" placeholder="単価を入力" inputmode="numeric" style="width:100%; padding:12px; margin-bottom:12px;">
+                    
+                    <label style="font-size:0.85rem; font-weight:600; margin-bottom:4px; display:block;">個数</label>
+                    <input type="number" id="modalQtyInput" placeholder="個数を入力" min="1" inputmode="numeric" style="width:100%; padding:12px; margin-bottom:16px;">
+                    
                     <div style="display:flex; gap:10px; width:100%;">
                         <button class="menu-option" onclick="closePriceModal()" style="flex:1; background:var(--history-bg); justify-content:center;">キャンセル</button>
                         <button class="modal-close-btn" onclick="savePriceModal()" style="flex:1; margin:0; justify-content:center; display:flex; align-items:center;">保存する</button>
@@ -1381,8 +1408,9 @@
             if (!item) return;
 
             currentEditingItemId = id;
-            document.getElementById('priceModalTitle').textContent = `「${item.name}」の単価変更`;
+            document.getElementById('priceModalTitle').textContent = `「${item.name}」の編集`;
             document.getElementById('modalPriceInput').value = item.price || '';
+            document.getElementById('modalQtyInput').value = item.quantity || 1; // 個数を代入
             document.getElementById('priceModal').style.display = 'flex';
             
             setTimeout(() => document.getElementById('modalPriceInput').focus(), 50);
@@ -1397,18 +1425,22 @@
             if (!currentEditingItemId) return;
             
             const item = listItems.find(i => i.id === currentEditingItemId);
-            const inputVal = document.getElementById('modalPriceInput').value.trim();
+            const priceVal = document.getElementById('modalPriceInput').value.trim();
+            const qtyVal = document.getElementById('modalQtyInput').value.trim();
             
             if (item) {
-                const newPrice = parseInt(inputVal, 10) || 0;
-                if (newPrice < 0) {
-                    alert("⚠️ 0以上の数字を入力してください。");
+                const newPrice = parseInt(priceVal, 10) || 0;
+                const newQty = parseInt(qtyVal, 10) || 1;
+                
+                if (newPrice < 0 || newQty < 1) {
+                    alert("⚠️ 単価は0以上、個数は1以上の数字を入力してください。");
                     return;
                 }
                 item.price = newPrice;
+                item.quantity = newQty; // 個数を保存
 
                 const master = itemMaster.find(m => m.name === item.name);
-                if (master) master.price = newPrice;
+                if (master) master.price = newPrice; // マスターデータ（履歴用）は単価のみ記憶
 
                 saveToStorage();
                 render();

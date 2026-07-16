@@ -1004,6 +1004,18 @@
                 todos = [];
             }
             
+            // 💡 【追加】自動ヘルプ表示機能（一度見たら次回から自動では開かない設定）
+            const hasSeenHelp = localStorage.getItem('hasSeenHelp');
+            if (!hasSeenHelp) {
+                // 初回アクセス時のみ、少しだけ遅らせて（カレンダー等の初期化完了後に）ヘルプを自動で開く
+                setTimeout(() => {
+                    if (typeof window.openHelpModal === 'function') {
+                        window.openHelpModal();
+                        localStorage.setItem('hasSeenHelp', 'true'); // 見たよ、という記録を保存
+                    }
+                }, 500); // 0.5秒後に実行
+            }
+
             let currentFilter = 'ALL';
             let editingTodoId = null;
             let activeMenuTodoId = null; 

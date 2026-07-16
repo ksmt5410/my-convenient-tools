@@ -263,7 +263,7 @@
         </button>
         <div class="header-title" style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">文字数カウンター</div>
         
-        <!-- 🛠️ 右側のアクションボタンをグループ化 -->
+        <!-- 🛠️ 右側のアクションボタン -->
         <div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
             <!-- ❔ ヘルプボタン -->
             <button class="settings-btn" onclick="openHelpModal()" title="ヘルプを見る">
@@ -399,6 +399,16 @@
         function closeHelpModal() {
             document.getElementById('helpModal').style.display = 'none';
         }
+
+        // 🚀 【新規追加】初回起動時のみヘルプを自動的に表示する処理
+        function checkFirstVisitHelp() {
+            const hasVisited = localStorage.getItem('has_visited_counter_help') === 'true';
+            if (!hasVisited) {
+                openHelpModal();
+                localStorage.setItem('has_visited_counter_help', 'true');
+            }
+        }
+
         function changeThemeSetting(newSetting) {
             themeSetting = newSetting;
             localStorage.setItem('themeSetting', themeSetting);
@@ -412,7 +422,7 @@
             const textarea = document.getElementById('textInput');
             const text = textarea.value;
 
-            // ローカルストレージに保持（インデックスバッジ連動用）
+            // ローカルストレージに保持
             localStorage.setItem('counter_text', text);
             localStorage.setItem('savedText', text);
 
@@ -426,7 +436,6 @@
             if (len === 0) {
                 document.getElementById('readingTime').textContent = "読了時間: 約 0 秒";
             } else {
-                // 全体の秒数を計算（小数点以下は四捨五入）
                 const totalSeconds = Math.round(len / (400 / 60)); 
                 
                 const minutes = Math.floor(totalSeconds / 60);
@@ -472,11 +481,14 @@
             }
         }
 
-        // ページ読み込み時にストレージから復元
+        // ページ読み込み時にストレージから復元 ＆ 初回ポップアップ確認
         window.addEventListener('DOMContentLoaded', () => {
             const saved = localStorage.getItem('counter_text') || localStorage.getItem('savedText') || '';
             document.getElementById('textInput').value = saved;
             countCharacters();
+            
+            // 🚀 【新規追加】初期表示の実行
+            checkFirstVisitHelp();
         });
     </script>
 </body>
