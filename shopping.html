@@ -26,7 +26,7 @@
             --bg-color: #121212;
             --panel-bg: #1e1e1e;
             --text-color: #e8eaed;
-            --sub-text: #9aa0a6;
+            --sub-text: #e8eaed;
             --border-color: #2f3134;
             --primary-color: #81c784;
             --primary-bg: #1b5e20;
@@ -42,19 +42,27 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
-            padding-bottom: 40px;
+            padding-top: 60px; /* 📌 ヘッダー固定に伴う上の余白 */
+            padding-bottom: 30px; /* 📌 下の余白を少し縮小 */
             user-select: auto;
             -webkit-user-select: auto;
         }
 
+        /* 📌 ヘッダーの固定 */
         header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+            box-sizing: border-box;
             background-color: var(--panel-bg);
-            padding: 14px 16px;
+            padding: 10px 16px; /* 📌 縦のパディングを少しスマートに */
             border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             gap: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
         .back-btn {
@@ -71,7 +79,7 @@
         .back-btn:active { background: var(--history-bg); }
 
         .header-title {
-            font-size: 1.15rem;
+            font-size: 1.1rem; /* 📌 少し縮小 */
             font-weight: 600;
             flex: 1;
             letter-spacing: 0.5px;
@@ -148,31 +156,31 @@
 
         .container {
             max-width: 480px;
-            margin: 20px auto;
-            padding: 0 16px;
+            margin: 12px auto; /* 📌 マージンを小さく調整 */
+            padding: 0 12px; /* 📌 横幅も少し広く使えるよう左右余白を削減 */
             box-sizing: border-box;
         }
 
         .input-panel {
             background-color: var(--panel-bg);
-            padding: 16px;
-            border-radius: 16px;
+            padding: 12px; /* 📌 パディングを小さく */
+            border-radius: 14px;
             box-shadow: var(--shadow);
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            margin-bottom: 20px;
+            gap: 8px; /* 📌 隙間をスマートに */
+            margin-bottom: 12px;
         }
 
         .input-row {
             display: flex;
-            gap: 10px;
+            gap: 8px; /* 📌 隙間をスマートに */
             width: 100%;
         }
 
         input {
-            padding: 12px;
-            border-radius: 10px;
+            padding: 10px 12px; /* 📌 インプットの上下の高さをスマートに */
+            border-radius: 8px;
             border: 1px solid var(--border-color);
             background: var(--bg-color); 
             color: var(--text-color);
@@ -238,7 +246,7 @@
 
         button {
             border: none;
-            border-radius: 10px;
+            border-radius: 8px;
             font-weight: 700;
             cursor: pointer;
             transition: transform 0.1s;
@@ -247,8 +255,8 @@
         .add-btn {
             background-color: var(--primary-color);
             color: #ffffff;
-            width: 46px;
-            height: 46px;
+            width: 42px; /* 📌 インプットの高さに合わせて調整 */
+            height: 42px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -257,34 +265,35 @@
             box-shadow: 0 4px 12px rgba(52, 168, 83, 0.2);
         }
         .add-btn:active { transform: scale(0.94); }
-        .add-btn .material-icons-round { font-size: 1.5rem; }
+        .add-btn .material-icons-round { font-size: 1.4rem; }
 
         .summary-panel {
             background-color: var(--primary-bg);
             color: var(--text-color);
-            padding: 16px;
-            border-radius: 14px;
+            padding: 12px; /* 📌 少しスリムに */
+            border-radius: 12px;
             font-weight: 700;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
         }
 
         .list-section-title {
-            font-size: 0.85rem;
+            font-size: 0.8rem; /* 📌 小さくスッキリと */
             color: var(--sub-text);
-            margin: 20px 0 8px 4px;
+            margin: 12px 0 6px 4px; /* 📌 マージン削減 */
             font-weight: 700;
             letter-spacing: 0.5px;
         }
 
-        /* === 📦 カテゴリーボックス用スタイル（冷蔵庫管理リストから移植・統合） === */
+        /* === 📦 カテゴリーボックス用スタイル === */
         .category-group-box {
             background-color: var(--panel-bg);
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 16px;
+            border-radius: 12px; /* 📌 丸みをわずかにスマートに */
+            padding: 10px 12px; /* 📌 内側余白をギュッと削減 */
+            margin-bottom: 10px; /* 📌 ボックス間の隙間を縮小 */
             box-shadow: var(--shadow);
             position: relative;
             touch-action: none;
@@ -298,15 +307,15 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 12px;
+            margin-bottom: 8px; /* 📌 隙間を削減 */
             border-bottom: 1px solid var(--border-color);
-            padding-bottom: 8px;
+            padding-bottom: 6px;
         }
 
         .header-left-zone {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .drag-handle {
@@ -320,7 +329,7 @@
         .drag-handle:active { cursor: grabbing; }
 
         .category-title-text {
-            font-size: 1rem;
+            font-size: 0.95rem; /* 📌 わずかにスマートに */
             color: var(--text-color);
             font-weight: 700;
             letter-spacing: 0.5px;
@@ -332,7 +341,7 @@
             color: var(--sub-text);
             opacity: 0.6;
             cursor: pointer;
-            padding: 4px 8px;
+            padding: 4px 6px;
             border-radius: 6px;
             display: flex;
             align-items: center;
@@ -358,17 +367,17 @@
         .shopping-list {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px; /* 📌 アイテム同士の間隔をスリムに */
             min-height: 20px;
         }
 
         .shopping-item {
             background-color: var(--bg-color);
-            padding: 12px 14px;
-            border-radius: 12px;
+            padding: 8px 12px; /* 📌 上下左右パディングを縮小してスマートに */
+            border-radius: 8px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             cursor: grab; 
             touch-action: none; 
             position: relative;
@@ -393,8 +402,8 @@
         .shopping-item.checked .item-name { text-decoration: line-through; color: var(--sub-text); }
 
         .checkbox {
-            width: 22px;
-            height: 22px;
+            width: 20px; /* 📌 わずかに縮小 */
+            height: 20px;
             border-radius: 50%;
             border: 2px solid var(--sub-text);
             display: flex;
@@ -405,7 +414,7 @@
             flex-shrink: 0;
             background-color: var(--panel-bg);
         }
-        .checkbox .material-icons-round { font-size: 0.95rem; display: none; color: white; }
+        .checkbox .material-icons-round { font-size: 0.85rem; display: none; color: white; }
         
         .shopping-item.checked .checkbox {
             background-color: var(--primary-color);
@@ -419,8 +428,8 @@
             align-items: center;
             flex: 1;
         }
-        .item-name { font-weight: 600; font-size: 1rem; }
-        .item-price { color: var(--sub-text); font-size: 0.9rem; font-weight: 600; }
+        .item-name { font-weight: 600; font-size: 0.95rem; } /* 📌 わずかにスリムに */
+        .item-price { color: var(--sub-text); font-size: 0.85rem; font-weight: 600; }
 
         .shopping-item.transitioning {
             opacity: 0 !important;
@@ -444,28 +453,28 @@
         .delete-btn:active { background: rgba(0,0,0,0.05); color: var(--danger-text); }
 
         .history-panel {
-            margin-top: 32px;
-            padding-top: 16px;
+            margin-top: 24px; /* 📌 隙間を小さく */
+            padding-top: 12px;
             border-top: 1px solid var(--border-color);
         }
 
         .history-grid {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 10px;
+            gap: 6px; /* 📌 隙間を削減 */
+            margin-top: 8px;
         }
 
         .history-chip {
             background-color: var(--panel-bg);
             color: var(--text-color);
-            padding: 8px 14px;
-            border-radius: 20px;
-            font-size: 0.9rem;
+            padding: 6px 12px; /* 📌 少しスリムに */
+            border-radius: 16px;
+            font-size: 0.85rem;
             font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             box-shadow: var(--shadow);
             border: 1px solid transparent;
             cursor: pointer;
@@ -476,14 +485,14 @@
         .clear-actions {
             display: flex;
             justify-content: flex-end;
-            gap: 10px;
-            margin-top: 16px;
+            gap: 8px;
+            margin-top: 12px;
         }
         .clear-btn {
             background-color: var(--danger-bg);
             color: var(--danger-text);
-            padding: 8px 14px;
-            font-size: 0.85rem;
+            padding: 6px 12px; /* 📌 スマートなボタンに */
+            font-size: 0.8rem;
         }
         .clear-btn:active { transform: scale(0.96); }
         
@@ -530,7 +539,7 @@
         </button>
         <div class="header-title" style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">お買い物リスト</div>
         
-        <!-- 🛠️ 右側のアクションボタンをグループ化 -->
+        <!-- 右側のアクションボタンをグループ化 -->
         <div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
             <!-- ❔ ヘルプボタン -->
             <button class="settings-btn" onclick="openHelpModal()" title="ヘルプを見る">
@@ -567,7 +576,7 @@
 
         <div class="summary-panel">
             <span>カゴ内の合計 (概算):</span>
-            <span id="totalPrice" style="font-size: 1.25rem;">￥0</span>
+            <span id="totalPrice" style="font-size: 1.2rem;">￥0</span>
         </div>
 
         <div class="list-section-title">買うものリスト</div>
@@ -584,6 +593,7 @@
         </div>
     </div>
 
+    <!-- テーマ設定モーダル -->
     <div class="modal" id="themeModal">
         <div class="modal-content">
             <h3 style="margin:0 0 4px 0; font-size:1.1rem; font-weight:700;">画面モードの設定</h3>
@@ -796,12 +806,12 @@
         function addItem() {
             const nameInput = document.getElementById('itemName');
             const priceInput = document.getElementById('itemPrice');
-            const qtyInput = document.getElementById('itemQuantity'); // 追加
+            const qtyInput = document.getElementById('itemQuantity');
             const catInput = document.getElementById('itemCategory');
             
             const name = nameInput.value.trim();
             const price = parseInt(priceInput.value) || 0;
-            const quantity = parseInt(qtyInput.value) || 1; // 追加（未入力なら1個）
+            const quantity = parseInt(qtyInput.value) || 1;
             const category = catInput.value.trim() || 'なし';
 
             if (!name) return;
@@ -810,7 +820,7 @@
                 id: Date.now().toString() + Math.random().toString(36).substr(2, 4),
                 name: name,
                 price: price,
-                quantity: quantity, // 追加
+                quantity: quantity,
                 category: category,
                 isChecked: false
             };
@@ -824,7 +834,7 @@
 
             nameInput.value = '';
             priceInput.value = '';
-            qtyInput.value = '1'; // 個数を1にリセット
+            qtyInput.value = '1';
             catInput.value = '';
             nameInput.focus();
 
@@ -847,7 +857,7 @@
                 id: Date.now().toString() + Math.random().toString(36).substr(2, 4),
                 name: name,
                 price: price,
-                quantity: 1, // 追加
+                quantity: 1,
                 category: category || 'なし',
                 isChecked: false
             };
@@ -921,7 +931,6 @@
                     } else if (['肉類', '魚類', '食品', '調味料', '乳製品'].includes(item.category)) {
                         mappedCategory = '冷蔵';
                     } else if (item.category === 'なし' || item.category === 'その他') {
-                        mappedCategory = 'null'; 
                         mappedCategory = 'その他';
                     }
 
@@ -1202,10 +1211,8 @@
             let totalPrice = 0;
 
             function createItemElement(item) {
-                // デフォルトで個数データがない過去データへの対策
                 const qty = item.quantity || 1;
                 
-                // カゴに入っている場合、単価×個数で合計に加算
                 if (item.isChecked) totalPrice += (item.price * qty);
 
                 const div = document.createElement('div');
@@ -1227,12 +1234,10 @@
 
                 div.style.animation = 'fadeInItem 0.25s ease-out forwards';
                 
-                // 単価と個数表示の組み立て
                 let priceText = '';
                 if (item.price > 0) {
                     priceText = `￥${(item.price * qty).toLocaleString()}`;
                 }
-                // 個数が2個以上のとき、または単価があって1個のとき、わかりやすく個数を表示
                 const qtyText = qty > 1 ? ` <span style="font-size:0.8rem; color:var(--sub-text); font-weight:normal;">(${qty}個)</span>` : '';
                 
                 div.innerHTML = `
@@ -1243,7 +1248,6 @@
                         <span class="item-name" onclick="toggleCheck('${item.id}')">${item.name}${qtyText}</span>
                         <span class="item-price">${priceText}</span>
                     </div>
-                    <!-- 🛠️ 編集ボタンで個数も編集できるようにします -->
                     <button class="price-edit-btn" onclick="event.stopPropagation(); openPriceModal('${item.id}')" title="個数・単価を変更">
                         <span class="material-icons-round" style="font-size:1.1rem; pointer-events: none;">edit</span>
                     </button>
@@ -1276,7 +1280,6 @@
                     box.style.boxShadow = 'none';
                 }
 
-                // === 🛠 冷蔵庫管理リストのヘッダー構造・CSSに合わせる ===
                 const header = document.createElement('div');
                 header.className = 'category-group-header';
                 
@@ -1323,12 +1326,12 @@
 
             if (completedItems.length > 0) {
                 const compBox = document.createElement('div');
-                compBox.style.marginTop = '24px';
+                compBox.style.marginTop = '18px'; /* 📌 マージン調整 */
                 
                 const compHeader = document.createElement('div');
                 compHeader.className = 'category-group-header';
                 compHeader.style.color = 'var(--sub-text)';
-                compHeader.style.marginBottom = '8px';
+                compHeader.style.marginBottom = '6px';
                 compHeader.style.paddingLeft = '8px';
                 compHeader.textContent = 'カゴに入れたもの';
                 compBox.appendChild(compHeader);
@@ -1381,7 +1384,7 @@
 
         let currentEditingItemId = null;
 
-        // 編集モーダルのHTML（個数入力欄を追加）
+        // 編集モーダルのHTML
         const modalHtml = `
             <div class="modal" id="priceModal">
                 <div class="modal-content">
@@ -1410,7 +1413,7 @@
             currentEditingItemId = id;
             document.getElementById('priceModalTitle').textContent = `「${item.name}」の編集`;
             document.getElementById('modalPriceInput').value = item.price || '';
-            document.getElementById('modalQtyInput').value = item.quantity || 1; // 個数を代入
+            document.getElementById('modalQtyInput').value = item.quantity || 1;
             document.getElementById('priceModal').style.display = 'flex';
             
             setTimeout(() => document.getElementById('modalPriceInput').focus(), 50);
@@ -1437,17 +1440,17 @@
                     return;
                 }
                 item.price = newPrice;
-                item.quantity = newQty; // 個数を保存
+                item.quantity = newQty;
 
                 const master = itemMaster.find(m => m.name === item.name);
-                if (master) master.price = newPrice; // マスターデータ（履歴用）は単価のみ記憶
+                if (master) master.price = newPrice;
 
                 saveToStorage();
                 render();
             }
             closePriceModal();
         }
-        // ❔ ヘルプモーダルの開閉
+        
         function openHelpModal() {
             document.getElementById('helpModal').style.display = 'flex';
         }
@@ -1455,7 +1458,6 @@
             document.getElementById('helpModal').style.display = 'none';
         }
 
-        // 🚀 初回起動時のみ、ヘルプを自動的に表示する処理
         function checkFirstVisitHelp() {
             const hasVisited = localStorage.getItem('has_visited_shopping_help') === 'true';
             if (!hasVisited) {
@@ -1464,7 +1466,6 @@
             }
         }
 
-        // 初期化処理のどこか（または script の最下部など）で呼び出してください
         checkFirstVisitHelp();
     </script>
 </body>

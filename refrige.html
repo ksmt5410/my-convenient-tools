@@ -53,19 +53,27 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
-            padding-bottom: 40px;
+            padding-top: 60px; /* 📌 ヘッダー固定に伴う上の余白 */
+            padding-bottom: 30px; /* 📌 下の余白を少し縮小 */
             user-select: none;
             -webkit-user-select: none;
         }
 
+        /* 📌 ヘッダーの固定 */
         header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+            box-sizing: border-box;
             background-color: var(--panel-bg);
-            padding: 14px 16px;
+            padding: 10px 16px; /* 📌 パディングを少しスマートに */
             border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             gap: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
         .back-btn {
@@ -82,7 +90,7 @@
         .back-btn:active { background: var(--history-bg); }
 
         .header-title {
-            font-size: 1.15rem;
+            font-size: 1.1rem; /* 📌 少し縮小 */
             font-weight: 600;
             flex: 1;
             letter-spacing: 0.5px;
@@ -116,33 +124,33 @@
 
         .container {
             max-width: 480px;
-            margin: 20px auto;
-            padding: 0 16px;
+            margin: 12px auto; /* 📌 マージンを小さく調整 */
+            padding: 0 12px; /* 📌 左右余白を削減 */
             box-sizing: border-box;
         }
 
         .input-panel {
             background-color: var(--panel-bg);
-            padding: 16px;
-            border-radius: 16px;
+            padding: 12px; /* 📌 パディングを小さく */
+            border-radius: 14px;
             box-shadow: var(--shadow);
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            margin-bottom: 20px;
+            gap: 8px; /* 📌 隙間をスマートに */
+            margin-bottom: 12px;
             user-select: auto;
             -webkit-user-select: auto;
         }
 
         .input-row {
             display: flex;
-            gap: 10px;
+            gap: 8px; /* 📌 隙間をスマートに */
             width: 100%;
         }
 
         input, select {
-            padding: 12px;
-            border-radius: 10px;
+            padding: 10px 12px; /* 📌 インプットの上下の高さをスマートに */
+            border-radius: 8px;
             border: 1px solid var(--border-color);
             background: var(--bg-color); 
             color: var(--text-color);
@@ -157,7 +165,7 @@
 
         #itemName { flex: 2; }
         #itemCategory { flex: 1.2; }
-        #itemQuantity { width: 70px; text-align: center; } 
+        #itemQuantity { width: 65px; text-align: center; } 
 
         .date-input-wrapper {
             position: relative;
@@ -167,7 +175,7 @@
             align-items: center;
             background: var(--bg-color);
             border: 1px solid var(--border-color);
-            border-radius: 10px;
+            border-radius: 8px;
             box-sizing: border-box;
             transition: border-color 0.2s, box-shadow 0.2s;
         }
@@ -179,10 +187,10 @@
 
         .date-input-wrapper input {
             width: 100%;
-            height: 44px;
+            height: 42px; /* 📌 高さをスマートに */
             border: none !important;
             background: transparent !important;
-            padding: 0 40px 0 12px;
+            padding: 0 36px 0 10px;
             font-size: 0.95rem;
             color: var(--text-color);
             outline: none;
@@ -191,7 +199,7 @@
 
         .date-icon-emoji {
             position: absolute;
-            right: 12px;
+            right: 10px;
             top: 50%;
             transform: translateY(-50%);
             color: var(--sub-text);
@@ -203,14 +211,14 @@
         .add-btn {
             background-color: var(--primary-color);
             color: #ffffff;
-            width: 46px;
-            height: 46px;
+            width: 42px; /* 📌 インプットの高さに合わせて調整 */
+            height: 42px;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
             border: none;
-            border-radius: 10px;
+            border-radius: 8px;
             font-weight: 700;
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(26, 115, 232, 0.2);
@@ -221,9 +229,9 @@
         /* === 📦 カテゴリーボックス === */
         .category-group-box {
             background-color: var(--panel-bg);
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 16px;
+            border-radius: 12px; /* 📌 丸みをスマートに */
+            padding: 10px 12px; /* 📌 内側余白を縮小 */
+            margin-bottom: 10px; /* 📌 ボックス間の隙間を縮小 */
             box-shadow: var(--shadow);
             position: relative;
             touch-action: none;
@@ -243,15 +251,15 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 12px;
+            margin-bottom: 8px; /* 📌 隙間を削減 */
             border-bottom: 1px solid var(--border-color);
-            padding-bottom: 8px;
+            padding-bottom: 6px;
         }
 
         .header-left-zone {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .drag-handle {
@@ -265,7 +273,7 @@
         .drag-handle:active { cursor: grabbing; }
 
         .category-title-text {
-            font-size: 1rem;
+            font-size: 0.95rem; /* 📌 わずかにスマートに */
             color: var(--text-color);
             font-weight: 700;
             letter-spacing: 0.5px;
@@ -277,7 +285,7 @@
             color: var(--sub-text);
             opacity: 0.6;
             cursor: pointer;
-            padding: 4px 8px;
+            padding: 4px 6px;
             border-radius: 6px;
             display: flex;
             align-items: center;
@@ -294,30 +302,30 @@
 
         .fridge-list {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-            gap: 10px;
-            min-height: 50px;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); /* 📌 グリッド幅を微調整 */
+            gap: 8px; /* 📌 カード同士の隙間を縮小 */
+            min-height: 40px;
         }
 
         .empty-message {
             grid-column: 1 / -1;
             text-align: center;
             color: var(--sub-text);
-            padding: 16px 12px;
-            font-size: 0.88rem;
+            padding: 12px 8px;
+            font-size: 0.85rem;
             font-weight: 600;
             opacity: 0.5;
             pointer-events: none;
         }
 
-        /* === 📝 食材カード（極限までシンプルに＆全面タップ可） === */
+        /* === 📝 食材カード === */
         .fridge-item {
             background-color: var(--bg-color);
-            padding: 12px;
-            border-radius: 12px;
+            padding: 8px 10px; /* 📌 カードの余白をスリムに */
+            border-radius: 8px;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 4px; /* 📌 内側の隙間を微調整 */
             box-sizing: border-box;
             border: 1px solid var(--border-color);
             cursor: pointer;
@@ -331,7 +339,7 @@
 
         .item-name { 
             font-weight: 700; 
-            font-size: 0.95rem; 
+            font-size: 0.9rem; /* 📌 少しスマートに */
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -341,7 +349,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             color: var(--sub-text);
         }
 
@@ -357,12 +365,12 @@
             font-weight: 700;
             background: var(--panel-bg);
             border: 1px solid var(--border-color);
-            padding: 1px 6px;
+            padding: 1px 5px;
             border-radius: 6px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
         }
 
-        /* === 📱 ボトムシート（下から出てくる親指操作メニュー） === */
+        /* === 📱 ボトムシート === */
         .bottom-sheet-overlay {
             display: none;
             position: fixed;
@@ -371,7 +379,7 @@
             z-index: 1000;
             backdrop-filter: blur(2px);
             -webkit-backdrop-filter: blur(2px);
-            align-items: flex-end; /* 下寄せ */
+            align-items: flex-end;
         }
         
         .bottom-sheet {
@@ -413,7 +421,6 @@
             white-space: nowrap;
         }
 
-        /* ボトムシート内の大きな操作ボタン一覧 */
         .sheet-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -440,7 +447,6 @@
             filter: brightness(0.95);
         }
 
-        /* 特殊アクションのボタンカラー */
         .sheet-btn-cart {
             background-color: var(--primary-bg);
             color: #1a73e8;
@@ -454,7 +460,6 @@
             color: var(--danger-text);
         }
 
-        /* ボトムシート内のでっかい数量調整パネル */
         .sheet-qty-panel {
             display: flex;
             align-items: center;
@@ -1236,7 +1241,7 @@
             document.getElementById('helpModal').style.display = 'none';
         }
 
-        // 🚀 初回起動時のみ、ヘルプを自動的に表示する処理
+        // 初回起動時ヘルプチェック
         function checkFirstVisitHelp() {
             const hasVisited = localStorage.getItem('has_visited_refrige_help') === 'true';
             if (!hasVisited) {
@@ -1245,7 +1250,6 @@
             }
         }
 
-        // 初期化処理のどこか（または script の最下部など）で呼び出してください
         checkFirstVisitHelp();
 
         /* =========================================================

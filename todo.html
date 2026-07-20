@@ -111,11 +111,11 @@
         /* 📱 ヘッダー全体のレイアウト調整 */
         header {
             background-color: var(--panel-bg);
-            padding: 12px 16px;
+            padding: 8px 12px;
             border-bottom: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 8px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.02);
         }
 
@@ -125,7 +125,7 @@
             align-items: center; 
             justify-content: space-between;
             width: 100%;
-            gap: 10px;
+            gap: 6px;
         }
 
         /* 矢印・歯車ボタンをスマートに統一 */
@@ -135,16 +135,16 @@
             background: transparent !important;
             border: none !important;
             box-shadow: none !important;
-            padding: 6px !important;
+            padding: 4px !important;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             transition: opacity 0.2s;
             flex-shrink: 0;
-            width: 36px;
-            height: 36px;
-            font-size: 24px;
+            width: 32px;
+            height: 32px;
+            font-size: 22px;
             box-sizing: border-box;
         }
         .home-link-btn:active {
@@ -161,12 +161,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 8px !important;
+            padding: 6px !important;
             border-radius: 50% !important;
             transition: background 0.2s;
             flex-shrink: 0;
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
             box-sizing: border-box;
         }
         .settings-link-btn:active {
@@ -175,8 +175,8 @@
 
         /* index.htmlのSVG用スタイルを反映 */
         .settings-link-btn .icon-svg {
-            width: 1.25rem;
-            height: 1.25rem;
+            width: 1.2rem;
+            height: 1.2rem;
             fill: none;
             stroke: currentColor;
             stroke-width: 2;
@@ -193,38 +193,39 @@
         
         .filters {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             align-items: center;
             flex: 1;
             min-width: 0; 
         }
 
+        /* ✨ ボタンからテキストリンク風に変更＆サイズを小さく */
         .filter-btn {
-            padding: 8px 14px;
-            border-radius: 20px;
-            border: 1px solid var(--border-color);
-            background-color: var(--bg-color);
+            padding: 4px 6px;
+            border: none;
+            background: transparent;
             color: var(--sub-text);
             cursor: pointer;
-            font-size: 0.88rem;
+            font-size: 0.8rem;
             font-weight: 600;
-            transition: all 0.2s ease;
+            transition: color 0.2s ease;
             white-space: nowrap;
+            flex-shrink: 0;
         }
 
         .filter-btn.active {
-            background-color: var(--active-color);
-            color: #ffffff;
-            border-color: var(--active-color);
+            background: transparent;
+            color: var(--active-color);
+            font-weight: bold;
         }
 
         #categoryFilter {
             flex: 1;
             min-width: 0;
-            padding: 7px;
-            font-size: 0.88rem;
+            padding: 5px 8px;
+            font-size: 0.82rem;
             font-weight: 600;
-            border-radius: 20px;
+            border-radius: 16px;
             background-color: var(--bg-color);
         }
 
@@ -236,8 +237,8 @@
         #searchField {
             width: 100%;
             box-sizing: border-box;
-            padding: 10px 14px;
-            font-size: 0.92rem;
+            padding: 8px 12px;
+            font-size: 0.88rem;
             border-radius: 10px;
             border: 1px solid var(--border-color);
             background: var(--bg-color);
@@ -262,7 +263,7 @@
             transition: all 0.15s;
             background-color: var(--panel-bg);
             box-sizing: border-box;
-            margin-top: 3px;
+            margin-top: 2px;
         }
         .status-circle-btn .material-icons-round {
             font-size: 0.95rem;
@@ -306,23 +307,25 @@
             box-sizing: border-box;
         }
 
+        /* ✨ 余白を削減 */
         .todo-list {
-            padding: 12px;
+            padding: 8px 10px;
             max-width: 600px;
             margin: 0 auto;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
 
+        /* ✨ カード内部のパディングとギャップを削減 */
         .todo-item {
             display: flex;
             align-items: flex-start;
-            padding: 16px;
+            padding: 10px 12px;
             background-color: var(--panel-bg);
-            border-radius: 14px;
+            border-radius: 12px;
             border-bottom: none;
-            gap: 14px;
+            gap: 10px;
             box-shadow: var(--shadow);
             opacity: 1;
             transform: translateY(0);
@@ -353,7 +356,7 @@
         .todo-left {
             display: flex;
             align-items: flex-start;
-            gap: 14px;
+            gap: 10px;
             flex: 1;
             min-width: 0;
         }
@@ -361,15 +364,15 @@
         .todo-details {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 4px;
             flex: 1;
             min-width: 0;
         }
 
         .todo-title {
-            font-size: 1.02rem;
+            font-size: 0.96rem;
             font-weight: 600;
-            line-height: 1.4;
+            line-height: 1.35;
             transition: color 0.3s;
             word-wrap: break-word;
         }
@@ -381,16 +384,16 @@
         }
 
         .repeat-row {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: #e65100;
             font-weight: 700;
             background: #fff3e0;
-            padding: 3px 8px;
+            padding: 2px 6px;
             border-radius: 4px;
             align-self: flex-start;
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 3px;
         }
         [data-theme="dark"] .repeat-row {
             color: #ffb74d;
@@ -398,7 +401,7 @@
         }
 
         .todo-sub {
-            font-size: 0.82rem;
+            font-size: 0.78rem;
             color: var(--sub-text);
             font-weight: 500;
         }
@@ -409,13 +412,13 @@
         }
 
         .memo-row {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: #00796b;
             white-space: pre-wrap;
-            margin-top: 4px;
+            margin-top: 2px;
             background: var(--bg-color);
-            padding: 8px 12px;
-            border-radius: 8px;
+            padding: 6px 10px;
+            border-radius: 6px;
             border-left: 3px solid var(--active-color);
         }
         [data-theme="dark"] .memo-row {
@@ -426,7 +429,7 @@
         .todo-right {
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 4px;
             justify-content: center;
             align-self: center;
         }
@@ -436,7 +439,7 @@
             bottom: 0;
             width: 100%;
             background-color: var(--panel-bg);
-            padding: 16px 0;
+            padding: 12px 0;
             text-align: center;
             border-top: 1px solid var(--border-color);
             z-index: 10;
@@ -447,8 +450,8 @@
             background-color: var(--active-color);
             color: #ffffff;
             border: none;
-            font-size: 0.95rem;
-            padding: 12px 28px;
+            font-size: 0.9rem;
+            padding: 10px 24px;
             border-radius: 24px;
             font-weight: bold;
             box-shadow: 0 4px 12px rgba(26, 115, 232, 0.23);
@@ -641,7 +644,7 @@
             border: none;
             color: var(--sub-text);
             cursor: pointer;
-            padding: 8px;
+            padding: 6px;
             border-radius: 50%;
             transition: all 0.2s;
             display: flex;
@@ -679,9 +682,9 @@
 
         /* 💻 PC用の調整 */
         @media (min-width: 600px) {
-            header { padding: 14px 24px; }
-            .filter-btn { padding: 8px 18px; font-size: 0.9rem; }
-            #categoryFilter { font-size: 0.9rem; padding: 8px 14px; }
+            header { padding: 12px 20px; }
+            .filter-btn { font-size: 0.85rem; padding: 4px 8px; }
+            #categoryFilter { font-size: 0.88rem; padding: 6px 10px; }
         }
         
         /* 📅 日付入力欄 */
@@ -836,8 +839,8 @@
                 <svg class="svg-icon" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59c.39-.39.39-1.02 0-1.41a.996.996 0 0 0-1.41 0l-7.3 7.3a.996.996 0 0 0 0 1.41l7.3 7.3c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41L7.83 13H20c.55 0 1-.45 1-1s-.45-1-1-1z"/></svg>
             </a>
             
-            <!-- 🔍 フィルターエリア（幅を自動調節） -->
-            <div class="filters" style="flex: 1; min-width: 0;">
+            <!-- 🔍 フィルターエリア（ボタンからテキストのみに変更・文字化け修正） -->
+            <div class="filters">
                 <button id="filterAll" class="filter-btn active" onclick="setFilter('ALL')">すべて</button>
                 <button id="filterActive" class="filter-btn" onclick="setFilter('ACTIVE')">未完了</button>
                 <select id="categoryFilter" onchange="renderTodos()">
@@ -845,11 +848,11 @@
                 </select>
             </div>
             
-            <!-- 🛠️ 右側のアクションボタンをまとめるグループ（横並びで固定） -->
-            <div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
+            <!-- 🛠️ 右側のアクションボタンをまとめるグループ -->
+            <div style="display: flex; align-items: center; gap: 2px; flex-shrink: 0;">
                 <!-- ❔ ヘルプボタン -->
                 <button class="settings-link-btn" onclick="openHelpModal()" title="ヘルプを見る">
-                    <svg class="icon-svg" viewBox="0 0 24 24" style="fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; width: 1.25rem; height: 1.25rem; display: inline-block;">
+                    <svg class="icon-svg" viewBox="0 0 24 24" style="fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; width: 1.2rem; height: 1.2rem; display: inline-block;">
                         <circle cx="12" cy="12" r="10"></circle>
                         <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
                         <line x1="12" y1="17" x2="12.01" y2="17"></line>
@@ -875,11 +878,11 @@
 
     <div class="footer-panel">
         <button class="add-btn" onclick="openAddModal()">
-            <svg class="svg-icon" style="width:20px; height:20px;" viewBox="0 0 24 24"><path d="M19 13h-6v6c0 .55-.45 1-1 1s-1-.45-1-1v-6H5c-.55 0-1-.45-1-1s.45-1 1-1h6V5c0-.55.45-1 1-1s1 .45 1 1v6h6c.55 0 1 .45 1 1s-.45 1-1 1z"/></svg>タスクを追加する
+            <svg class="svg-icon" style="width:18px; height:18px;" viewBox="0 0 24 24"><path d="M19 13h-6v6c0 .55-.45 1-1 1s-1-.45-1-1v-6H5c-.55 0-1-.45-1-1s.45-1 1-1h6V5c0-.55.45-1 1-1s1 .45 1 1v6h6c.55 0 1 .45 1 1s-.45 1-1 1z"/></svg>タスクを追加する
         </button>
     </div>
 
-    <!-- ⚙️ 冷蔵庫アプリと100%同一デザインに修正した画面モード設定モーダル -->
+    <!-- ⚙️ 画面モード設定モーダル -->
     <div class="modal" id="settingsModal">
         <div class="modal-content" style="gap: 16px;">
             <h3 style="margin:0; font-size: 1.15rem; font-weight: bold;">画面モードの設定</h3>
@@ -980,7 +983,7 @@
 
                 <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
                     <strong style="color: var(--active-color); display: block; margin-bottom: 4px;">🔍 絞り込みと検索</strong>
-                    上部の「未完了」ボタンで完了していないタスクのみを抽出したり、検索窓に文字を入れることで「タスク名」や「カテゴリ名」から絞り込むことができます。
+                    上部の「未完了」テキストで完了していないタスクのみを抽出したり、検索窓に文字を入れることで「タスク名」や「カテゴリ名」から絞り込むことができます。
                 </div>
 
                 <div>
@@ -1004,16 +1007,14 @@
                 todos = [];
             }
             
-            // 💡 【追加】自動ヘルプ表示機能（一度見たら次回から自動では開かない設定）
             const hasSeenHelp = localStorage.getItem('hasSeenHelp');
             if (!hasSeenHelp) {
-                // 初回アクセス時のみ、少しだけ遅らせて（カレンダー等の初期化完了後に）ヘルプを自動で開く
                 setTimeout(() => {
                     if (typeof window.openHelpModal === 'function') {
                         window.openHelpModal();
-                        localStorage.setItem('hasSeenHelp', 'true'); // 見たよ、という記録を保存
+                        localStorage.setItem('hasSeenHelp', 'true');
                     }
-                }, 500); // 0.5秒後に実行
+                }, 500);
             }
 
             let currentFilter = 'ALL';
@@ -1057,7 +1058,6 @@
                 }
             }
 
-            // ❔ ヘルプモーダルの開閉処理
             window.openHelpModal = function() {
                 document.getElementById('helpModal').style.display = 'flex';
             }
@@ -1372,7 +1372,7 @@
                         
                         <div class="todo-right">
                             <button class="menu-trigger-btn" id="menu-btn-${todo.id}" title="操作メニュー">
-                                <svg class="svg-icon" style="width:24px; height:24px;" viewBox="0 0 24 24"><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+                                <svg class="svg-icon" style="width:22px; height:22px;" viewBox="0 0 24 24"><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
                             </button>
                         </div>
                     `;
