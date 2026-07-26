@@ -20,7 +20,7 @@
             --text-color: #202124;
             --sub-text: #202124;
             --border-color: #e8eaed;
-            --primary-color: #34a853;   
+            --primary-color: #2563eb;   
             --primary-bg: #e8f0fe;
             --danger-bg: #fce8e6;
             --danger-text: #d93025;
@@ -37,7 +37,7 @@
             --text-color: #e8eaed;
             --sub-text: #9aa0a6;
             --border-color: #2f3134;
-            --primary-color: #81c784;
+            --primary-color: #3b82f6;
             --primary-bg: #1a233a;
             --danger-bg: #b71c1c;
             --danger-text: #ef9a9a;
@@ -372,34 +372,35 @@
 
         /* === 📱 ボトムシート === */
         .bottom-sheet-overlay {
-            display: none;
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4);
             backdrop-filter: blur(2px);
             -webkit-backdrop-filter: blur(2px);
-            align-items: flex-end;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.25s ease, visibility 0.25s ease;
+            z-index: 1000;
         }
-        
+        .bottom-sheet-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
         .bottom-sheet {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
             background: var(--panel-bg);
-            width: 100%;
+            border-radius: 20px 20px 0 0;
+            padding: 20px 20px 32px;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.1, 0.9, 0.2, 1);
+            z-index: 1001;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
             max-width: 480px;
             margin: 0 auto;
-            border-radius: 24px 24px 0 0;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
-            padding: 20px 20px 30px 20px;
             box-sizing: border-box;
-            transform: translateY(100%);
-            transition: transform 0.25s cubic-bezier(0.1, 0.76, 0.55, 0.94);
         }
-
-        .bottom-sheet-overlay.active {
-            display: flex;
-        }
-
-        .bottom-sheet-overlay.active .bottom-sheet {
+        .bottom-sheet.active {
             transform: translateY(0);
         }
 
@@ -483,7 +484,9 @@
             cursor: pointer;
             box-shadow: 0 2px 6px rgba(0,0,0,0.05);
         }
-        .sheet-qty-btn:active { transform: scale(0.9); }
+        .sheet-qty-btn:active { 
+            transform: scale(0.9); 
+        }
 
         .sheet-qty-val {
             font-size: 1.3rem;
@@ -540,6 +543,106 @@
             font-weight: 700;
             border: none;
             margin-top: 8px;
+        }
+
+        /* 💡 洗練されたヘルプモーダル専用スタイル */
+        .help-modal-content {
+            max-width: 400px !important;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            padding: 20px !important;
+            gap: 0 !important;
+            border-radius: 24px !important;
+        }
+
+        .help-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 14px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 16px;
+        }
+
+        .help-modal-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-color);
+        }
+
+        .help-modal-title span {
+            color: var(--primary-color);
+            font-size: 1.4rem;
+        }
+
+        .help-scroll-area {
+            overflow-y: auto;
+            padding-right: 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        /* スクロールバーのカスタマイズ */
+        .help-scroll-area::-webkit-scrollbar {
+            width: 5px;
+        }
+        .help-scroll-area::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        .help-card {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .help-card-title {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .help-card-title .material-icons-round {
+            font-size: 1.1rem;
+        }
+
+        .help-card-text {
+            font-size: 0.82rem;
+            line-height: 1.55;
+            color: var(--text-color);
+            margin: 0;
+        }
+
+        .help-card-text ul {
+            margin: 4px 0 0 0;
+            padding-left: 18px;
+        }
+
+        .help-card-text li {
+            margin-bottom: 2px;
+        }
+
+        .help-note {
+            font-size: 0.75rem;
+            color: var(--sub-text);
+            margin-top: 4px;
+            display: block;
+            opacity: 0.85;
         }
 
         @keyframes fadeInItem {
@@ -603,40 +706,39 @@
     </div>
 
     <!-- 📱 ボトムシート（食材アクション） -->
-    <div class="bottom-sheet-overlay" id="actionSheetOverlay" onclick="closeActionSheet(event)">
-        <div class="bottom-sheet" onclick="event.stopPropagation()">
-            <div class="sheet-handle"></div>
-            <div class="sheet-title" id="sheetItemTitle">食材の名前</div>
-            
-            <div class="sheet-grid">
-                <!-- 数量調整パネル -->
-                <div class="sheet-qty-panel">
-                    <span style="font-weight:700; font-size:0.95rem; color:var(--sub-text);">個数調整</span>
-                    <div style="display:flex; align-items:center; gap:20px;">
-                        <button class="sheet-qty-btn" onclick="changeSheetQty(-1)">-</button>
-                        <span class="sheet-qty-val" id="sheetQtyVal">1</span>
-                        <button class="sheet-qty-btn" onclick="changeSheetQty(1)">+</button>
-                    </div>
+    <div id="actionSheetOverlay" class="bottom-sheet-overlay" onclick="closeActionSheet()"></div>
+    <div id="actionSheet" class="bottom-sheet">
+        <div class="sheet-handle"></div>
+        <div class="sheet-title" id="sheetItemTitle">食材の名前</div>
+        
+        <div class="sheet-grid">
+            <!-- 数量調整パネル -->
+            <div class="sheet-qty-panel">
+                <span style="font-weight:700; font-size:0.95rem; color:var(--sub-text);">個数調整</span>
+                <div style="display:flex; align-items:center; gap:20px;">
+                    <button class="sheet-qty-btn" onclick="changeSheetQty(-1)">-</button>
+                    <span class="sheet-qty-val" id="sheetQtyVal">1</span>
+                    <button class="sheet-qty-btn" onclick="changeSheetQty(1)">+</button>
                 </div>
-
-                <!-- 買い物かごに入れる -->
-                <button class="sheet-btn sheet-btn-cart" onclick="triggerCartFromSheet()">
-                    <span class="material-icons-round">shopping_cart</span>
-                    <span>買い物リストに追加する</span>
-                </button>
-
-                <!-- 編集する -->
-                <button class="sheet-btn" onclick="triggerEditFromSheet()">
-                    <span class="material-icons-round">edit</span>
-                    <span>賞味期限・保管場所を編集</span>
-                </button>
-
-                <!-- 削除する -->
-                <button class="sheet-btn sheet-btn-danger" onclick="triggerDeleteFromSheet()">
-                    <span class="material-icons-round">delete</span>
-                    <span>この食材を削除</span>
-                </button>
             </div>
+
+            <!-- 買い物かごに入れる -->
+            <button class="sheet-btn sheet-btn-cart" onclick="triggerCartFromSheet()">
+                <span class="material-icons-round">shopping_cart</span>
+                <span>買い物リストに追加する</span>
+            </button>
+
+            <!-- 編集する -->
+            <button class="sheet-btn" onclick="triggerEditFromSheet()">
+                <span class="material-icons-round">edit</span>
+                <span>賞味期限・保管場所を編集</span>
+            </button>
+
+            <!-- 削除する -->
+            <button class="sheet-btn sheet-btn-danger" onclick="triggerDeleteFromSheet()">
+                <span class="material-icons-round">delete</span>
+                <span>この食材を削除</span>
+            </button>
         </div>
     </div>
 
@@ -720,50 +822,76 @@
         </div>
     </div>
 
-    <!-- ❔ ヘルプモーダル -->
+    <!-- ❔ 洗練されたスタイルのヘルプモーダル -->
     <div class="modal" id="helpModal">
-        <div class="modal-content" style="max-width: 420px; max-height: 80vh; overflow-y: auto;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <h3 style="margin:0; font-size: 1.15rem; font-weight: bold; display: flex; align-items: center; gap: 6px;">
-                    <span class="material-icons-round" style="color: var(--primary-color); font-size: 1.3rem;">help_outline</span>
-                    冷蔵庫管理の使い方のヒント
+        <div class="modal-content help-modal-content">
+            <div class="help-modal-header">
+                <h3 class="help-modal-title">
+                    <span class="material-icons-round">help_outline</span>
+                    冷蔵庫管理のヒント
                 </h3>
             </div>
             
-            <div style="display: flex; flex-direction: column; gap: 14px; font-size: 0.88rem; line-height: 1.5; color: var(--text-color); text-align: left;">
+            <div class="help-scroll-area">
                 
-                <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
-                    <strong style="color: var(--primary-color); display: block; margin-bottom: 4px;">🍱 直感的な食材カード操作</strong>
-                    保管中の食材をタップすると、操作シートが現れます。
-                    <ul>
-                        <li>個数を「+ / -」調整できます。</li>
-                        <li>食材が少なくなったり無くなったりしたら、<strong>「買い物リストに追加する」</strong>をタップして、お買い物リスト追加できます。</li>
-                    </ul>
+                <div class="help-card">
+                    <div class="help-card-title">
+                        <span class="material-icons-round">touch_app</span>
+                        直感的な食材カード操作
+                    </div>
+                    <div class="help-card-text">
+                        食材をタップすると操作シートが開きます。
+                        <ul>
+                            <li>個数を「+ / -」ボタンで調整できます。</li>
+                            <li>残りが少なくなったら<strong>「買い物リストに追加する」</strong>をタップして買い物リストへ転送できます</li>
+                        </ul>
+                    </div>
                 </div>
 
-                <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
-                    <strong style="color: var(--primary-color); display: block; margin-bottom: 4px;">📅 賞味期限の管理と並び替え</strong>
-                    食材を登録すると、各カテゴリ（冷蔵・冷凍・野菜など）ごとに賞味期限が近い順に自動的に並び変わります。
-                    <span style="font-size: 0.8rem; display: block; margin-top: 2px; color: var(--sub-text);">※期限まで残り「2日以下」になると黄色の注意表示、当日または期限が切れると赤い「警告表示」でお知らせします。</span>
+                <div class="help-card">
+                    <div class="help-card-title">
+                        <span class="material-icons-round">event_available</span>
+                        賞味期限の自動ソート＆警告
+                    </div>
+                    <div class="help-card-text">
+                        各カテゴリ内で<strong>賞味期限が近い順</strong>に自動で並び変わります。
+                        <span class="help-note">※期限まで残り2日以下で黄色表示、当日または期限切れで赤色の警告が表示されます。</span>
+                    </div>
                 </div>
 
-                <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
-                    <strong style="color: var(--primary-color); display: block; margin-bottom: 4px;">↕️ 保管場所（カテゴリ）の並び替え</strong>
-                    各カテゴリ名の左端にある <strong>アイコン (⋮⋮)</strong> をドラッグすることで、カテゴリ位置を上下に並び替えることができます。よくチェックする場所（例：冷蔵室や野菜室など）を一番上に持ってくると便利です。
+                <div class="help-card">
+                    <div class="help-card-title">
+                        <span class="material-icons-round">drag_indicator</span>
+                        保管場所（カテゴリ）の並び替え
+                    </div>
+                    <div class="help-card-text">
+                        各カテゴリの左側にある <strong>ドラッグアイコン (⋮⋮)</strong> を長押しして上下に動かすことで、使いやすい順番に変更できます。
+                    </div>
                 </div>
 
-                <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
-                    <strong style="color: var(--primary-color); display: block; margin-bottom: 4px;">🎨 カテゴリごとの色分け</strong>
-                    各カテゴリ名右端のパレットボタン (🎨) から、カテゴリボックス全体の背景色を好きな色にカスタマイズできます。
+                <div class="help-card">
+                    <div class="help-card-title">
+                        <span class="material-icons-round">palette</span>
+                        カテゴリカラーのカスタマイズ
+                    </div>
+                    <div class="help-card-text">
+                        各カテゴリ右上の <strong>パレットアイコン (🎨)</strong> を押すことで、お好みの色に自由に枠カラーをカスタマイズできます。
+                    </div>
                 </div>
 
-                <div>
-                    <strong style="color: var(--primary-color); display: block; margin-bottom: 4px;">⚡ 入力の手間を減らすマスター機能</strong>
-                    一度登録した「食材の名前」と「保管場所（カテゴリ）」は自動でマスターデータに記憶されます。次回以降、同じ食材名を入力すると自動で保管場所（冷蔵・冷凍・野菜など）がセレクトボックスに反映されるため、2回目以降の入力が楽になります。
+                <div class="help-card">
+                    <div class="help-card-title">
+                        <span class="material-icons-round">bolt</span>
+                        入力が楽になるマスター記憶機能
+                    </div>
+                    <div class="help-card-text">
+                        一度登録した「食材名」と「保管場所」は保存されます。次回以降、名前を入力するだけで保管場所が自動入力されます。
+                    </div>
                 </div>
+
             </div>
             
-            <button class="modal-close-btn" onclick="closeHelpModal()" style="margin-top: 12px; width: 100%;">閉じる</button>
+            <button class="modal-close-btn" onclick="closeHelpModal()" style="margin-top:0; width:100%;">閉じる</button>
         </div>
     </div>
 
@@ -934,14 +1062,13 @@
             document.getElementById('sheetItemTitle').textContent = item.name;
             document.getElementById('sheetQtyVal').textContent = item.quantity || 1;
             
-            const overlay = document.getElementById('actionSheetOverlay');
-            overlay.classList.add('active');
+            document.getElementById('actionSheetOverlay').classList.add('active');
+            document.getElementById('actionSheet').classList.add('active');
         }
 
-        function closeActionSheet(e) {
-            if (e && e.target !== document.getElementById('actionSheetOverlay')) return;
-            const overlay = document.getElementById('actionSheetOverlay');
-            overlay.classList.remove('active');
+        function closeActionSheet() {
+            document.getElementById('actionSheetOverlay').classList.remove('active');
+            document.getElementById('actionSheet').classList.remove('active');
             selectedSheetItemId = null;
         }
 
