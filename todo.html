@@ -828,6 +828,10 @@
             background: var(--active-color) !important;
             border-color: var(--active-color) !important;
         }
+
+        body.modal-open {
+            overflow: hidden;
+        }
     </style>
 </head>
 <body>
@@ -1041,10 +1045,12 @@
             window.openSettingsModal = function() {
                 updateThemeModalUi();
                 document.getElementById('settingsModal').style.display = 'flex';
+                document.body.classList.add('modal-open');
             }
 
             window.closeSettingsModal = function() {
                 document.getElementById('settingsModal').style.display = 'none';
+                document.body.classList.remove('modal-open');
             }
 
             window.selectThemeSetting = function(theme) {
@@ -1060,10 +1066,12 @@
 
             window.openHelpModal = function() {
                 document.getElementById('helpModal').style.display = 'flex';
+                document.body.classList.add('modal-open');
             }
 
             window.closeHelpModal = function() {
                 document.getElementById('helpModal').style.display = 'none';
+                document.body.classList.remove('modal-open');
             }
 
             function updateThemeModalUi() {
@@ -1468,6 +1476,7 @@
                 updateCategoryDropdowns();
                 document.getElementById('customDropdownList').style.display = 'none'; 
                 document.getElementById('taskModal').style.display = 'flex';
+                document.body.classList.add('modal-open');
             }
 
             function openEditModal(id) {
@@ -1495,10 +1504,12 @@
                 updateCategoryDropdowns();
                 document.getElementById('customDropdownList').style.display = 'none'; 
                 document.getElementById('taskModal').style.display = 'flex';
+                document.body.classList.add('modal-open');
             }
 
             window.closeModal = function() {
                 document.getElementById('taskModal').style.display = 'none';
+                document.body.classList.remove('modal-open');
             }
 
             function saveTodo() {
@@ -1553,11 +1564,13 @@
                 activeMenuTodoId = id;
                 document.getElementById('menuModalTitle').textContent = `「${name}」の操作`;
                 document.getElementById('actionMenuModal').style.display = 'flex';
+                document.body.classList.add('modal-open');
             }
 
             window.closeActionMenu = function() {
                 document.getElementById('actionMenuModal').style.display = 'none';
                 activeMenuTodoId = null;
+                document.body.classList.remove('modal-open');
             }
 
             window.triggerEdit = function() {

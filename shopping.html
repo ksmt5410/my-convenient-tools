@@ -18,7 +18,7 @@
             --bg-color: #f8f9fa;
             --panel-bg: #ffffff;
             --text-color: #202124;
-            --sub-text: #5f6368;
+            --sub-text: #202124;
             --border-color: #e8eaed;
             --primary-color: #2563eb;  
             --primary-bg: #eff6ff;
@@ -33,7 +33,7 @@
             --bg-color: #121212;
             --panel-bg: #1e1e1e;
             --text-color: #e8eaed;
-            --sub-text: #9aa0a6;
+            --sub-text: #e8eaed;
             --border-color: #2f3134;
             --primary-color: #3b82f6;
             --primary-bg: #1e3a8a;
@@ -716,6 +716,10 @@
             width: 100%;
             margin-top: 0;
         }
+
+        body.modal-open {
+            overflow: hidden;
+        }
     </style>
 </head>
 <body>
@@ -817,7 +821,7 @@
             <div class="help-modal-body">
                 <div class="help-section">
                     <div class="help-title">
-                        <span class="material-symbols-outlined">add</span>
+                        <span class="material-symbols-outlined"></span>
                         ➕ アイテムの追加・予測</div>
                     <div class="help-desc">
                         名前を入力すると、過去に登録した「単価」や「カテゴリ」を自動で補完します。カテゴリは一覧からの選択も可能です。
@@ -936,6 +940,7 @@
             document.getElementById('themeLight').checked = (themeSetting === 'light');
             document.getElementById('themeDark').checked = (themeSetting === 'dark');
             document.getElementById('themeModal').style.display = 'flex';
+            document.body.classList.add('modal-open');
         }
 
         function changeThemeSetting(newSetting) {
@@ -946,6 +951,7 @@
 
         function closeThemeModal() {
             document.getElementById('themeModal').style.display = 'none';
+            document.body.classList.remove('modal-open');
         }
 
         applyCurrentTheme();
@@ -1236,6 +1242,7 @@
 
             document.getElementById('bottomSheetOverlay').classList.add('active');
             document.getElementById('bottomSheet').classList.add('active');
+            document.body.classList.add('modal-open');
         }
 
         // ボトムシートを閉じる
@@ -1243,6 +1250,7 @@
             document.getElementById('bottomSheetOverlay').classList.remove('active');
             document.getElementById('bottomSheet').classList.remove('active');
             activeSheetItemId = null;
+            document.body.classList.remove('modal-open');
         }
 
         // 数量切り替え関数
@@ -1733,11 +1741,13 @@
             document.getElementById('priceModal').style.display = 'flex';
             
             setTimeout(() => document.getElementById('modalPriceInput').focus(), 50);
+            document.body.classList.add('modal-open');
         }
 
         function closePriceModal() {
             document.getElementById('priceModal').style.display = 'none';
             currentEditingItemId = null;
+            document.body.classList.remove('modal-open');
         }
 
         function savePriceModal() {
@@ -1769,9 +1779,11 @@
         
         function openHelpModal() {
             document.getElementById('helpModal').style.display = 'flex';
+            document.body.classList.add('modal-open');
         }
         function closeHelpModal() {
             document.getElementById('helpModal').style.display = 'none';
+            document.body.classList.remove('modal-open');
         }
 
         function checkFirstVisitHelp() {

@@ -253,6 +253,10 @@
             border: none;
             margin-top: 8px;
         }
+
+        body.modal-open {
+            overflow: hidden;
+        }
     </style>
 </head>
 <body>
@@ -391,13 +395,16 @@
             document.getElementById('themeLight').checked = (themeSetting === 'light');
             document.getElementById('themeDark').checked = (themeSetting === 'dark');
             document.getElementById('themeModal').style.display = 'flex';
+            document.body.classList.add('modal-open');
         }
         // ❔ ヘルプモーダルの開閉処理
         function openHelpModal() {
             document.getElementById('helpModal').style.display = 'flex';
+            document.body.classList.add('modal-open');
         }
         function closeHelpModal() {
             document.getElementById('helpModal').style.display = 'none';
+            document.body.classList.remove('modal-open');
         }
 
         // 🚀 【新規追加】初回起動時のみヘルプを自動的に表示する処理

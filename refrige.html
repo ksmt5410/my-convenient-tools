@@ -35,7 +35,7 @@
             --bg-color: #121212;
             --panel-bg: #1e1e1e;
             --text-color: #e8eaed;
-            --sub-text: #9aa0a6;
+            --sub-text: #e8eaed;
             --border-color: #2f3134;
             --primary-color: #3b82f6;
             --primary-bg: #1a233a;
@@ -53,13 +53,12 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
-            padding-top: 60px; /* 📌 ヘッダー固定に伴う上の余白 */
-            padding-bottom: 30px; /* 📌 下の余白を少し縮小 */
+            padding-top: 60px;
+            padding-bottom: 30px;
             user-select: none;
             -webkit-user-select: none;
         }
 
-        /* 📌 ヘッダーの固定 */
         header {
             position: fixed;
             top: 0;
@@ -68,7 +67,7 @@
             z-index: 100;
             box-sizing: border-box;
             background-color: var(--panel-bg);
-            padding: 10px 16px; /* 📌 パディングを少しスマートに */
+            padding: 10px 16px;
             border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
@@ -90,7 +89,7 @@
         .back-btn:active { background: var(--history-bg); }
 
         .header-title {
-            font-size: 1.1rem; /* 📌 少し縮小 */
+            font-size: 1.1rem;
             font-weight: 600;
             flex: 1;
             letter-spacing: 0.5px;
@@ -124,19 +123,19 @@
 
         .container {
             max-width: 480px;
-            margin: 12px auto; /* 📌 マージンを小さく調整 */
-            padding: 0 12px; /* 📌 左右余白を削減 */
+            margin: 12px auto;
+            padding: 0 12px;
             box-sizing: border-box;
         }
 
         .input-panel {
             background-color: var(--panel-bg);
-            padding: 12px; /* 📌 パディングを小さく */
+            padding: 12px;
             border-radius: 14px;
             box-shadow: var(--shadow);
             display: flex;
             flex-direction: column;
-            gap: 8px; /* 📌 隙間をスマートに */
+            gap: 8px;
             margin-bottom: 12px;
             user-select: auto;
             -webkit-user-select: auto;
@@ -144,12 +143,12 @@
 
         .input-row {
             display: flex;
-            gap: 8px; /* 📌 隙間をスマートに */
+            gap: 8px;
             width: 100%;
         }
 
         input, select {
-            padding: 10px 12px; /* 📌 インプットの上下の高さをスマートに */
+            padding: 10px 12px;
             border-radius: 8px;
             border: 1px solid var(--border-color);
             background: var(--bg-color); 
@@ -187,7 +186,7 @@
 
         .date-input-wrapper input {
             width: 100%;
-            height: 42px; /* 📌 高さをスマートに */
+            height: 42px;
             border: none !important;
             background: transparent !important;
             padding: 0 36px 0 10px;
@@ -211,7 +210,7 @@
         .add-btn {
             background-color: var(--primary-color);
             color: #ffffff;
-            width: 42px; /* 📌 インプットの高さに合わせて調整 */
+            width: 42px;
             height: 42px;
             display: flex;
             align-items: center;
@@ -229,12 +228,13 @@
         /* === 📦 カテゴリーボックス === */
         .category-group-box {
             background-color: var(--panel-bg);
-            border-radius: 12px; /* 📌 丸みをスマートに */
-            padding: 10px 12px; /* 📌 内側余白を縮小 */
-            margin-bottom: 10px; /* 📌 ボックス間の隙間を縮小 */
+            border-radius: 12px;
+            padding: 10px 12px;
+            margin-bottom: 10px;
             box-shadow: var(--shadow);
             position: relative;
-            touch-action: none;
+            /* 🔧 スクロールを阻害しないように touch-action: pan-y に修正 */
+            touch-action: pan-y;
             transition: border-color 0.2s, background-color 0.2s;
             border: 2px solid transparent;
         }
@@ -251,7 +251,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 8px; /* 📌 隙間を削減 */
+            margin-bottom: 8px;
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 6px;
         }
@@ -269,11 +269,13 @@
             display: flex;
             align-items: center;
             padding: 2px;
+            /* ドラッグ用アイコン部分のみタッチアクションを制限 */
+            touch-action: none;
         }
         .drag-handle:active { cursor: grabbing; }
 
         .category-title-text {
-            font-size: 0.95rem; /* 📌 わずかにスマートに */
+            font-size: 0.95rem;
             color: var(--text-color);
             font-weight: 700;
             letter-spacing: 0.5px;
@@ -302,8 +304,8 @@
 
         .fridge-list {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); /* 📌 グリッド幅を微調整 */
-            gap: 8px; /* 📌 カード同士の隙間を縮小 */
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 8px;
             min-height: 40px;
         }
 
@@ -321,11 +323,11 @@
         /* === 📝 食材カード === */
         .fridge-item {
             background-color: var(--bg-color);
-            padding: 8px 10px; /* 📌 カードの余白をスリムに */
+            padding: 8px 10px;
             border-radius: 8px;
             display: flex;
             flex-direction: column;
-            gap: 4px; /* 📌 内側の隙間を微調整 */
+            gap: 4px;
             box-sizing: border-box;
             border: 1px solid var(--border-color);
             cursor: pointer;
@@ -339,7 +341,7 @@
 
         .item-name { 
             font-weight: 700; 
-            font-size: 0.9rem; /* 📌 少しスマートに */
+            font-size: 0.9rem;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -493,7 +495,6 @@
             font-weight: 800;
         }
 
-        /* 通常モーダル（共通） */
         .modal {
             display: none;
             position: fixed;
@@ -545,7 +546,6 @@
             margin-top: 8px;
         }
 
-        /* 💡 洗練されたヘルプモーダル専用スタイル */
         .help-modal-content {
             max-width: 400px !important;
             max-height: 85vh;
@@ -589,7 +589,6 @@
             margin-bottom: 16px;
         }
 
-        /* スクロールバーのカスタマイズ */
         .help-scroll-area::-webkit-scrollbar {
             width: 5px;
         }
@@ -645,6 +644,10 @@
             opacity: 0.85;
         }
 
+        body.modal-open {
+            overflow: hidden;
+        }
+
         @keyframes fadeInItem {
             from { opacity: 0; transform: translateY(6px); }
             to { opacity: 1; transform: translateY(0); }
@@ -659,13 +662,10 @@
         </button>
         <div class="header-title" style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">冷蔵庫在庫リスト</div>
         
-        <!-- 🛠️ 右側のアクションボタンをグループ化 -->
         <div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
-            <!-- ❔ ヘルプボタン -->
             <button class="settings-btn" onclick="openHelpModal()" title="ヘルプを見る">
                 <span class="material-icons-round" style="font-size: 1.35rem;">help_outline</span>
             </button>
-            <!-- ⚙️ 設定ボタン -->
             <button class="settings-btn" onclick="openThemeModal()" title="画面モードの設定">
                 <svg class="icon-svg" viewBox="0 0 24 24">
                     <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
@@ -712,7 +712,6 @@
         <div class="sheet-title" id="sheetItemTitle">食材の名前</div>
         
         <div class="sheet-grid">
-            <!-- 数量調整パネル -->
             <div class="sheet-qty-panel">
                 <span style="font-weight:700; font-size:0.95rem; color:var(--sub-text);">個数調整</span>
                 <div style="display:flex; align-items:center; gap:20px;">
@@ -722,19 +721,16 @@
                 </div>
             </div>
 
-            <!-- 買い物かごに入れる -->
             <button class="sheet-btn sheet-btn-cart" onclick="triggerCartFromSheet()">
                 <span class="material-icons-round">shopping_cart</span>
                 <span>買い物リストに追加する</span>
             </button>
 
-            <!-- 編集する -->
             <button class="sheet-btn" onclick="triggerEditFromSheet()">
                 <span class="material-icons-round">edit</span>
                 <span>賞味期限・保管場所を編集</span>
             </button>
 
-            <!-- 削除する -->
             <button class="sheet-btn sheet-btn-danger" onclick="triggerDeleteFromSheet()">
                 <span class="material-icons-round">delete</span>
                 <span>この食材を削除</span>
@@ -822,7 +818,7 @@
         </div>
     </div>
 
-    <!-- ❔ 洗練されたスタイルのヘルプモーダル -->
+    <!-- ❔ ヘルプモーダル -->
     <div class="modal" id="helpModal">
         <div class="modal-content help-modal-content">
             <div class="help-modal-header">
@@ -875,7 +871,7 @@
                         カテゴリカラーのカスタマイズ
                     </div>
                     <div class="help-card-text">
-                        各カテゴリ右上の <strong>パレットアイコン (🎨)</strong> を押すことで、お好みの色に自由に枠カラーをカスタマイズできます。
+                        各カテゴリ右上の「<span class="material-icons-round" style="font-size:0.9rem; vertical-align:middle;">palette</span>」を押すことで、お好みの色に自由に枠カラーをカスタマイズできます。
                     </div>
                 </div>
 
@@ -906,10 +902,7 @@
         let activeMenuCategory = null;
         let currentEditingItemId = null;
         
-        // 操作選択用のアイテム
         let selectedSheetItemId = null;
-
-        // カート用ステート
         let currentCartTargetItem = null;
         let cartTargetQty = 1;
 
@@ -955,6 +948,7 @@
             document.getElementById('themeLight').checked = (themeSetting === 'light');
             document.getElementById('themeDark').checked = (themeSetting === 'dark');
             document.getElementById('themeModal').style.display = 'flex';
+            document.body.classList.add('modal-open');
         }
 
         function changeThemeSetting(newSetting) {
@@ -965,6 +959,7 @@
 
         function closeThemeModal() {
             document.getElementById('themeModal').style.display = 'none';
+            document.body.classList.remove('modal-open');
         }
 
         applyCurrentTheme();
@@ -1053,7 +1048,6 @@
             render();
         }
 
-        /* === 📱 ボトムシートを開く / 閉じる === */
         function openActionSheet(id) {
             const item = fridgeItems.find(i => i.id === id);
             if (!item) return;
@@ -1064,15 +1058,16 @@
             
             document.getElementById('actionSheetOverlay').classList.add('active');
             document.getElementById('actionSheet').classList.add('active');
+            document.body.classList.add('modal-open');
         }
 
         function closeActionSheet() {
             document.getElementById('actionSheetOverlay').classList.remove('active');
             document.getElementById('actionSheet').classList.remove('active');
             selectedSheetItemId = null;
+            document.body.classList.remove('modal-open');
         }
 
-        // ボトムシート内：数量変更
         function changeSheetQty(change) {
             if (!selectedSheetItemId) return;
             const item = fridgeItems.find(i => i.id === selectedSheetItemId);
@@ -1091,7 +1086,6 @@
             }
         }
 
-        // ボトムシート内：編集トリガー
         function triggerEditFromSheet() {
             const tempId = selectedSheetItemId;
             closeActionSheet();
@@ -1100,7 +1094,6 @@
             }, 200);
         }
 
-        // ボトムシート内：削除トリガー
         function triggerDeleteFromSheet() {
             if (!selectedSheetItemId) return;
             if (confirm("この食材を削除しますか？")) {
@@ -1111,7 +1104,6 @@
             }
         }
 
-        // ボトムシート内：買い物かごトリガー
         function triggerCartFromSheet() {
             const tempId = selectedSheetItemId;
             closeActionSheet();
@@ -1120,7 +1112,6 @@
             }, 200);
         }
 
-        /* === ✍️ 食材編集モーダル機能 === */
         function openEditModal(id) {
             const item = fridgeItems.find(i => i.id === id);
             if (!item) return;
@@ -1138,10 +1129,12 @@
             }
 
             document.getElementById('editItemModal').style.display = 'flex';
+            document.body.classList.add('modal-open');
         }
 
         function closeEditModal() {
             document.getElementById('editItemModal').style.display = 'none';
+            document.body.classList.remove('modal-open');
             currentEditingItemId = null;
         }
 
@@ -1165,7 +1158,6 @@
             closeEditModal();
         }
 
-        /* === 🛒 買い物かごモーダル処理 === */
         function openCartModal(id) {
             const item = fridgeItems.find(i => i.id === id);
             if (!item) return;
@@ -1176,10 +1168,12 @@
             document.getElementById('cartModalTitle').textContent = `「${item.name}」をカゴへ`;
             document.getElementById('cartModalQtyVal').textContent = cartTargetQty;
             document.getElementById('cartAddModal').style.display = 'flex';
+            document.body.classList.add('modal-open');
         }
 
         function closeCartModal() {
             document.getElementById('cartAddModal').style.display = 'none';
+            document.body.classList.remove('modal-open');
             currentCartTargetItem = null;
         }
 
@@ -1283,6 +1277,9 @@
            ========================================================= */
         let dragBoxSrc = null;
         let touchBoxStart = null;
+        let draggedItemId = null;
+        let touchDraggedItemEl = null;
+        let touchDraggedItemId = null;
 
         function handleBoxDragStart(e) {
             this.classList.add('dragging-box');
@@ -1298,8 +1295,19 @@
             this.style.borderTop = '3px dashed var(--primary-color)';
         }
         function handleBoxDragLeave() { this.style.borderTop = ''; }
+
         function handleBoxDrop(e) {
             if (e.stopPropagation) e.stopPropagation();
+
+            // 1. 商品がドロップされた場合
+            if (draggedItemId) {
+                const targetCat = this.getAttribute('data-category');
+                moveItemToCategory(draggedItemId, targetCat);
+                draggedItemId = null;
+                return false;
+            }
+
+            // 2. カテゴリー自体がドロップされた場合（既存処理）
             if (dragBoxSrc && dragBoxSrc !== this) {
                 const srcCat = dragBoxSrc.getAttribute('data-category');
                 const targetCat = this.getAttribute('data-category');
@@ -1312,7 +1320,6 @@
             document.querySelectorAll('.category-group-box').forEach(el => el.style.borderTop = '');
         }
 
-        // スマホ用カテゴリー移動ハンドラ
         function handleBoxTouchStart(e) {
             if (!e.target.closest('.drag-handle')) return;
             touchBoxStart = this;
@@ -1360,15 +1367,15 @@
             }
         }
 
-        // ❔ ヘルプモーダルの開閉
         function openHelpModal() {
             document.getElementById('helpModal').style.display = 'flex';
+            document.body.classList.add('modal-open');
         }
         function closeHelpModal() {
             document.getElementById('helpModal').style.display = 'none';
+            document.body.classList.remove('modal-open');
         }
 
-        // 初回起動時ヘルプチェック
         function checkFirstVisitHelp() {
             const hasVisited = localStorage.getItem('has_visited_refrige_help') === 'true';
             if (!hasVisited) {
@@ -1376,7 +1383,87 @@
                 localStorage.setItem('has_visited_refrige_help', 'true');
             }
         }
+        /* =========================================================
+        🥩 食材（商品）単体のドラッグ＆ドロップ機能
+        ========================================================= */
 
+        // --- PC版 (HTML5 Drag & Drop) ---
+        function handleItemDragStart(e) {
+            // ⚠️ これが最重要：親要素（カテゴリー）のドラッグ発動を止める！
+            e.stopPropagation(); 
+            draggedItemId = this.getAttribute('data-id');
+            e.dataTransfer.setData('text/plain', draggedItemId);
+            e.dataTransfer.effectAllowed = 'move';
+            this.style.opacity = '0.5';
+        }
+
+        function handleItemDragEnd(e) {
+            e.stopPropagation();
+            this.style.opacity = '1';
+            draggedItemId = null;
+        }
+
+        // --- スマホ版 (Touch Events) ---
+        function handleItemTouchStart(e) {
+            e.stopPropagation(); // カテゴリー側のタッチイベント発動を防止
+            touchDraggedItemId = this.getAttribute('data-id');
+            touchDraggedItemEl = this;
+            this.style.opacity = '0.5';
+        }
+
+        function handleItemTouchMove(e) {
+            if (!touchDraggedItemId) return;
+            e.preventDefault(); // スクロールを一時停止
+
+            const touch = e.touches[0];
+            const target = document.elementFromPoint(touch.clientX, touch.clientY);
+            
+            // ホバー中のカテゴリーボックスをハイライト
+            document.querySelectorAll('.category-group-box').forEach(el => el.classList.remove('drag-hover-box'));
+            if (target) {
+                const boxEl = target.closest('.category-group-box');
+                if (boxEl) boxEl.classList.add('drag-hover-box');
+            }
+        }
+
+        function handleItemTouchEnd(e) {
+            if (!touchDraggedItemId) return;
+            e.stopPropagation();
+
+            if (touchDraggedItemEl) touchDraggedItemEl.style.opacity = '1';
+            document.querySelectorAll('.category-group-box').forEach(el => el.classList.remove('drag-hover-box'));
+
+            const touch = e.changedTouches[0];
+            const target = document.elementFromPoint(touch.clientX, touch.clientY);
+
+            if (target) {
+                const boxEl = target.closest('.category-group-box');
+                if (boxEl) {
+                    const targetCategory = boxEl.getAttribute('data-category');
+                    moveItemToCategory(touchDraggedItemId, targetCategory);
+                }
+            }
+
+            touchDraggedItemId = null;
+            touchDraggedItemEl = null;
+        }
+
+        // 食材のカテゴリーを変更して再描画する共通関数
+        function moveItemToCategory(itemId, newCategory) {
+            const item = fridgeItems.find(i => i.id === itemId);
+            if (item && item.category !== newCategory) {
+                item.category = newCategory;
+
+                // マスター側の保管場所も更新
+                const masterIdx = fridgeMaster.findIndex(m => m.name === item.name);
+                if (masterIdx !== -1) {
+                    fridgeMaster[masterIdx].category = newCategory;
+                }
+
+                saveToStorage();
+                render();
+            }
+        }
         checkFirstVisitHelp();
 
         /* =========================================================
@@ -1447,7 +1534,18 @@
                     catItems.forEach(item => {
                         const div = document.createElement('div');
                         div.className = 'fridge-item';
+                        div.setAttribute('data-id', item.id);
                         div.setAttribute('onclick', `openActionSheet('${item.id}')`);
+
+                        // ➕ PC用ドラッグイベントを追加
+                        div.draggable = true;
+                        div.addEventListener('dragstart', handleItemDragStart, false);
+                        div.addEventListener('dragend', handleItemDragEnd, false);
+
+                        // ➕ スマホ用タッチイベントを追加
+                        div.addEventListener('touchstart', handleItemTouchStart, {passive: false});
+                        div.addEventListener('touchmove', handleItemTouchMove, {passive: false});
+                        div.addEventListener('touchend', handleItemTouchEnd, false);
 
                         const status = getExpiryStatus(item.expiry);
                         const expiryTextToShow = item.expiry ? item.expiry.substring(5) : '-'; 
