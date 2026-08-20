@@ -1,0 +1,1802 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5795069269656881"
+     crossorigin="anonymous"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>お買い物リスト</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
+
+    <style>
+        /* === 🎨 カラー変数の設定 === */
+        :root {
+            --bg-color: #f8f9fa;
+            --panel-bg: #ffffff;
+            --text-color: #202124;
+            --sub-text: #202124;
+            --border-color: #e8eaed;
+            --primary-color: #2563eb;  
+            --primary-bg: #eff6ff;
+            --danger-bg: #fce8e6;
+            --danger-text: #d93025;
+            --history-bg: #f1f3f4;
+            --modal-option-bg: #f1f3f4;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #121212;
+            --panel-bg: #1e1e1e;
+            --text-color: #e8eaed;
+            --sub-text: #e8eaed;
+            --border-color: #2f3134;
+            --primary-color: #3b82f6;
+            --primary-bg: #1e3a8a;
+            --danger-bg: #b71c1c;
+            --danger-text: #ef9a9a;
+            --history-bg: #2d2d2d;
+            --modal-option-bg: #2d2d2d;
+            --shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-top: 60px;
+            padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px)); /* スマホのセーフエリアも考慮 */
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* 📌 ヘッダーの固定 */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+            box-sizing: border-box;
+            background-color: var(--panel-bg);
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .back-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            border-radius: 50%;
+        }
+        .back-btn:active { background: var(--history-bg); }
+
+        .header-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            flex: 1;
+            letter-spacing: 0.5px;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .settings-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--sub-text);
+            border-radius: 50%;
+        }
+        .settings-btn:active { background: var(--history-bg); }
+
+        .icon-svg {
+            width: 1.25rem;
+            height: 1.25rem;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            pointer-events: none;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: var(--panel-bg);
+            padding: 24px;
+            border-radius: 20px;
+            width: 85%;
+            max-width: 360px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        .theme-option, .menu-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px;
+            border-radius: 12px;
+            background: var(--modal-option-bg);
+            cursor: pointer;
+            border: none;
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 0.95rem;
+            width: 100%;
+            box-sizing: border-box;
+            transition: transform 0.1s;
+        }
+        .menu-option:active {
+            transform: scale(0.98);
+            filter: brightness(0.95);
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 12px auto;
+            padding: 0 12px;
+            box-sizing: border-box;
+        }
+
+        .input-panel {
+            background-color: var(--panel-bg);
+            padding: 12px;
+            border-radius: 14px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+        }
+
+        input {
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-color); 
+            color: var(--text-color);
+            font-size: 0.95rem;
+            box-sizing: border-box;
+            min-width: 0;
+            outline: none;
+        }
+        input:focus {
+            border-color: var(--primary-color);
+        }
+
+        #itemName { flex: 2; min-width: 0; }
+        #itemPrice { flex: 1.1; min-width: 0; }
+        #itemQuantity { flex: 0.6; min-width: 0; }
+        
+        .category-combobox {
+            display: flex;
+            flex: 2; 
+            min-width: 0;
+            position: relative;
+        }
+        #itemCategory {
+            flex: 1;
+            width: 100%;
+            padding-right: 34px;
+        }
+        .combobox-arrow {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.8rem;
+            color: var(--sub-text);
+            pointer-events: none;
+        }
+
+        .custom-dropdown-list {
+            display: none;
+            position: absolute;
+            top: 105%;
+            left: 0;
+            width: 100%;
+            max-height: 150px;
+            overflow-y: auto;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 999;
+            box-sizing: border-box;
+            padding: 6px 0;
+        }
+        .custom-dropdown-item {
+            padding: 10px 14px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+        .custom-dropdown-item:active {
+            background-color: var(--primary-bg);
+        }
+
+        button {
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .add-btn {
+            background-color: var(--primary-color);
+            color: #ffffff;
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            padding: 0;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+        .add-btn:active { transform: scale(0.94); }
+        .add-btn .material-icons-round { font-size: 1.4rem; }
+
+        .summary-panel {
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+        }
+
+        .list-section-title {
+            font-size: 0.8rem;
+            color: var(--sub-text);
+            margin: 12px 0 6px 4px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        /* === 📦 カテゴリーボックス用スタイル === */
+        .category-group-box {
+            background-color: var(--panel-bg);
+            border-radius: 12px;
+            padding: 10px 12px;
+            margin-bottom: 10px;
+            box-shadow: var(--shadow);
+            position: relative;
+            touch-action: none;
+        }
+        .category-group-box.dragging-box {
+            opacity: 0.4;
+            border: 2px dashed var(--sub-text);
+        }
+
+        .category-group-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 6px;
+        }
+
+        .header-left-zone {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .drag-handle {
+            color: var(--sub-text);
+            cursor: grab;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            padding: 2px;
+        }
+        .drag-handle:active { cursor: grabbing; }
+
+        .category-title-text {
+            font-size: 0.95rem;
+            color: var(--text-color);
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .color-palette-btn {
+            background: transparent;
+            border: none;
+            color: var(--sub-text);
+            opacity: 0.6;
+            cursor: pointer;
+            padding: 4px 6px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            transition: opacity 0.2s, background-color 0.2s;
+        }
+        .color-palette-btn:hover { opacity: 1; background-color: var(--history-bg); }
+
+        .inline-color-input {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            opacity: 0;
+            padding: 0;
+            margin: 0;
+            border: none;
+            pointer-events: none;
+            visibility: hidden;
+        }
+
+        .shopping-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-height: 20px;
+        }
+
+        .shopping-item {
+            background-color: var(--bg-color);
+            padding: 8px 12px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: grab; 
+            touch-action: none; 
+            position: relative;
+            user-select: none;
+            -webkit-user-select: none;
+            max-height: 100px; 
+            overflow: hidden;
+            box-sizing: border-box;
+            transition: opacity 0.35s ease, transform 0.35s ease, max-height 0.35s ease, padding 0.35s ease, margin 0.35s ease;
+        }
+        .shopping-item:active { cursor: grabbing; }
+        .shopping-item.dragging {
+            opacity: 0.5;
+            background-color: var(--border-color);
+            border: 2px dashed var(--sub-text);
+        }
+
+        .shopping-item.checked {
+            opacity: 0.4;
+            cursor: default; 
+        }
+        .shopping-item.checked .item-name { text-decoration: line-through; color: var(--sub-text); }
+
+        .checkbox-area {
+            padding: 4px 6px 4px 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid var(--sub-text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+            flex-shrink: 0;
+            background-color: var(--panel-bg);
+        }
+        .checkbox .material-icons-round { font-size: 0.85rem; display: none; color: white; }
+        
+        .shopping-item.checked .checkbox {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        .shopping-item.checked .checkbox .material-icons-round { display: block; }
+
+        .item-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex: 1;
+            cursor: pointer;
+        }
+        .item-name { font-weight: 600; font-size: 0.95rem; }
+        .item-price { color: var(--sub-text); font-size: 0.85rem; font-weight: 600; }
+
+        .shopping-item.transitioning {
+            opacity: 0 !important;
+            transform: scale(0.95) translateY(-4px);
+            max-height: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+            border: none !important;
+        }
+
+        .history-panel {
+            margin-top: 24px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .history-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .history-chip {
+            background-color: var(--panel-bg);
+            color: var(--text-color);
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: var(--shadow);
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        .history-chip:active { transform: scale(0.95); }
+
+        /* 🛒 買い物完了ボタン固定エリア */
+        .fixed-bottom-actions {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 12px 16px 20px;
+            background: linear-gradient(to top, var(--bg-color) 80%, rgba(0,0,0,0));
+            z-index: 90;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .complete-shopping-btn {
+            width: 100%;
+            max-width: 480px;
+            background-color: var(--primary-color);
+            color: #ffffff;
+            padding: 14px 20px;
+            font-size: 1rem;
+            font-weight: 700;
+            border-radius: 30px;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        .complete-shopping-btn:active { transform: scale(0.98); }
+
+        .clear-btn-sub {
+            background-color: var(--danger-bg);
+            color: var(--danger-text);
+            padding: 8px 14px;
+            font-size: 0.8rem;
+            border-radius: 20px;
+        }
+
+        .modal-close-btn {
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            background: var(--primary-color); 
+            color: white;
+            font-weight: 700;
+            border: none;
+            margin-top: 8px;
+        }
+
+        /* === 📱 ボトムシート === */
+        .bottom-sheet-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(2px);
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.25s ease;
+            z-index: 1000;
+        }
+        .bottom-sheet-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .bottom-sheet {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: var(--panel-bg);
+            border-radius: 20px 20px 0 0;
+            padding: 20px 20px 32px;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.1, 0.9, 0.2, 1);
+            z-index: 1001;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+            max-width: 500px;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+        .bottom-sheet.active {
+            transform: translateY(0);
+        }
+        .sheet-handle {
+            width: 36px; height: 4px;
+            background: var(--sub-text);
+            opacity: 0.4;
+            border-radius: 2px;
+            margin: -6px auto 16px;
+        }
+        .sheet-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin: 0 0 16px 0;
+            text-align: center;
+        }
+        .sheet-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        /* トグルスイッチ */
+        .toggle-switch {
+            position: relative; width: 46px; height: 26px;
+        }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc; transition: .25s; border-radius: 26px;
+        }
+        .slider:before {
+            position: absolute; content: ""; height: 18px; width: 18px;
+            left: 4px; bottom: 4px; background-color: white; transition: .25s; border-radius: 50%;
+        }
+        input:checked + .slider { background-color: var(--primary-color); }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        .sheet-btn {
+            width: 100%; padding: 14px; border: none; border-radius: 12px;
+            font-size: 0.95rem; font-weight: bold; margin-top: 10px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+        }
+        .btn-edit { background: var(--modal-option-bg); color: var(--text-color); }
+        .btn-delete { background: var(--danger-bg); color: var(--danger-text); margin-top: 16px; }
+
+        @keyframes fadeInItem {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 📱 ボトムシート内の個数調整パネル（冷蔵庫リスト基準） */
+        .sheet-qty-panel {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--modal-option-bg);
+            padding: 12px 20px;
+            border-radius: 14px;
+            margin-bottom: 12px;
+        }
+
+        .sheet-qty-btn {
+            background: var(--panel-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        .sheet-qty-btn:active { transform: scale(0.9); }
+
+        .sheet-qty-val {
+            font-size: 1.3rem;
+            font-weight: 800;
+        }    
+        
+        /* === ❔ ヘルプモーダル専用スタイル === */
+        .help-modal-content {
+            max-width: 420px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            padding: 20px !important;
+            gap: 0 !important;
+        }
+
+        .help-modal-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+
+        .help-modal-body {
+            overflow-y: auto;
+            padding: 14px 4px 14px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            font-size: 0.88rem;
+            line-height: 1.5;
+            color: var(--text-color);
+        }
+
+        .help-section {
+            background: var(--bg-color);
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .help-title {
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 4px;
+            font-size: 0.9rem;
+        }
+
+        .help-desc {
+            color: var(--text-color);
+            font-size: 0.83rem;
+        }
+
+        .help-modal-footer {
+            padding-top: 12px;
+            border-top: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+
+        .help-modal-footer .modal-close-btn {
+            width: 100%;
+            margin-top: 0;
+        }
+
+        body.modal-open {
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <button class="back-btn" onclick="location.href='index.html'" title="トップへ戻る">
+            <span class="material-icons-round">arrow_back</span>
+        </button>
+        <div class="header-title">お買い物リスト</div>
+        
+        <div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
+            <button class="settings-btn" onclick="openHelpModal()" title="ヘルプを見る">
+                <span class="material-icons-round" style="font-size: 1.35rem;">help_outline</span>
+            </button>
+            <button class="settings-btn" onclick="openThemeModal()" title="画面モードの設定">
+                <svg class="icon-svg" viewBox="0 0 24 24">
+                    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="input-panel">
+            <div class="input-row">
+                <input type="text" id="itemName" placeholder="買うものを入力... (例: 牛肉)" oninput="matchHistoryData()" onkeypress="handleKeyPress(event)">
+                <input type="number" id="itemPrice" placeholder="￥単価(任意)" inputmode="numeric" onkeypress="handleKeyPress(event)">
+                <input type="number" id="itemQuantity" placeholder="数" min="1" value="1" inputmode="numeric" style="flex: 0.6; text-align: center;" onkeypress="handleKeyPress(event)">
+            </div>
+            <div class="input-row">
+                <div class="category-combobox">
+                    <input type="text" id="itemCategory" placeholder="カテゴリ (例: 冷蔵)" oninput="handleCategoryInput()" onclick="showCustomDropdown(event)" autocomplete="off">
+                    <span class="combobox-arrow">▼</span>
+                    <div id="customDropdownList" class="custom-dropdown-list"></div>
+                </div>
+                <button class="add-btn" onclick="addItem()">
+                    <span class="material-icons-round">add</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="summary-panel">
+            <span>カゴ内の合計 (概算):</span>
+            <span id="totalPrice" style="font-size: 1.2rem;">￥0</span>
+        </div>
+
+        <div class="list-section-title">買うものリスト</div>
+        <div id="listContainer"></div>
+
+        <div class="history-panel" id="historyPanel" style="display: none;">
+            <div class="list-section-title">よく買うもの（タップで追加）</div>
+            <div class="history-grid" id="historyGrid"></div>
+        </div>
+
+        <div style="text-align: right; margin-top: 16px; margin-bottom: 20px;">
+            <button class="clear-btn-sub" onclick="clearAll()">すべてのリストを消去</button>
+        </div>
+    </div>
+
+    <!-- 🛒 買い物完了（青色固定ボタン） -->
+    <div class="fixed-bottom-actions" id="fixedBottomActions" style="display: none;">
+        <button class="complete-shopping-btn" onclick="completeShopping()">
+            <span class="material-icons-round" style="font-size: 1.2rem;">shopping_cart_checkout</span>
+            買い物完了
+        </button>
+    </div>
+
+    <!-- テーマ設定モーダル -->
+    <div class="modal" id="themeModal">
+        <div class="modal-content">
+            <h3 style="margin:0 0 4px 0; font-size:1.1rem; font-weight:700;">画面モードの設定</h3>
+            <label class="theme-option" onclick="changeThemeSetting('auto')">
+                <span>システム設定に従う</span>
+                <input type="radio" name="themeGroup" id="themeAuto" checked>
+            </label>
+            <label class="theme-option" onclick="changeThemeSetting('light')">
+                <span>ライトモード</span>
+                <input type="radio" name="themeGroup" id="themeLight">
+            </label>
+            <label class="theme-option" onclick="changeThemeSetting('dark')">
+                <span>ダークモード</span>
+                <input type="radio" name="themeGroup" id="themeDark">
+            </label>
+            <button class="modal-close-btn" onclick="closeThemeModal()">閉じる</button>
+        </div>
+    </div>
+
+    <!-- ❔ ヘルプモーダル -->
+    <div class="modal" id="helpModal" onclick="closeHelpModal()">
+        <div class="modal-content help-modal-content" onclick="event.stopPropagation()">
+            <!-- ヘッダー -->
+            <div class="help-modal-header">
+                <span class="material-icons-round" style="color: var(--primary-color); font-size: 1.4rem;">help_outline</span>
+                <h3 style="margin: 0; font-size: 1.15rem; font-weight: bold;">使い方のヒント</h3>
+            </div>
+            
+            <!-- スクロール可能なコンテンツエリア -->
+            <div class="help-modal-body">
+                <div class="help-section">
+                    <div class="help-title">
+                        <span class="material-symbols-outlined"></span>
+                        ➕ アイテムの追加・予測</div>
+                    <div class="help-desc">
+                        名前を入力すると、過去に登録した「単価」や「カテゴリ」を自動で補完します。カテゴリは一覧からの選択も可能です。
+                    </div>
+                </div>
+
+                <div class="help-section">
+                    <div class="help-title">📱 タップで個数変更・詳細編集</div>
+                    <div class="help-desc">
+                        リストのアイテムをタップするとボトムシートが開き、<strong>個数の調整（＋ / −）</strong>や単価の変更、削除が行えます。
+                    </div>
+                </div>
+
+                <div class="help-section">
+                    <div class="help-title">↕️ 順番の並べ替え・カラー変更</div>
+                    <div class="help-desc">
+                        アイテムをドラッグすると並べ替えができます。カテゴリヘッダーの「<span class="material-icons-round" style="font-size:0.9rem; vertical-align:middle;">palette</span>」アイコンから、色を自由にカスタマイズ可能です。
+                    </div>
+                </div>
+
+                <div class="help-section">
+                    <div class="help-title">❄️ 冷蔵庫在庫アプリとの連動</div>
+                    <div class="help-desc">
+                        チェックを入れた状態で「<strong>買い物完了</strong>」を押すと、設定がONになっている食材が<strong>自動で冷蔵庫の在庫リストへ移動</strong>します。
+                    </div>
+                </div>
+
+                <div class="help-section">
+                    <div class="help-title">🏷️ よく買うもの（履歴）</div>
+                    <div class="help-desc">
+                        下部の「よく買うもの」チップをタップするだけで、ワンタップで買い物リストに追加できます。
+                    </div>
+                </div>
+            </div>
+
+            <!-- 下部固定の閉じるボタン -->
+            <div class="help-modal-footer">
+                <button class="modal-close-btn" onclick="closeHelpModal()">閉じる</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 📱 ボトムシート（アイテム詳細メニュー） -->
+    <div id="bottomSheetOverlay" class="bottom-sheet-overlay" onclick="closeBottomSheet()"></div>
+    <div id="bottomSheet" class="bottom-sheet">
+        <div class="sheet-handle"></div>
+        <h3 id="sheetTitle" class="sheet-title">アイテム名</h3>
+
+        <!-- 数量調整パネル（冷蔵庫リストと統一） -->
+        <div class="sheet-qty-panel">
+            <span style="font-weight:700; font-size:0.95rem; color:var(--sub-text);">個数調整</span>
+            <div style="display:flex; align-items:center; gap:20px;">
+                <button class="sheet-qty-btn" type="button" onclick="updateSheetQty(-1)">-</button>
+                <span class="sheet-qty-val" id="sheetQtyVal">1</span>
+                <button class="sheet-qty-btn" type="button" onclick="updateSheetQty(1)">+</button>
+            </div>
+        </div>
+
+        <div class="sheet-row">
+            <span>冷蔵庫在庫にも追加</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="sheetFridgeToggle" onchange="updateFridgePref()">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <button class="sheet-btn btn-edit" onclick="triggerPriceModalFromSheet()">
+            <span class="material-icons-round" style="font-size:1.1rem;">edit</span> カテゴリ・単価を編集
+        </button>
+        <button class="sheet-btn btn-delete" onclick="deleteSheetItem()">
+            <span class="material-icons-round" style="font-size:1.1rem;">delete</span> このアイテムを削除
+        </button>
+    </div>
+
+    <script>
+        let listItems = [];
+        let itemMaster = [];
+        let categoryColors = {};
+        let categoryOrder = [];
+        let fridgePrefsMaster = {}; // 個別トグル学習用
+        let themeSetting = localStorage.getItem('themeSetting') || 'auto';
+        let activeMenuCategory = null;
+        let activeSheetItemId = null;
+
+        const foodCategories = ['冷蔵', '冷凍', '野菜', '肉類', '魚類', '食品', '加工食品', '調味料', '乳製品', '飲料'];
+
+        try {
+            listItems = JSON.parse(localStorage.getItem('shopping_items')) || [];
+            itemMaster = JSON.parse(localStorage.getItem('shopping_master')) || [];
+            categoryColors = JSON.parse(localStorage.getItem('shopping_category_colors')) || {};
+            categoryOrder = JSON.parse(localStorage.getItem('shopping_category_order')) || [];
+            fridgePrefsMaster = JSON.parse(localStorage.getItem('fridge_prefs_master')) || {};
+        } catch(e) {
+            listItems = [];
+            itemMaster = [];
+            categoryColors = {};
+            categoryOrder = [];
+            fridgePrefsMaster = {};
+        }
+
+        function applyCurrentTheme() {
+            if (themeSetting === 'auto') {
+                const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                document.documentElement.setAttribute('data-theme', isSystemDark ? 'dark' : 'light');
+            } else {
+                document.documentElement.setAttribute('data-theme', themeSetting);
+            }
+        }
+        
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+            if (themeSetting === 'auto') applyCurrentTheme();
+        });
+
+        function openThemeModal() {
+            document.getElementById('themeAuto').checked = (themeSetting === 'auto');
+            document.getElementById('themeLight').checked = (themeSetting === 'light');
+            document.getElementById('themeDark').checked = (themeSetting === 'dark');
+            document.getElementById('themeModal').style.display = 'flex';
+            document.body.classList.add('modal-open');
+        }
+
+        function changeThemeSetting(newSetting) {
+            themeSetting = newSetting;
+            localStorage.setItem('themeSetting', themeSetting);
+            applyCurrentTheme();
+        }
+
+        function closeThemeModal() {
+            document.getElementById('themeModal').style.display = 'none';
+            document.body.classList.remove('modal-open');
+        }
+
+        applyCurrentTheme();
+
+        function saveToStorage() {
+            localStorage.setItem('shopping_items', JSON.stringify(listItems));
+            localStorage.setItem('shopping_master', JSON.stringify(itemMaster));
+            localStorage.setItem('shopping_category_colors', JSON.stringify(categoryColors));
+            localStorage.setItem('shopping_category_order', JSON.stringify(categoryOrder));
+            localStorage.setItem('fridge_prefs_master', JSON.stringify(fridgePrefsMaster));
+        }
+
+        function getFridgePreference(name, category) {
+            if (fridgePrefsMaster[name] !== undefined) {
+                return fridgePrefsMaster[name];
+            }
+            return foodCategories.includes(category);
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') addItem();
+        }
+
+        function getUniqueCategories() {
+            const fromMaster = itemMaster.map(m => m.category).filter(Boolean);
+            const fromList = listItems.map(i => i.category).filter(Boolean);
+            return [...new Set([...fromMaster, ...fromList])].filter(c => c !== 'なし');
+        }
+
+        function buildCustomDropdownList() {
+            const dropdown = document.getElementById('customDropdownList');
+            if (!dropdown) return;
+
+            const categories = getUniqueCategories();
+            const currentInputText = document.getElementById('itemCategory').value.trim().toLowerCase();
+
+            const filteredCategories = categories.filter(cat => {
+                if (!currentInputText) return true;
+                return cat.toLowerCase().includes(currentInputText);
+            });
+
+            dropdown.innerHTML = '';
+
+            if (filteredCategories.length === 0) {
+                dropdown.style.display = 'none';
+                return;
+            }
+
+            filteredCategories.forEach(cat => {
+                const item = document.createElement('div');
+                item.className = 'custom-dropdown-item';
+                item.textContent = cat;
+                
+                item.onclick = function(e) {
+                    e.stopPropagation();
+                    document.getElementById('itemCategory').value = cat;
+                    dropdown.style.display = 'none';
+                };
+                dropdown.appendChild(item);
+            });
+        }
+
+        function showCustomDropdown(e) {
+            e.stopPropagation();
+            buildCustomDropdownList();
+            const dropdown = document.getElementById('customDropdownList');
+            if (dropdown.children.length > 0) {
+                dropdown.style.display = 'block';
+            }
+        }
+
+        function handleCategoryInput() {
+            buildCustomDropdownList();
+            const dropdown = document.getElementById('customDropdownList');
+            if (dropdown.children.length > 0) {
+                dropdown.style.display = 'block';
+            } else {
+                dropdown.style.display = 'none';
+            }
+        }
+
+        document.addEventListener('click', function() {
+            const dropdown = document.getElementById('customDropdownList');
+            if (dropdown) dropdown.style.display = 'none';
+        });
+
+        function matchHistoryData() {
+            const currentName = document.getElementById('itemName').value.trim();
+            if (!currentName) return;
+
+            const found = itemMaster.find(m => m.name === currentName);
+            if (found) {
+                if (found.price > 0 && !document.getElementById('itemPrice').value) {
+                    document.getElementById('itemPrice').value = found.price;
+                }
+                if (found.category && found.category !== 'なし' && !document.getElementById('itemCategory').value) {
+                    document.getElementById('itemCategory').value = found.category;
+                }
+            }
+        }
+
+        function addItem() {
+            const nameInput = document.getElementById('itemName');
+            const priceInput = document.getElementById('itemPrice');
+            const qtyInput = document.getElementById('itemQuantity');
+            const catInput = document.getElementById('itemCategory');
+            
+            const name = nameInput.value.trim();
+            const price = parseInt(priceInput.value) || 0;
+            const quantity = parseInt(qtyInput.value) || 1;
+            const category = catInput.value.trim() || 'なし';
+
+            if (!name) return;
+
+            const newItem = {
+                id: Date.now().toString() + Math.random().toString(36).substr(2, 4),
+                name: name,
+                price: price,
+                quantity: quantity,
+                category: category,
+                isChecked: false
+            };
+
+            listItems.push(newItem);
+            updateMasterData(name, category, price);
+
+            if (category !== 'なし' && !categoryOrder.includes(category)) {
+                categoryOrder.push(category);
+            }
+
+            nameInput.value = '';
+            priceInput.value = '';
+            qtyInput.value = '1';
+            catInput.value = '';
+            nameInput.focus();
+
+            saveToStorage();
+            render();
+        }
+
+        function updateMasterData(name, category, price) {
+            const existingMasterIndex = itemMaster.findIndex(m => m.name === name);
+            if (existingMasterIndex === -1) {
+                itemMaster.push({ name: name, price: price, category: category });
+            } else {
+                itemMaster[existingMasterIndex].category = category;
+                if (price !== undefined && price > 0) itemMaster[existingMasterIndex].price = price;
+            }
+        }
+
+        function addFromHistory(name, price, category) {
+            const newItem = {
+                id: Date.now().toString() + Math.random().toString(36).substr(2, 4),
+                name: name,
+                price: price,
+                quantity: 1,
+                category: category || 'なし',
+                isChecked: false
+            };
+            listItems.push(newItem);
+
+            if (category && category !== 'なし' && !categoryOrder.includes(category)) {
+                categoryOrder.push(category);
+            }
+
+            saveToStorage();
+            render();
+        }
+
+        function toggleCheck(id) {
+            const item = listItems.find(i => i.id === id);
+            if (!item) return;
+
+            const element = document.getElementById(`shop-${id}`);
+            if (element) {
+                item.isChecked = !item.isChecked;
+                element.classList.toggle('checked', item.isChecked);
+                element.classList.add('transitioning');
+            }
+
+            setTimeout(() => {
+                saveToStorage();
+                render();
+            }, 350);
+        }
+
+        function deleteItem(id) {
+            listItems = listItems.filter(i => i.id !== id);
+            saveToStorage();
+            render();
+        }
+
+        function deleteMaster(name) {
+            event.stopPropagation();
+            if(confirm(`履歴から「${name}」を削除しますか？`)) {
+                itemMaster = itemMaster.filter(m => m.name !== name);
+                saveToStorage();
+                render();
+            }
+        }
+
+        /* 🛒 買い物完了（青ボタン）の処理 */
+        function completeShopping() {
+            const checkedItems = listItems.filter(i => i.isChecked);
+            
+            if (checkedItems.length === 0) {
+                alert('カゴの中（チェック済み）にアイテムがありません。');
+                return;
+            }
+
+            if (confirm(`カゴ内の ${checkedItems.length} 件のお買い物を完了しますか？`)) {
+                let fridgeItems = [];
+                let fridgeMaster = []; 
+                try {
+                    fridgeItems = JSON.parse(localStorage.getItem('fridge_items')) || [];
+                    fridgeMaster = JSON.parse(localStorage.getItem('fridge_master')) || [];
+                } catch(e) {
+                    fridgeItems = [];
+                    fridgeMaster = [];
+                }
+
+                let addedCount = 0;
+
+                checkedItems.forEach(item => {
+                    // 「冷蔵庫に追加」がONのアイテムのみ登録
+                    if (getFridgePreference(item.name, item.category)) {
+                        let mappedCategory = 'その他';
+                        
+                        if (['冷蔵', '冷凍', '野菜'].includes(item.category)) {
+                            mappedCategory = item.category;
+                        } else if (['肉類', '魚類', '食品', '調味料', '乳製品'].includes(item.category)) {
+                            mappedCategory = '冷蔵';
+                        }
+
+                        const newFridgeItem = {
+                            id: Date.now().toString() + Math.random().toString(36).substr(2, 4),
+                            name: item.name,
+                            category: mappedCategory,
+                            expiry: '' 
+                        };
+                        fridgeItems.push(newFridgeItem);
+
+                        const existingMasterIndex = fridgeMaster.findIndex(m => m.name === item.name);
+                        if (existingMasterIndex === -1) {
+                            fridgeMaster.push({ name: item.name, category: mappedCategory });
+                        } else {
+                            fridgeMaster[existingMasterIndex].category = mappedCategory;
+                        }
+                        addedCount++;
+                    }
+                });
+
+                localStorage.setItem('fridge_items', JSON.stringify(fridgeItems));
+                localStorage.setItem('fridge_master', JSON.stringify(fridgeMaster));
+                localStorage.setItem('refrigerator_badge_count', fridgeItems.length);
+
+                listItems = listItems.filter(i => !i.isChecked);
+                saveToStorage();
+                render();
+                
+                alert(`お買い物が完了しました！\n（${addedCount}件の食材を冷蔵庫に移動しました）`);
+            }
+        }
+
+        function clearAll() {
+            if(confirm('今日の買い物リストをすべて空にしますか？')) {
+                listItems = [];
+                saveToStorage();
+                render();
+            }
+        }
+
+        // ボトムシートを開く
+        function openBottomSheet(id) {
+            const item = listItems.find(i => i.id === id);
+            if (!item) return;
+
+            activeSheetItemId = id;
+            document.getElementById('sheetTitle').textContent = item.name;
+            
+            const qtyVal = document.getElementById('sheetQtyVal');
+            if (qtyVal) qtyVal.textContent = item.quantity || 1;
+
+            const fridgeToggle = document.getElementById('sheetFridgeToggle');
+            if (fridgeToggle) {
+                fridgeToggle.checked = getFridgePreference(item.name, item.category);
+            }
+
+            document.getElementById('bottomSheetOverlay').classList.add('active');
+            document.getElementById('bottomSheet').classList.add('active');
+            document.body.classList.add('modal-open');
+        }
+
+        // ボトムシートを閉じる
+        function closeBottomSheet() {
+            document.getElementById('bottomSheetOverlay').classList.remove('active');
+            document.getElementById('bottomSheet').classList.remove('active');
+            activeSheetItemId = null;
+            document.body.classList.remove('modal-open');
+        }
+
+        // 数量切り替え関数
+        function updateSheetQty(delta) {
+            if (!activeSheetItemId) return;
+            const item = listItems.find(i => i.id === activeSheetItemId);
+            if (item) {
+                const newQty = (item.quantity || 1) + delta;
+                if (newQty >= 1) {
+                    item.quantity = newQty;
+                    const qtyVal = document.getElementById('sheetQtyVal');
+                    if (qtyVal) qtyVal.textContent = newQty;
+                    saveToStorage();
+                    render();
+                }
+            }
+        }
+
+        function updateFridgePref() {
+            if (!activeSheetItemId) return;
+            const item = listItems.find(i => i.id === activeSheetItemId);
+            if (item) {
+                const isChecked = document.getElementById('sheetFridgeToggle').checked;
+                fridgePrefsMaster[item.name] = isChecked;
+                saveToStorage();
+                render();
+            }
+        }
+
+        function triggerPriceModalFromSheet() {
+            if (!activeSheetItemId) return;
+            const targetId = activeSheetItemId;
+            
+            closeBottomSheet();
+            openPriceModal(targetId);
+        }
+
+        function deleteSheetItem() {
+            if (activeSheetItemId) {
+                deleteItem(activeSheetItemId);
+                closeBottomSheet();
+            }
+        }
+
+        function openDirectColorPicker(category, boxId) {
+            activeMenuCategory = category;
+            const picker = document.getElementById(`picker-${boxId}`);
+            if (picker) {
+                picker.style.visibility = 'visible';
+                picker.value = categoryColors[category] || '#ffffff';
+                picker.click();
+            }
+        }
+
+        function handleColorPicked(colorHex, boxId) {
+            if (!activeMenuCategory) return;
+            categoryColors[activeMenuCategory] = colorHex;
+            saveToStorage();
+            activeMenuCategory = null;
+            
+            const picker = document.getElementById(`picker-${boxId}`);
+            if (picker) picker.style.visibility = 'hidden';
+            
+            render();
+        }
+
+        let dragSrcElement = null;
+        let touchStartEl = null;
+
+        function handleDragStart(e) {
+            if (this.classList.contains('checked')) return;
+            this.classList.add('dragging');
+            dragSrcElement = this;
+            if(e.dataTransfer) {
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', this.id);
+            }
+        }
+        function handleDragOver(e) {
+            if (e.preventDefault) e.preventDefault();
+            if (this.classList.contains('checked')) return;
+            return false;
+        }
+        function handleDragEnter() {
+            if (this.classList.contains('checked') || this === dragSrcElement) return;
+            this.style.borderTop = '2px solid var(--primary-color)';
+        }
+        function handleDragLeave() { this.style.borderTop = ''; }
+        function handleDrop(e) {
+            if (e.stopPropagation) e.stopPropagation();
+            if (e.preventDefault) e.preventDefault();
+            if (dragSrcElement && dragSrcElement !== this && !this.classList.contains('checked')) {
+                const srcId = dragSrcElement.id.replace('shop-', '');
+                const targetId = this.id.replace('shop-', '');
+                reorderItemsArray(srcId, targetId);
+            }
+            return false;
+        }
+        function handleDragEnd() {
+            this.classList.remove('dragging');
+            document.querySelectorAll('.shopping-item').forEach(el => el.style.borderTop = '');
+        }
+
+        function handleTouchStart(e) {
+            if (this.classList.contains('checked')) return;
+            if (e.target.closest('.checkbox-area')) return;
+            touchStartEl = this;
+            this.classList.add('dragging');
+            dragSrcElement = this;
+        }
+        function handleTouchMove(e) {
+            if (!touchStartEl) return;
+            e.preventDefault();
+            const touch = e.touches[0];
+            const target = document.elementFromPoint(touch.clientX, touch.clientY);
+            if (!target) return;
+            const itemEl = target.closest('.shopping-item');
+            document.querySelectorAll('.shopping-item').forEach(el => el.style.borderTop = '');
+            if (itemEl && itemEl !== touchStartEl && !itemEl.classList.contains('checked')) {
+                itemEl.style.borderTop = '2px solid var(--primary-color)';
+            }
+        }
+        function handleTouchEnd(e) {
+            if (!touchStartEl) return;
+            touchStartEl.classList.remove('dragging');
+            const touch = e.changedTouches[0];
+            const target = document.elementFromPoint(touch.clientX, touch.clientY);
+            document.querySelectorAll('.shopping-item').forEach(el => el.style.borderTop = '');
+            if (target) {
+                const itemEl = target.closest('.shopping-item');
+                if (itemEl && itemEl !== touchStartEl && !itemEl.classList.contains('checked')) {
+                    const srcId = touchStartEl.id.replace('shop-', '');
+                    const targetId = itemEl.id.replace('shop-', '');
+                    reorderItemsArray(srcId, targetId);
+                }
+            }
+            touchStartEl = null;
+            dragSrcElement = null;
+        }
+
+        function reorderItemsArray(srcId, targetId) {
+            const srcIndex = listItems.findIndex(i => i.id === srcId);
+            const targetIndex = listItems.findIndex(i => i.id === targetId);
+            if (srcIndex !== -1 && targetIndex !== -1) {
+                const [movedItem] = listItems.splice(srcIndex, 1);
+                movedItem.category = listItems[targetIndex >= srcIndex ? targetIndex - 1 : targetIndex].category;
+                listItems.splice(targetIndex, 0, movedItem);
+                saveToStorage();
+                render();
+            }
+        }
+
+        let dragBoxSrc = null;
+        let touchBoxStart = null;
+
+        function handleBoxDragStart(e) {
+            if (e.target.closest('.shopping-item')) return; 
+            this.classList.add('dragging-box');
+            dragBoxSrc = this;
+            if (e.dataTransfer) e.dataTransfer.setData('text/plain', this.getAttribute('data-category'));
+        }
+        function handleBoxDragOver(e) {
+            if (e.preventDefault) e.preventDefault();
+            return false;
+        }
+        function handleBoxDragEnter() {
+            if (this === dragBoxSrc) return;
+            this.style.borderTop = '3px dashed var(--primary-color)';
+        }
+        function handleBoxDragLeave() { this.style.borderTop = ''; }
+        function handleBoxDrop(e) {
+            if (e.stopPropagation) e.stopPropagation();
+            if (dragBoxSrc && dragBoxSrc !== this) {
+                const srcCat = dragBoxSrc.getAttribute('data-category');
+                const targetCat = this.getAttribute('data-category');
+                reorderCategoryArray(srcCat, targetCat);
+            }
+            return false;
+        }
+        function handleBoxDragEnd() {
+            this.classList.remove('dragging-box');
+            document.querySelectorAll('.category-group-box').forEach(el => el.style.borderTop = '');
+        }
+
+        function handleBoxTouchStart(e) {
+            if (!e.target.closest('.drag-handle')) return;
+            touchBoxStart = this;
+            this.classList.add('dragging-box');
+            dragBoxSrc = this;
+        }
+        function handleBoxTouchMove(e) {
+            if (!touchBoxStart) return;
+            e.preventDefault();
+            const touch = e.touches[0];
+            const target = document.elementFromPoint(touch.clientX, touch.clientY);
+            if (!target) return;
+            const boxEl = target.closest('.category-group-box');
+            document.querySelectorAll('.category-group-box').forEach(el => el.style.borderTop = '');
+            if (boxEl && boxEl !== touchBoxStart) {
+                boxEl.style.borderTop = '3px dashed var(--primary-color)';
+            }
+        }
+        function handleBoxTouchEnd(e) {
+            if (!touchBoxStart) return;
+            touchBoxStart.classList.remove('dragging-box');
+            const touch = e.changedTouches[0];
+            const target = document.elementFromPoint(touch.clientX, touch.clientY);
+            document.querySelectorAll('.category-group-box').forEach(el => el.style.borderTop = '');
+            if (target) {
+                const boxEl = target.closest('.category-group-box');
+                if (boxEl && boxEl !== touchBoxStart) {
+                    const srcCat = touchBoxStart.getAttribute('data-category');
+                    const targetCat = boxEl.getAttribute('data-category');
+                    reorderCategoryArray(srcCat, targetCat);
+                }
+            }
+            touchBoxStart = null;
+            dragBoxSrc = null;
+        }
+
+        function reorderCategoryArray(srcCat, targetCat) {
+            const srcIdx = categoryOrder.indexOf(srcCat);
+            const targetIdx = categoryOrder.indexOf(targetCat);
+            if (srcIdx !== -1 && targetIdx !== -1) {
+                const [moved] = categoryOrder.splice(srcIdx, 1);
+                categoryOrder.splice(targetIdx, 0, moved);
+                saveToStorage();
+                render();
+            }
+        }
+
+        function getLightenColor(hex, opacity = 0.15) {
+            if (!hex || hex === '#ffffff') return 'var(--panel-bg)';
+            hex = hex.replace('#', '');
+            if (hex.length === 3) {
+                hex = hex.split('').map(s => s + s).join('');
+            }
+            const r = parseInt(hex.substring(0, 2), 16);
+            const g = parseInt(hex.substring(2, 4), 16);
+            const b = parseInt(hex.substring(4, 6), 16);
+            return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+        }
+
+        function render() {
+            const mainListContainer = document.getElementById('listContainer');
+            const historyGrid = document.getElementById('historyGrid');
+            const totalPriceEl = document.getElementById('totalPrice');
+            const fixedActions = document.getElementById('fixedBottomActions');
+            
+            mainListContainer.innerHTML = '';
+            historyGrid.innerHTML = '';
+
+            if (listItems.length === 0) {
+                mainListContainer.innerHTML = '<div style="text-align:center; color:gray; padding:24px; font-size:0.9rem; font-weight:600;">リストは空っぽです</div>';
+                fixedActions.style.display = 'none';
+                document.getElementById('historyPanel').style.display = itemMaster.length > 0 ? 'block' : 'none';
+                renderHistoryOnly();
+                return;
+            } else {
+                fixedActions.style.display = 'flex';
+            }
+
+            const uncompletedItems = listItems.filter(i => !i.isChecked);
+            const completedItems = listItems.filter(i => i.isChecked);
+            const activeCategories = [...new Set(uncompletedItems.map(i => i.category))];
+
+            activeCategories.forEach(c => {
+                if (c !== 'なし' && !categoryOrder.includes(c)) {
+                    categoryOrder.push(c);
+                }
+            });
+
+            itemMaster.forEach(m => {
+                if (m.category && m.category !== 'なし' && !categoryOrder.includes(m.category)) {
+                    categoryOrder.push(m.category);
+                }
+            });
+
+            const sortedCategories = categoryOrder.filter(c => activeCategories.includes(c));
+            if (activeCategories.includes('なし')) {
+                sortedCategories.push('なし');
+            }
+
+            let totalPrice = 0;
+
+            function createItemElement(item) {
+                const qty = item.quantity || 1;
+                
+                if (item.isChecked) totalPrice += (item.price * qty);
+
+                const div = document.createElement('div');
+                div.id = `shop-${item.id}`;
+                div.className = `shopping-item ${item.isChecked ? 'checked' : ''}`;
+                
+                if (!item.isChecked) {
+                    div.draggable = true;
+                    div.addEventListener('dragstart', handleDragStart, false);
+                    div.addEventListener('dragenter', handleDragEnter, false);
+                    div.addEventListener('dragover', handleDragOver, false);
+                    div.addEventListener('dragleave', handleDragLeave, false);
+                    div.addEventListener('drop', handleDrop, false);
+                    div.addEventListener('dragend', handleDragEnd, false);
+                    div.addEventListener('touchstart', handleTouchStart, {passive: false});
+                    div.addEventListener('touchmove', handleTouchMove, {passive: false});
+                    div.addEventListener('touchend', handleTouchEnd, false);
+                }
+
+                div.style.animation = 'fadeInItem 0.25s ease-out forwards';
+                
+                let priceText = '';
+                if (item.price > 0) {
+                    priceText = `￥${(item.price * qty).toLocaleString()}`;
+                }
+                const qtyText = qty > 1 ? ` <span style="font-size:0.8rem; color:var(--sub-text); font-weight:normal;">(${qty}個)</span>` : '';
+                
+                const isFridgeOn = getFridgePreference(item.name, item.category);
+                const badgeText = isFridgeOn ? '<span style="font-size:0.75rem; color:var(--primary-color); margin-left:4px;"></span>' : '';
+
+                div.innerHTML = `
+                    <div class="checkbox-area" onclick="event.stopPropagation(); toggleCheck('${item.id}')">
+                        <div class="checkbox">
+                            <span class="material-icons-round">done</span>
+                        </div>
+                    </div>
+                    <div class="item-info" onclick="openBottomSheet('${item.id}')">
+                        <span class="item-name">${item.name}${qtyText}${badgeText}</span>
+                        <span class="item-price">${priceText}</span>
+                    </div>
+                `;
+                return div;
+            }
+
+            sortedCategories.forEach((cat, index) => {
+                const boxId = `box-${index}`;
+                const box = document.createElement('div');
+                box.className = 'category-group-box';
+                box.setAttribute('data-category', cat);
+
+                box.draggable = true;
+                box.addEventListener('dragstart', handleBoxDragStart, false);
+                box.addEventListener('dragover', handleBoxDragOver, false);
+                box.addEventListener('dragenter', handleBoxDragEnter, false);
+                box.addEventListener('dragleave', handleBoxDragLeave, false);
+                box.addEventListener('drop', handleBoxDrop, false);
+                box.addEventListener('dragend', handleBoxDragEnd, false);
+                box.addEventListener('touchstart', handleBoxTouchStart, {passive: false});
+                box.addEventListener('touchmove', handleBoxTouchMove, {passive: false});
+                box.addEventListener('touchend', handleBoxTouchEnd, false);
+
+                if (categoryColors[cat]) {
+                    box.style.backgroundColor = categoryColors[cat];
+                    box.style.boxShadow = 'none';
+                }
+
+                const header = document.createElement('div');
+                header.className = 'category-group-header';
+                
+                const titleText = cat === 'なし' ? 'その他' : cat;
+                
+                header.innerHTML = `
+                    <div class="header-left-zone">
+                        <span class="material-icons-round drag-handle">drag_indicator</span>
+                        <span class="category-title-text">${titleText}</span>
+                    </div>
+                `;
+
+                if (cat !== 'なし') {
+                    const menuBtn = document.createElement('button');
+                    menuBtn.className = 'color-palette-btn';
+                    menuBtn.innerHTML = '<span class="material-icons-round" style="font-size: 1.15rem;">palette</span>';
+                    menuBtn.title = 'カテゴリの色を変更';
+                    menuBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        openDirectColorPicker(cat, boxId);
+                    };
+                    header.appendChild(menuBtn);
+
+                    const inlinePicker = document.createElement('input');
+                    inlinePicker.type = 'color';
+                    inlinePicker.id = `picker-${boxId}`;
+                    inlinePicker.className = 'inline-color-input';
+                    inlinePicker.onchange = (e) => handleColorPicked(e.target.value, boxId);
+                    header.appendChild(inlinePicker);
+                }
+                box.appendChild(header);
+
+                const subList = document.createElement('div');
+                subList.className = 'shopping-list';
+
+                const catItems = uncompletedItems.filter(i => i.category === cat);
+                catItems.forEach(item => {
+                    subList.appendChild(createItemElement(item));
+                });
+
+                box.appendChild(subList);
+                mainListContainer.appendChild(box);
+            });
+
+            if (completedItems.length > 0) {
+                const compBox = document.createElement('div');
+                compBox.style.marginTop = '18px';
+                
+                const compHeader = document.createElement('div');
+                compHeader.className = 'category-group-header';
+                compHeader.style.color = 'var(--sub-text)';
+                compHeader.style.marginBottom = '6px';
+                compHeader.style.paddingLeft = '8px';
+                compHeader.textContent = 'カゴに入れたもの';
+                compBox.appendChild(compHeader);
+                
+                const compList = document.createElement('div');
+                compList.className = 'shopping-list';
+                completedItems.forEach(item => {
+                    compList.appendChild(createItemElement(item));
+                });
+                compBox.appendChild(compList);
+                mainListContainer.appendChild(compBox);
+            }
+
+            totalPriceEl.textContent = `￥${totalPrice.toLocaleString()}`;
+            renderHistoryGrid();
+        }
+
+        function renderHistoryOnly() {
+            document.getElementById('totalPrice').textContent = '￥0';
+            renderHistoryGrid();
+        }
+
+        function renderHistoryGrid() {
+            const historyGrid = document.getElementById('historyGrid');
+            if (itemMaster.length > 0) {
+                document.getElementById('historyPanel').style.display = 'block';
+                itemMaster.forEach(m => {
+                    const chip = document.createElement('button');
+                    chip.className = 'history-chip';
+                    chip.onclick = () => addFromHistory(m.name, m.price, m.category);
+                    
+                    let bgStyle = 'var(--panel-bg)';
+                    if (m.category && categoryColors[m.category]) {
+                        bgStyle = getLightenColor(categoryColors[m.category], 0.3);
+                    }
+                    chip.style.backgroundColor = bgStyle;
+
+                    chip.innerHTML = `
+                        <span>${m.name}</span>
+                        <span style="margin-left:6px; color:var(--sub-text); font-size:1.1rem; display:flex; align-items:center; opacity:0.6;" onclick="deleteMaster('${m.name}')">×</span>
+                    `;
+                    historyGrid.appendChild(chip);
+                });
+            } else {
+                document.getElementById('historyPanel').style.display = 'none';
+            }
+        }
+
+        render();
+
+        let currentEditingItemId = null;
+
+        // 編集モーダルのHTML
+        const modalHtml = `
+            <div class="modal" id="priceModal">
+                <div class="modal-content">
+                    <h3 id="priceModalTitle" style="margin:0 0 4px 0; font-size:1.1rem; font-weight:700;">商品の編集</h3>
+                    
+                    <label style="font-size:0.85rem; font-weight:600; margin-bottom:4px; display:block;">単価 (￥)</label>
+                    <input type="number" id="modalPriceInput" placeholder="単価を入力" inputmode="numeric" style="width:100%; padding:12px; margin-bottom:12px;">
+                    
+                    <label style="font-size:0.85rem; font-weight:600; margin-bottom:4px; display:block;">個数</label>
+                    <input type="number" id="modalQtyInput" placeholder="個数を入力" min="1" inputmode="numeric" style="width:100%; padding:12px; margin-bottom:16px;">
+                    
+                    <div style="display:flex; gap:10px; width:100%;">
+                        <button class="menu-option" onclick="closePriceModal()" style="flex:1; background:var(--history-bg); justify-content:center;">キャンセル</button>
+                        <button class="modal-close-btn" onclick="savePriceModal()" style="flex:1; margin:0; justify-content:center; display:flex; align-items:center;">保存する</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+        function openPriceModal(id) {
+            const item = listItems.find(i => i.id === id);
+            if (!item) return;
+
+            currentEditingItemId = id;
+            document.getElementById('priceModalTitle').textContent = `「${item.name}」の編集`;
+            document.getElementById('modalPriceInput').value = item.price || '';
+            document.getElementById('modalQtyInput').value = item.quantity || 1;
+            document.getElementById('priceModal').style.display = 'flex';
+            
+            setTimeout(() => document.getElementById('modalPriceInput').focus(), 50);
+            document.body.classList.add('modal-open');
+        }
+
+        function closePriceModal() {
+            document.getElementById('priceModal').style.display = 'none';
+            currentEditingItemId = null;
+            document.body.classList.remove('modal-open');
+        }
+
+        function savePriceModal() {
+            if (!currentEditingItemId) return;
+            
+            const item = listItems.find(i => i.id === currentEditingItemId);
+            const priceVal = document.getElementById('modalPriceInput').value.trim();
+            const qtyVal = document.getElementById('modalQtyInput').value.trim();
+            
+            if (item) {
+                const newPrice = parseInt(priceVal, 10) || 0;
+                const newQty = parseInt(qtyVal, 10) || 1;
+                
+                if (newPrice < 0 || newQty < 1) {
+                    alert("⚠️ 単価は0以上、個数は1以上の数字を入力してください。");
+                    return;
+                }
+                item.price = newPrice;
+                item.quantity = newQty;
+
+                const master = itemMaster.find(m => m.name === item.name);
+                if (master) master.price = newPrice;
+
+                saveToStorage();
+                render();
+            }
+            closePriceModal();
+        }
+        
+        function openHelpModal() {
+            document.getElementById('helpModal').style.display = 'flex';
+            document.body.classList.add('modal-open');
+        }
+        function closeHelpModal() {
+            document.getElementById('helpModal').style.display = 'none';
+            document.body.classList.remove('modal-open');
+        }
+
+        function checkFirstVisitHelp() {
+            const hasVisited = localStorage.getItem('has_visited_shopping_help') === 'true';
+            if (!hasVisited) {
+                openHelpModal();
+                localStorage.setItem('has_visited_shopping_help', 'true');
+            }
+        }
+
+        checkFirstVisitHelp();
+    </script>
+</body>
+</html>
